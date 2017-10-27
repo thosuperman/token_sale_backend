@@ -24,17 +24,17 @@ module.exports = {
   },
 
   attributes: {
-    phone: { type: 'string', required: true, phoneNumber: true },
+    phone: { type: 'string', phoneNumber: true },
 
     userName: { type: 'string', required: true, alphanumericdashed: true },
 
     userNameOrigin: { type: 'string' },
 
-    email: { type: 'string', email: true },
+    email: { type: 'string', required: true, email: true },
 
-    firstName: { type: 'string', required: true },
+    firstName: { type: 'string', required: true, alpha: true },
 
-    lastName: { type: 'string', required: true },
+    lastName: { type: 'string', required: true, alpha: true },
 
     ethereumAddress: { type: 'string', ethereumAddress: true, required: true },
 
@@ -61,7 +61,10 @@ module.exports = {
   indexes: [
     {
       attributes: { phone: 1 },
-      options: { unique: true }
+      options: {
+        unique: true,
+        partialFilterExpression: {phone: {$exists: true}}
+      }
     }, {
       attributes: { userName: 1 },
       options: { unique: true }
