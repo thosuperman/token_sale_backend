@@ -53,9 +53,13 @@ module.exports.policies = {
   UserController: {
     '*': ['isMyProfile'],
     create: true,
-    destroy: false,
+    destroy: true,
     // Remove this laater
     find: true,
     findOne: true
+  },
+
+  RegistrationController: {
+    userInfo: true
   }
 };

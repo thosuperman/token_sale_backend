@@ -36,11 +36,15 @@ module.exports = {
 
     lastName: { type: 'string', required: true, alpha: true },
 
-    ethereumAddress: { type: 'string', ethereumAddress: true, required: true },
+    ethereumAddress: { type: 'string', ethereumAddress: true },
 
     role: { type: 'string', in: rolesList, defaultsTo: roles.user },
 
     encryptedPassword: { type: 'string' },
+
+    twoFactorSecret: { type: 'string' },
+
+    enabled: {type: 'boolean', defaultsTo: false},
 
     toJSON: function () {
       var obj = this.toObject();
@@ -48,6 +52,7 @@ module.exports = {
       obj.userName = obj.userNameOrigin;
       delete obj.userNameOrigin;
       delete obj.encryptedPassword;
+      delete obj.twoFactorSecret;
 
       return obj;
     }

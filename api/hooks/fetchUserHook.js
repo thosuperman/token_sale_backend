@@ -29,7 +29,10 @@ module.exports = function sessionTokenHook (sails) {
               }
 
               if (!user) {
-                return res.json(401, {message: 'Could not find user in session!'});
+                sails.log.warn('Could not find user in session with id', userId);
+                delete req.session.userId;
+
+                return next();
               }
 
               req.user = user;
