@@ -20,6 +20,11 @@
  * http://sailsjs.org/#!/documentation/concepts/Routes/RouteTargetSyntax.html
  */
 
+// /* global sails */
+
+// const {blueprints} = require('./blueprints');
+// const prefix = blueprints.prefix || '';
+
 module.exports.routes = {
 
   /***************************************************************************
@@ -49,4 +54,6 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
+  // [`${prefix}/custom`]: {controller: 'User', action: 'find'},
+  // '/routes': (req, res) => res.ok(sails.config.routes)
 };
