@@ -7,6 +7,9 @@
 
 /* global User */
 
+const speakeasy = require('speakeasy');
+const qrcode = require('qrcode');
+
 module.exports = {
 
   /**
@@ -36,17 +39,69 @@ module.exports = {
    * `RegistrationController.ethereumAddress()`
    */
   ethereumAddress: function (req, res) {
-    return res.json({
-      todo: 'ethereumAddress() is not implemented yet!'
-    });
+    let allParams = req.allParams();
+    const {ethereumAddress} = allParams;
+
+    User.update({id: req.user.id}, {ethereumAddress})
+      .then(records => {
+        if (records && records[0]) {
+          req.user = records[0];
+        } else {
+          let err = new Error('User was not update in db');
+          err.status = 400;
+          return Promise.reject(err);
+        }
+
+        return req.user;
+      })
+      .then(result => res.ok(result))
+      .catch(err => res.negotiate(err));
   },
 
   /**
-   * `RegistrationController.Confirm()`
+   * `RegistrationController.generateQRCode()`
    */
-  Confirm: function (req, res) {
+  generateQRCode: function (req, res) {
+    if (req.user.enabled) {
+      return res.badRequest({
+        message: 'Two factor authentication already enabled for user'
+      });
+    }
+
+    const secret = speakeasy.generateSecret();
+
+    User.update({id: req.user.id}, {twoFactorSecret: secret.base32})
+      .then(records => {
+        if (records && records[0]) {
+          req.user = records[0];
+        } else {
+          let err = new Error('User was not update in db');
+          err.status = 400;
+          return Promise.reject(err);
+        }
+
+        return new Promise((resolve, reject) => qrcode.toDataURL(secret.otpauth_url, (err, url) => {
+          if (err) {
+            return reject(err);
+          }
+
+          return resolve(url);
+        }));
+      })
+      .then(url => ({
+        qrcode: url,
+        key: secret.base32
+      }))
+      .then(result => res.ok(result))
+      .catch(err => res.negotiate(err));
+  },
+
+  /**
+   * `RegistrationController.confirmQRCode()`
+   */
+  confirmQRCode: function (req, res) {
     return res.json({
-      todo: 'Confirm() is not implemented yet!'
+      todo: 'confirmQRCode() is not implemented yet!'
     });
   }
 };
