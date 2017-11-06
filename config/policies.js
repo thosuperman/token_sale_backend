@@ -60,6 +60,7 @@ module.exports.policies = {
   },
 
   RegistrationController: {
+    '*': ['isUserNotEnabled'],
     userInfo: true
   }
 };

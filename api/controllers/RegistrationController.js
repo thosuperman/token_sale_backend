@@ -62,12 +62,6 @@ module.exports = {
    * `RegistrationController.generateQRCode()`
    */
   generateQRCode: function (req, res) {
-    if (req.user.enabled) {
-      return res.badRequest({
-        message: 'Two factor authentication already enabled for user'
-      });
-    }
-
     const secret = speakeasy.generateSecret();
 
     User.update({id: req.user.id}, {twoFactorSecret: secret.base32})
@@ -100,8 +94,38 @@ module.exports = {
    * `RegistrationController.confirmQRCode()`
    */
   confirmQRCode: function (req, res) {
-    return res.json({
-      todo: 'confirmQRCode() is not implemented yet!'
+    if (!req.user.twoFactorSecret) {
+      return res.badRequest({
+        message: 'User do not have generated secret QR Code'
+      });
+    }
+
+    const {token} = req.allParams();
+    const verified = speakeasy.totp.verify({
+      secret: req.user.twoFactorSecret,
+      encoding: 'base32',
+      token
     });
+
+    if (!verified) {
+      return res.badRequest({
+        message: 'Token verification fails'
+      });
+    }
+
+    User.update({id: req.user.id}, {enabled: true})
+      .then(records => {
+        if (records && records[0]) {
+          req.user = records[0];
+        } else {
+          let err = new Error('User was not update in db');
+          err.status = 400;
+          return Promise.reject(err);
+        }
+
+        return req.user;
+      })
+      .then(result => res.ok(result))
+      .catch(err => res.negotiate(err));
   }
 };

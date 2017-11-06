@@ -7,8 +7,12 @@
 
 module.exports = function (req, res, next) {
   // req.user creates in fetchUserHook
-  if (!(req.user && req.user.enabled)) {
-    return res.json(401, {message: 'User is not authorized'});
+  if (!req.user) {
+    return res.json(401, {message: 'User not start the registration'});
+  }
+
+  if (req.user.enabled) {
+    return res.json(401, {message: 'User is already registered'});
   }
 
   return next();
