@@ -64,8 +64,11 @@ module.exports = {
    * `AuthController.logout()`
    */
   logout: function (req, res) {
-    return res.json({
-      todo: 'logout() is not implemented yet!'
+    req.session.destroy();
+    req.user = null;
+
+    return res.ok({
+      message: 'User is loged out'
     });
   }
 };
