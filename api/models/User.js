@@ -89,38 +89,33 @@ module.exports = {
       values.email = values.email.toLowerCase();
     }
 
-    return cb();
-  },
-
-  beforeCreate: function (values, cb) {
-    let password = values.password;
-
-    delete values.password;
-
-    if (!password) {
-      if (sails.config.environment === 'development') {
-        // Password for development purposes
-        password = 'qwer1234';
-      } else {
-        return cb(new WLError({status: 400, reason: 'Password must be set'}));
-      }
-    }
-
-    bcrypt.genSalt(10, function (err, salt) {
-      if (err) {
-        return cb(err);
-      }
-
-      bcrypt.hash(password, salt, function (err, hash) {
+    if (values.password) {
+      return bcrypt.genSalt(10, function (err, salt) {
         if (err) {
           return cb(err);
         }
 
-        values.encryptedPassword = hash;
+        bcrypt.hash(values.password, salt, function (err, hash) {
+          if (err) {
+            return cb(err);
+          }
 
-        return cb();
+          values.encryptedPassword = hash;
+
+          return cb();
+        });
       });
-    });
+    }
+
+    return cb();
+  },
+
+  beforeCreate: function (values, cb) {
+    if (!values.password) {
+      return cb(new WLError({status: 400, reason: 'Password must be set'}));
+    }
+
+    return cb();
   },
 
   comparePassword: function (password, user, cb) {

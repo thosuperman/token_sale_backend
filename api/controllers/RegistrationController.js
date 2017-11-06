@@ -24,7 +24,20 @@ module.exports = {
     //
     // delete allParams.confirmPassword
 
-    User.create(allParams)
+    let promise = User.create(allParams);
+
+    if (req.user) {
+      if (req.user.enabled) {
+        return res.badRequest({
+          message: 'Looks like user is already registered. Logout first'
+        });
+      } else {
+        promise = User.update({id: req.user.id}, allParams)
+        .then(recors => recors[0]);
+      }
+    }
+
+    return promise
       .then(user => {
         req.session.userId = user.id;
         req.user = user;
