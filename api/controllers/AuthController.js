@@ -17,6 +17,18 @@ module.exports = {
   login: function (req, res) {
     const {userName, password, token} = req.allParams();
 
+    if (!userName) {
+      return res.badRequest({ message: 'Username can not be empty' });
+    }
+
+    if (!password) {
+      return res.badRequest({ message: 'Password can not be empty ' });
+    }
+
+    if (!token) {
+      return res.badRequest({ message: 'Google Authenticator Code can not be empty' });
+    }
+
     User.findOne({userName: userName.toLowerCase(), enabled: true})
       .exec((err, user) => {
         if (err) {
