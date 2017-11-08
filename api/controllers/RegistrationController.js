@@ -55,6 +55,12 @@ module.exports = {
     let allParams = req.allParams();
     const {ethereumAddress} = allParams;
 
+    if (typeof ethereumAddress === 'undefined') {
+      let err = new Error('EthereumAddress must be set');
+      err.status = 400;
+      return res.badRequest(err);
+    }
+
     User.update({id: req.user.id}, {ethereumAddress})
       .then(records => {
         if (records && records[0]) {
