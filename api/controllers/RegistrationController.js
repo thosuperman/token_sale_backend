@@ -55,7 +55,7 @@ module.exports = {
     let allParams = req.allParams();
     const {ethereumAddress} = allParams;
 
-    if (typeof ethereumAddress === 'undefined') {
+    if (!ethereumAddress) {
       let err = new Error('EthereumAddress must be set');
       err.status = 400;
       return res.badRequest(err);
