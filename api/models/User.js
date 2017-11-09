@@ -24,13 +24,13 @@ module.exports = {
   },
 
   attributes: {
-    phone: { type: 'string', phoneNumber: true },
+    phone: { type: 'string', unique: true, phoneNumber: true },
 
-    userName: { type: 'string', required: true, alphanumericdashed: true },
+    userName: { type: 'string', unique: true, required: true, alphanumericdashed: true },
 
     userNameOrigin: { type: 'string' },
 
-    email: { type: 'string', required: true, email: true },
+    email: { type: 'string', unique: true, required: true, email: true },
 
     firstName: { type: 'string', required: true, alpha: true },
 
@@ -61,6 +61,41 @@ module.exports = {
   types: {
     phoneNumber: value => ValidationService.phoneNumber(value),
     ethereumAddress: value => ValidationService.address(value)
+  },
+
+  validationMessages: {
+    phone: {
+      phoneNumber: 'Provide valid phone number',
+      unique: 'Phone number is already taken'
+    },
+    userName: {
+      required: 'Username is required',
+      alphanumericdashed: 'Provide valid username',
+      unique: 'Username is already taken'
+    },
+    email: {
+      required: 'Email is required',
+      email: 'Provide valid email',
+      unique: 'Email is already taken'
+    },
+    firstName: {
+      required: 'First name is required',
+      alpha: 'Provide valid first name'
+    },
+    lastName: {
+      required: 'Last name is required',
+      alpha: 'Provide valid last name'
+    },
+    ethereumAddress: {
+      required: 'Ethereum address is required',
+      ethereumAddress: 'Provide valid Ethereum Address'
+    },
+    encryptedPassword: {
+      required: 'Password is required'
+    },
+    twoFactorSecret: {
+      required: 'Two factor secret is required'
+    }
   },
 
   indexes: [

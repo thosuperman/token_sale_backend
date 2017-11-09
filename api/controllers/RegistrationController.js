@@ -34,11 +34,11 @@ module.exports = {
     let allParamsKeys = Object.keys(allParams);
 
     User.validate(allParams, err => {
-      if (err && err.invalidAttributes) {
-        let errors = _.pick(err.invalidAttributes, allParamsKeys);
+      if (err && err.Errors) {
+        let errors = _.pick(err.Errors, allParamsKeys);
 
         if (!_.isEmpty(errors)) {
-          return res.badRequest({invalidAttributes: errors});
+          return res.badRequest({Errors: errors});
         }
       }
 
@@ -54,7 +54,7 @@ module.exports = {
 
           err.status = 400;
 
-          err.invalidAttributes = results.reduce((previous, current, index) => {
+          err.Errors = results.reduce((previous, current, index) => {
             if (current) {
               let key = allParamsKeys[index];
               previous[key] = {message: `User whitch such ${key} is already exists`};
@@ -111,11 +111,11 @@ module.exports = {
       });
     }
 
-    const {token} = req.allParams();
+    let allParams = req.allParams();
     const verified = speakeasy.totp.verify({
       secret: twoFactorSecret,
       encoding: 'base32',
-      token
+      token: allParams.token
     });
 
     if (!verified) {
@@ -123,8 +123,6 @@ module.exports = {
         message: 'Token verification fails'
       });
     }
-
-    let allParams = req.allParams();
 
     // if (allParams.password !== allParams.confirmPassword) {
     //   return res.badRequest({message: 'Password doesn\'t match, What a shame!'})
