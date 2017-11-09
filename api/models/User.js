@@ -36,15 +36,15 @@ module.exports = {
 
     lastName: { type: 'string', required: true, alpha: true },
 
-    ethereumAddress: { type: 'string', ethereumAddress: true },
+    ethereumAddress: { type: 'string', required: true, ethereumAddress: true },
 
     role: { type: 'string', in: rolesList, defaultsTo: roles.user },
 
-    encryptedPassword: { type: 'string' },
+    encryptedPassword: { type: 'string', required: true },
 
-    twoFactorSecret: { type: 'string' },
+    twoFactorSecret: { type: 'string', required: true },
 
-    enabled: {type: 'boolean', defaultsTo: false},
+    enabled: {type: 'boolean', defaultsTo: true},
 
     toJSON: function () {
       var obj = this.toObject();
@@ -129,7 +129,7 @@ module.exports = {
   },
 
   findOneUnique: function (identifier, cb) {
-    this.findOne({$or: [
+    this.findOne({or: [
         {phone: identifier},
         {userName: identifier.toLowerCase()},
         {email: identifier.toLowerCase()}

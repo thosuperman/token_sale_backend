@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global User */
+/* global _ User */
 
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
@@ -13,94 +13,84 @@ const qrcode = require('qrcode');
 module.exports = {
 
   /**
-   * `RegistrationController.userInfo()`
+   * `RegistrationController.checkUserInfo()`
    */
-  userInfo: function (req, res) {
-    let allParams = req.allParams();
+  checkUserInfo: function (req, res) {
+    let {userName, email, phone} = req.allParams();
 
-    // if (allParams.password !== allParams.confirmPassword) {
-    //   return res.badRequest({message: 'Password doesn\'t match, What a shame!'})
-    // }
-    //
-    // delete allParams.confirmPassword
+    if ([userName, email, phone].every(p => !p)) {
+      return res.badRequest({
+        message: 'Some of userName, email, phone parameters must be set'
+      });
+    }
 
-    let promise = User.create(allParams);
-
-    if (req.user) {
-      if (req.user.enabled) {
-        return res.badRequest({
-          message: 'Looks like user is already registered. Logout first'
-        });
-      } else {
-        promise = User.update({id: req.user.id}, allParams)
-        .then(recors => recors[0]);
+    let temp = {userName, email, phone};
+    let allParams = Object.keys(temp).reduce((result, el) => {
+      if (temp[el]) {
+        result[el] = temp[el].toLowerCase();
       }
-    }
+      return result;
+    }, {});
+    let allParamsKeys = Object.keys(allParams);
 
-    return promise
-      .then(user => {
-        req.session.userId = user.id;
-        req.user = user;
+    User.validate(allParams, err => {
+      if (err && err.invalidAttributes) {
+        let errors = _.pick(err.invalidAttributes, allParamsKeys);
 
-        return user;
-      })
-      .then(result => res.ok(result))
-      .catch(err => res.negotiate(err));
-  },
-
-  /**
-   * `RegistrationController.ethereumAddress()`
-   */
-  ethereumAddress: function (req, res) {
-    let allParams = req.allParams();
-    const {ethereumAddress} = allParams;
-
-    if (!ethereumAddress) {
-      let err = new Error('EthereumAddress must be set');
-      err.status = 400;
-      return res.badRequest(err);
-    }
-
-    User.update({id: req.user.id}, {ethereumAddress})
-      .then(records => {
-        if (records && records[0]) {
-          req.user = records[0];
-        } else {
-          let err = new Error('User was not update in db');
-          err.status = 400;
-          return Promise.reject(err);
+        if (!_.isEmpty(errors)) {
+          return res.badRequest({invalidAttributes: errors});
         }
+      }
 
-        return req.user;
-      })
-      .then(result => res.ok(result))
-      .catch(err => res.negotiate(err));
+      return Promise.all(
+        allParamsKeys.map(key => User.findOne({[key]: allParams[key]}))
+      )
+        .then(results => {
+          if (results.every(r => !r)) {
+            return {message: `No users with ${allParamsKeys.join(', ')} attributes`};
+          }
+
+          let err = new Error(`User with some of ${allParamsKeys.join(', ')} attributes is already exists`);
+
+          err.status = 400;
+
+          err.invalidAttributes = results.reduce((previous, current, index) => {
+            if (current) {
+              let key = allParamsKeys[index];
+              previous[key] = {message: `User whitch such ${key} is already exists`};
+            }
+
+            return previous;
+          }, {});
+
+          return Promise.reject(err);
+        })
+        .then(result => res.ok(result))
+        .catch(err => res.negotiate(err));
+    });
   },
 
   /**
    * `RegistrationController.generateQRCode()`
    */
   generateQRCode: function (req, res) {
+    if (req.user && req.user.enabled) {
+      return res.badRequest({
+        message: 'Looks like user is already registered. Logout first'
+      });
+    }
+
     const secret = speakeasy.generateSecret();
 
-    User.update({id: req.user.id}, {twoFactorSecret: secret.base32})
-      .then(records => {
-        if (records && records[0]) {
-          req.user = records[0];
-        } else {
-          let err = new Error('User was not update in db');
-          err.status = 400;
-          return Promise.reject(err);
-        }
+    return new Promise((resolve, reject) => qrcode.toDataURL(secret.otpauth_url, (err, url) => {
+      if (err) {
+        return reject(err);
+      }
 
-        return new Promise((resolve, reject) => qrcode.toDataURL(secret.otpauth_url, (err, url) => {
-          if (err) {
-            return reject(err);
-          }
+      req.session.twoFactorSecret = secret.base32;
 
-          return resolve(url);
-        }));
-      })
+      return resolve(url);
+    }))
       .then(url => ({
         qrcode: url,
         key: secret.base32
@@ -110,10 +100,12 @@ module.exports = {
   },
 
   /**
-   * `RegistrationController.confirmQRCode()`
+   * `RegistrationController.confirm()`
    */
-  confirmQRCode: function (req, res) {
-    if (!req.user.twoFactorSecret) {
+  confirm: function (req, res) {
+    const twoFactorSecret = req.session.twoFactorSecret;
+
+    if (!twoFactorSecret) {
       return res.badRequest({
         message: 'User do not have generated secret QR Code'
       });
@@ -121,7 +113,7 @@ module.exports = {
 
     const {token} = req.allParams();
     const verified = speakeasy.totp.verify({
-      secret: req.user.twoFactorSecret,
+      secret: twoFactorSecret,
       encoding: 'base32',
       token
     });
@@ -132,17 +124,25 @@ module.exports = {
       });
     }
 
-    User.update({id: req.user.id}, {enabled: true})
-      .then(records => {
-        if (records && records[0]) {
-          req.user = records[0];
-        } else {
-          let err = new Error('User was not update in db');
-          err.status = 400;
-          return Promise.reject(err);
-        }
+    let allParams = req.allParams();
 
-        return req.user;
+    // if (allParams.password !== allParams.confirmPassword) {
+    //   return res.badRequest({message: 'Password doesn\'t match, What a shame!'})
+    // }
+    //
+    // delete allParams.confirmPassword
+
+    delete allParams.role;
+
+    Object.assign(allParams, {twoFactorSecret});
+
+    User.create(allParams)
+      .then(user => {
+        delete req.session.twoFactorSecret;
+        req.session.userId = user.id;
+        req.user = user;
+
+        return user;
       })
       .then(result => res.ok(result))
       .catch(err => res.negotiate(err));
