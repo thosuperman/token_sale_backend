@@ -57,7 +57,7 @@ module.exports = {
           err.Errors = results.reduce((previous, current, index) => {
             if (current) {
               let key = allParamsKeys[index];
-              previous[key] = {message: `User whitch such ${key} is already exists`};
+              previous[key] = [{message: `User whitch such ${key} is already exists`}];
             }
 
             return previous;
