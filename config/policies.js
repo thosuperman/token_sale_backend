@@ -59,6 +59,10 @@ module.exports.policies = {
     findOne: true
   },
 
+  CountriesController: {
+    '*': true
+  },
+
   RegistrationController: {
     '*': true
   },
