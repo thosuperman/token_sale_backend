@@ -51,7 +51,7 @@ module.exports.policies = {
   '*': ['isAuthorized'],
 
   UserController: {
-    '*': ['isMyProfile'],
+    '*': ['isAuthorized', 'isMyProfile'],
     create: true,
     destroy: true,
     // Remove this laater
@@ -64,6 +64,7 @@ module.exports.policies = {
   },
 
   AuthController: {
+    '*': ['isAuthorized'],
     login: true
   }
 };
