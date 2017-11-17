@@ -5,7 +5,7 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global _ sails ValidationService */
+/* global _ ValidationService CountriesService */
 
 const bcrypt = require('bcrypt');
 
@@ -36,6 +36,10 @@ module.exports = {
 
     lastName: { type: 'string', required: true, alpha: true },
 
+    country: { type: 'string', required: true, in: CountriesService.list.map(el => el.countryCode) },
+
+    nationality: { type: 'string', required: true, in: CountriesService.list.map(el => el.countryCode) },
+
     ethereumAddress: { type: 'string', required: true, ethereumAddress: true },
 
     role: { type: 'string', in: rolesList, defaultsTo: roles.user },
@@ -53,6 +57,16 @@ module.exports = {
       delete obj.userNameOrigin;
       delete obj.encryptedPassword;
       delete obj.twoFactorSecret;
+
+      if (obj.country) {
+        obj.countryFlag = CountriesService.flagImg(obj.country);
+        obj.countryName = CountriesService.collection[obj.country].name;
+      }
+
+      if (obj.nationality) {
+        obj.nationalityFlag = CountriesService.flagImg(obj.nationality);
+        obj.nationalityName = CountriesService.collection[obj.nationality].name;
+      }
 
       return obj;
     }
@@ -85,6 +99,14 @@ module.exports = {
     lastName: {
       required: 'Last name is required',
       alpha: 'Provide valid last name'
+    },
+    country: {
+      required: 'Country is required',
+      in: 'Provide valid country'
+    },
+    nationality: {
+      required: 'Nationality is required',
+      in: 'Provide valid nationality'
     },
     ethereumAddress: {
       required: 'Ethereum address is required',
