@@ -29,7 +29,14 @@ module.exports = {
       return res.badRequest({ message: 'Google Authenticator Code can not be empty' });
     }
 
-    User.findOne({userName: userName.toLowerCase(), enabled: true})
+    User.findOne({
+      or: [
+        {phone: userName},
+        {userName: userName.toLowerCase()},
+        {email: userName.toLowerCase()}
+      ],
+      enabled: true
+    })
       .exec((err, user) => {
         if (err) {
           return res.negotiate;
