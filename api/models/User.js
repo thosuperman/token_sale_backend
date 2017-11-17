@@ -40,7 +40,7 @@ module.exports = {
 
     nationality: { type: 'string', required: true, in: CountriesService.list.map(el => el.countryCode) },
 
-    ethereumAddress: { type: 'string', required: true, ethereumAddress: true },
+    ethereumAddress: { type: 'string', unique: true, required: true, ethereumAddress: true },
 
     role: { type: 'string', in: rolesList, defaultsTo: roles.user },
 
@@ -110,7 +110,8 @@ module.exports = {
     },
     ethereumAddress: {
       required: 'Ethereum address is required',
-      ethereumAddress: 'Provide valid Ethereum Address'
+      ethereumAddress: 'Provide valid Ethereum Address',
+      unique: 'Ethereum address is already taken'
     },
     encryptedPassword: {
       required: 'Password is required'
@@ -123,15 +124,15 @@ module.exports = {
   indexes: [
     {
       attributes: { phone: 1 },
-      options: {
-        unique: true,
-        partialFilterExpression: {phone: {$exists: true}}
-      }
+      options: { unique: true }
     }, {
       attributes: { userName: 1 },
       options: { unique: true }
     }, {
       attributes: { email: 1 },
+      options: { unique: true }
+    }, {
+      attributes: { ethereumAddress: 1 },
       options: { unique: true }
     }
   ],
