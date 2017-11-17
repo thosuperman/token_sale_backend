@@ -16,15 +16,15 @@ module.exports = {
    * `RegistrationController.checkUserInfo()`
    */
   checkUserInfo: function (req, res) {
-    let {userName, email, phone} = req.allParams();
+    let {userName, email, phone, ethereumAddress} = req.allParams();
 
-    if ([userName, email, phone].every(p => !p)) {
+    if ([userName, email, phone, ethereumAddress].every(p => !p)) {
       return res.badRequest({
-        message: 'Some of userName, email, phone parameters must be set'
+        message: 'Some of userName, email, phone, ethereumAddress parameters must be set'
       });
     }
 
-    let temp = {userName, email, phone};
+    let temp = {userName, email, phone, ethereumAddress};
     let allParams = Object.keys(temp).reduce((result, el) => {
       if (temp[el]) {
         result[el] = temp[el].toLowerCase();
