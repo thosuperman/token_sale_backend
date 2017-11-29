@@ -19,7 +19,7 @@ module.exports = {
       case 'GET':
         return res.json(req.user);
 
-      case 'POST':
+      case 'PUT':
         let allParams = req.allParams();
 
         if (!allParams.token) {
@@ -55,7 +55,7 @@ module.exports = {
           .catch(err => res.negotiate(err));
 
       default:
-        return res.badRequest({message: 'Method not allowed'});
+        return res.send(405, {message: 'Method not allowed'});
     }
   }
 };
