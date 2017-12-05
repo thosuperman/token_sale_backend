@@ -124,7 +124,10 @@ module.exports = {
   indexes: [
     {
       attributes: { phone: 1 },
-      options: { unique: true }
+      options: {
+        unique: true,
+        partialFilterExpression: {phone: {$exists: true}}
+      }
     }, {
       attributes: { userName: 1 },
       options: { unique: true }
