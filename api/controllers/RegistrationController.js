@@ -5,10 +5,19 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global _ User */
+/* global sails _ User */
 
+const request = require('request');
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
+
+const captchaErrors = {
+  'missing-input-secret': 'The secret parameter is missing',
+  'invalid-input-secret': 'The secret parameter is invalid or malformed',
+  'missing-input-response': 'The response parameter is missing',
+  'invalid-input-response': 'The response parameter is invalid or malformed',
+  'bad-request': 'The request is invalid or malformed'
+};
 
 module.exports = {
 
@@ -71,6 +80,42 @@ module.exports = {
   },
 
   /**
+   * `RegistrationController.validateCaptcha()`
+   * Google Captcha Validation Action
+   * @description :: Server-side logic to validate captcha with google recaptcha api
+   */
+  validateCaptcha: function (req, res) {
+    let responseText = req.param('response');
+    sails.log.debug('Validate Captcha response: ', JSON.stringify(responseText));
+
+    request({
+      uri: 'https://www.google.com/recaptcha/api/siteverify',
+      qs: {secret: sails.config.captchaSecret, response: responseText},
+      method: 'POST'
+    }, function (err, response, body) {
+      if (err) {
+        return res.negotiate(err);
+      }
+
+      sails.log.debug(response.statusCode, body);
+
+      let apiResponse = JSON.parse(body);
+      let errorCodes = apiResponse['error-codes'] || [];
+
+      req.session.isCaptchaValid = apiResponse.success;
+
+      if (!apiResponse.success) {
+        return res.badRequest({
+          message: 'ReCaptcha validation failure',
+          Errors: {captcha: errorCodes.map(code => ({message: captchaErrors[code]}))}
+        });
+      }
+
+      return res.ok({message: 'ReCaptcha validation success'});
+    });
+  },
+
+  /**
    * `RegistrationController.generateQRCode()`
    */
   generateQRCode: function (req, res) {
@@ -105,6 +150,12 @@ module.exports = {
   confirm: function (req, res) {
     const twoFactorSecret = req.session.twoFactorSecret;
 
+    if (!req.session.isCaptchaValid) {
+      return res.badRequest({
+        message: `User didn't pass reCaptcha validation`
+      });
+    }
+
     if (!twoFactorSecret) {
       return res.badRequest({
         message: 'User do not have generated secret QR Code'
@@ -136,7 +187,9 @@ module.exports = {
 
     User.create(allParams)
       .then(user => {
+        delete req.session.isCaptchaValid;
         delete req.session.twoFactorSecret;
+
         req.session.userId = user.id;
         req.user = user;
 
