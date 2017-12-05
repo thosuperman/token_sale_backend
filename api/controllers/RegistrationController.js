@@ -10,6 +10,7 @@
 const request = require('request');
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
+const geoip = require('geoip-country');
 
 const captchaErrors = {
   'missing-input-secret': 'The secret parameter is missing',
@@ -113,6 +114,21 @@ module.exports = {
 
       return res.ok({message: 'ReCaptcha validation success'});
     });
+  },
+
+  /**
+   * `RegistrationController.checkIp()`
+   */
+  checkIp: function (req, res) {
+    let geo = geoip.lookup(req.ip);
+
+    req.session.ipChecked = true;
+
+    if (geo) {
+      req.session.isUSIp = (geo.country === 'US');
+    }
+
+    return res.ok({isUSIp: req.session.isUSIp, ip: req.ip, geo});
   },
 
   /**
