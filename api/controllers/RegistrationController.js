@@ -139,7 +139,7 @@ module.exports = {
       });
     }
 
-    const secret = speakeasy.generateSecret();
+    const secret = speakeasy.generateSecret({name: 'Kora'});
 
     return new Promise((resolve, reject) => qrcode.toDataURL(secret.otpauth_url, (err, url) => {
       if (err) {
