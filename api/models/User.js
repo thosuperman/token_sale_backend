@@ -48,6 +48,8 @@ module.exports = {
 
     twoFactorSecret: { type: 'string', required: true },
 
+    registeredFromUSIP: { type: 'boolean', required: true },
+
     enabled: {type: 'boolean', defaultsTo: true},
 
     toJSON: function () {

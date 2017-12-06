@@ -121,14 +121,12 @@ module.exports = {
    */
   checkIp: function (req, res) {
     let geo = geoip.lookup(req.ip);
+    let hasUSIP = (geo && geo.country === 'US');
 
-    req.session.ipChecked = true;
+    req.session.isIPChecked = true;
+    req.session.hasUSIP = hasUSIP;
 
-    if (geo) {
-      req.session.isUSIp = (geo.country === 'US');
-    }
-
-    return res.ok({isUSIp: req.session.isUSIp, ip: req.ip, geo});
+    return res.ok({hasUSIP, ip: req.ip, geo});
   },
 
   /**
@@ -172,6 +170,12 @@ module.exports = {
       });
     }
 
+    if (!req.session.isIPChecked) {
+      return res.badRequest({
+        message: `User didn't check his IP`
+      });
+    }
+
     if (!twoFactorSecret) {
       return res.badRequest({
         message: 'User do not have generated secret QR Code'
@@ -199,11 +203,13 @@ module.exports = {
 
     delete allParams.role;
 
-    Object.assign(allParams, {twoFactorSecret});
+    Object.assign(allParams, {twoFactorSecret, registeredFromUSIP: req.session.hasUSIP});
 
     User.create(allParams)
       .then(user => {
         delete req.session.isCaptchaValid;
+        delete req.session.isIPChecked;
+        delete req.session.hasUSIP;
         delete req.session.twoFactorSecret;
 
         req.session.userId = user.id;
