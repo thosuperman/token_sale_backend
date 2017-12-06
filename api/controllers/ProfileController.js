@@ -45,6 +45,9 @@ module.exports = {
         delete allParams.twoFactorSecret;
         delete allParams.enabled;
         delete allParams.userNameOrigin;
+        delete allParams.registeredFromUSIP;
+        delete allParams.sendingEthereumAddress;
+        delete allParams.receivingEthereumAddress;
 
         return User.update({id: req.user.id}, allParams)
           .then(([user]) => {

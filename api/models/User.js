@@ -40,7 +40,9 @@ module.exports = {
 
     nationality: { type: 'string', required: true, in: CountriesService.list.map(el => el.countryCode) },
 
-    ethereumAddress: { type: 'string', unique: true, required: true, ethereumAddress: true },
+    sendingEthereumAddress: { type: 'string', unique: true, required: true, ethereumAddress: true },
+
+    receivingEthereumAddress: { type: 'string', unique: true, ethereumAddress: true },
 
     role: { type: 'string', in: rolesList, defaultsTo: roles.user },
 
@@ -110,10 +112,14 @@ module.exports = {
       required: 'Nationality is required',
       in: 'Provide valid nationality'
     },
-    ethereumAddress: {
-      required: 'Ethereum address is required',
-      ethereumAddress: 'Provide valid Ethereum Address',
-      unique: 'Ethereum address is already taken'
+    sendingEthereumAddress: {
+      required: 'Sending ethereum address is required',
+      ethereumAddress: 'Provide valid sending ethereum address',
+      unique: 'Sending ethereum address is already taken'
+    },
+    receivingEthereumAddress: {
+      ethereumAddress: 'Provide valid receiving ethereum address',
+      unique: 'Receiving ethereum address is already taken'
     },
     encryptedPassword: {
       required: 'Password is required'
@@ -137,8 +143,14 @@ module.exports = {
       attributes: { email: 1 },
       options: { unique: true }
     }, {
-      attributes: { ethereumAddress: 1 },
+      attributes: { sendingEthereumAddress: 1 },
       options: { unique: true }
+    }, {
+      attributes: { receivingEthereumAddress: 1 },
+      options: {
+        unique: true,
+        partialFilterExpression: {receivingEthereumAddress: {$exists: true}}
+      }
     }
   ],
 
@@ -150,6 +162,14 @@ module.exports = {
 
     if (values.email) {
       values.email = values.email.toLowerCase();
+    }
+
+    if (values.sendingEthereumAddress) {
+      values.sendingEthereumAddress = values.sendingEthereumAddress.toLowerCase();
+    }
+
+    if (values.receivingEthereumAddress) {
+      values.receivingEthereumAddress = values.receivingEthereumAddress.toLowerCase();
     }
 
     if (values.password) {
