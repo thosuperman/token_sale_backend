@@ -10,5 +10,7 @@ module.exports = {
 
   address: value => Web3Utils.isAddress(value),
 
-  hex: value => Web3Utils.isHex(value)
+  hex: value => Web3Utils.isHex(value),
+
+  password: value => /^(?=.*\d)(?=.*[a-zA-Z]).{9,}$/.test(value)
 };

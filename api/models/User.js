@@ -173,6 +173,13 @@ module.exports = {
     }
 
     if (values.password) {
+      if (!ValidationService.password(values.password)) {
+        return cb(new WLError({
+          status: 400,
+          message: 'Password must be over 8 characters, have at least 1 uppercase English letter, 1 lowercase English letter and 1 number'
+        }));
+      }
+
       return bcrypt.genSalt(10, function (err, salt) {
         if (err) {
           return cb(err);
@@ -195,7 +202,7 @@ module.exports = {
 
   beforeCreate: function (values, cb) {
     if (!values.password) {
-      return cb(new WLError({status: 400, reason: 'Password must be set'}));
+      return cb(new WLError({status: 400, message: 'Password must be set'}));
     }
 
     return cb();
