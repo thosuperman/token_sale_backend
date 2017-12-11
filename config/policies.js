@@ -70,5 +70,9 @@ module.exports.policies = {
   AuthController: {
     '*': ['isAuthorized'],
     login: true
+  },
+
+  TestController: {
+    '*': true
   }
 };
