@@ -9,7 +9,7 @@
  * http://sailsjs.org/#!/documentation/reference/sails.config/sails.config.bootstrap.html
  */
 
-/* global sails */
+/* global sails JobsService */
 
 const scheduler = require('node-schedule');
 
@@ -23,9 +23,11 @@ module.exports.bootstrap = function (cb) {
     // Run job only for one instance of PM2
     process.env.NODE_APP_INSTANCE == 0 // eslint-disable-line eqeqeq
   ) {
-    scheduler.scheduleJob('*/10 * * * * *', function () {
-      sails.log.info(`[${process.env.NODE_APP_INSTANCE}]`, 'The answer to life, the universe, and everything!');
+    scheduler.scheduleJob('42 * * * * *', function () {
+      sails.log.info(`[${process.env.NODE_APP_INSTANCE}]`, new Date().toISOString(), '- The answer to life, the universe, and everything!');
     });
+
+    scheduler.scheduleJob('*/30 * * * * *', JobsService.copyEthTransactions);
   }
 
   // It's very important to trigger this callback method when you are finished
