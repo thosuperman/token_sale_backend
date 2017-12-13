@@ -4,17 +4,28 @@
  * description:: bitstamp api service
  */
 
-/* global MiscService */
+/* global _ MiscService */
 
 const Bitstamp = require('bitstamp');
 const bitstamp = new Bitstamp();
 
+const currencyPairs = {
+  btcusd: 'btcusd',
+  ethusd: 'ethusd'
+};
+const currencyPairsList = _.values(currencyPairs);
+
 module.exports = {
+  constants: {
+    currencyPairs,
+    currencyPairsList
+  },
+
   tickerHour,
 
-  tickerHourBtcUsd: cb => tickerHour({currencyPair: 'btcusd'}, cb),
+  tickerHourBtcUsd: cb => tickerHour({currencyPair: currencyPairs.btcusd}, cb),
 
-  tickerHourEthUsd: cb => tickerHour({currencyPair: 'ethusd'}, cb)
+  tickerHourEthUsd: cb => tickerHour({currencyPair: currencyPairs.ethusd}, cb)
 };
 
 function tickerHour ({currencyPair}, cb) {
