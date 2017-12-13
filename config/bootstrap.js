@@ -23,11 +23,13 @@ module.exports.bootstrap = function (cb) {
     // Run job only for one instance of PM2
     process.env.NODE_APP_INSTANCE == 0 // eslint-disable-line eqeqeq
   ) {
-    scheduler.scheduleJob('42 * * * * *', function () {
-      sails.log.info(`[${process.env.NODE_APP_INSTANCE}]`, new Date().toISOString(), '- The answer to life, the universe, and everything!');
-    });
+    // scheduler.scheduleJob('*/42 * * * * *', function () {
+    //   sails.log.info(`[${process.env.NODE_APP_INSTANCE}]`, new Date().toISOString(), '- The answer to life, the universe, and everything!');
+    // });
 
-    scheduler.scheduleJob('*/30 * * * * *', JobsService.copyEthTransactions);
+    scheduler.scheduleJob('30 * * * * *', JobsService.copyEthTransactions);
+
+    scheduler.scheduleJob('* * * * *', JobsService.copyExchangeRates);
   }
 
   // It's very important to trigger this callback method when you are finished

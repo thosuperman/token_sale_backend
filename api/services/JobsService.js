@@ -3,7 +3,7 @@
  * description:: Jobs for scheduler
  */
 
-/* global sails Transactions EtherscanService */
+/* global sails Transactions EtherscanService ExchangeRates BitstampService */
 
 module.exports = {
   copyEthTransactions: function () {
@@ -26,5 +26,32 @@ module.exports = {
       })
       .then(records => sails.log.info(records.length, 'new ETH transactions was received'))
       .catch((err) => sails.log.error(err));
+  },
+
+  copyExchangeRates: function () {
+    sails.log.info(new Date().toISOString(), '-', 'Run copy exchange rates job');
+
+    const currencyPairs = BitstampService.constants.currencyPairs;
+    const types = ExchangeRates.constants.types;
+
+    Promise.all(
+      [
+        {
+          currencyPair: currencyPairs.btcusd,
+          type: types.BTC
+        }, {
+          currencyPair: currencyPairs.ethusd,
+          type: types.ETH
+        }
+      ].map(opts => copyExchangeRate(opts))
+    )
+      .catch((err) => sails.log.error(err));
   }
 };
+
+function copyExchangeRate ({currencyPair, type}) {
+  return BitstampService.tickerHour({currencyPair})
+    .then(result => ExchangeRates.create({type, raw: result}))
+    .then(record => sails.log.info(record.date, type, 'hour ticker was received. USD:', record.USD))
+    .catch((err) => sails.log.error(err));
+}
