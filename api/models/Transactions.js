@@ -30,6 +30,8 @@ module.exports = {
 
     value: { type: 'float' },
 
+    USD: { type: 'float' },
+
     KTN: { type: 'float' },
 
     from: { model: 'user' }
@@ -56,7 +58,8 @@ module.exports = {
           .then(record => {
             if (record) {
               // TODO: Сhange koraExchangeRate logic
-              values.KTN = values.value * record.USD * sails.config.koraExchangeRate;
+              values.USD = values.value * record.USD;
+              values.KTN = values.USD * sails.config.koraExchangeRate;
             }
           })
         );
@@ -78,7 +81,7 @@ module.exports = {
           .then(() => cb())
           .catch(err => {
             sails.log.error(err);
-            return cb();
+            return cb(err);
           });
       }
     }
