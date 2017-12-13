@@ -27,9 +27,9 @@ module.exports.bootstrap = function (cb) {
     //   sails.log.info(`[${process.env.NODE_APP_INSTANCE}]`, new Date().toISOString(), '- The answer to life, the universe, and everything!');
     // });
 
-    scheduler.scheduleJob('30 * * * * *', JobsService.copyEthTransactions);
+    scheduler.scheduleJob('*/20 * * * * *', JobsService.copyEthTransactions);
 
-    scheduler.scheduleJob('* * * * *', JobsService.copyExchangeRates);
+    scheduler.scheduleJob('*/30 * * * *', JobsService.copyExchangeRates);
   }
 
   // It's very important to trigger this callback method when you are finished
