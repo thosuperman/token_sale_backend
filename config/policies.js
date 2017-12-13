@@ -72,6 +72,12 @@ module.exports.policies = {
     login: true
   },
 
+  TransactionsController: {
+    find: ['isAuthorized'],
+    balance: ['isAuthorized'],
+    '*': false
+  },
+
   TestController: {
     '*': true
   }
