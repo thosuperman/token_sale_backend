@@ -34,6 +34,8 @@ module.exports = {
 
     KTN: { type: 'float' },
 
+    exchangeRate: { model: 'exchangerates' },
+
     from: { model: 'user' }
   },
 
@@ -46,20 +48,37 @@ module.exports = {
       let promises = [];
 
       if (values.raw.value) {
-        values.value = Web3Utils.fromWei(values.raw.value, 'ether');
+        values.value = +Web3Utils.fromWei(values.raw.value, 'ether');
+
+        let date = values.date || new Date();
 
         promises.push(
           ExchangeRates.findOne({
             where: {
-              date: {'<=': values.date || new Date()}
+              type: ExchangeRates.constants.types.ETH,
+              date: {'<=': date}
             },
             sort: 'date DESC'
           })
           .then(record => {
+            if (!record) {
+              return ExchangeRates.findOne({
+                where: {
+                  type: ExchangeRates.constants.types.ETH,
+                  date: {'>': date}
+                },
+                sort: 'date ASC'
+              });
+            }
+
+            return record;
+          })
+          .then(record => {
             if (record) {
               // TODO: Сhange koraExchangeRate logic
-              values.USD = values.value * record.USD;
-              values.KTN = values.USD * sails.config.koraExchangeRate;
+              values.USD = +(values.value * record.USD).toFixed(10);
+              values.KTN = +(values.USD * sails.config.koraExchangeRate).toFixed(10);
+              values.exchangeRate = record.id;
             }
           })
         );

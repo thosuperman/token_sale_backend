@@ -5,6 +5,8 @@
 
 /* global sails Transactions EtherscanService ExchangeRates BitstampService */
 
+const koraEtherWallet = sails.config.koraEtherWallet.toLowerCase();
+
 module.exports = {
   copyEthTransactions: function () {
     sails.log.info(new Date().toISOString(), '-', 'Run copy ETH transactions job');
@@ -19,7 +21,7 @@ module.exports = {
       })
       .then(response => {
         let txs = response.result
-          .filter(tx => +tx.value)
+          .filter(tx => (+tx.value && tx.to.toLowerCase() === koraEtherWallet))
           .map(r => ({type, raw: r}));
 
         return Transactions.create(txs);

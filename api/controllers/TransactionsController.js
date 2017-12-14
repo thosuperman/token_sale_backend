@@ -44,6 +44,7 @@ module.exports = {
           return sum;
         }, 0);
       })
+      .then(sum => +sum.toFixed(10))
       .then(result => res.json(result))
       .catch(err => res.negotiate(err));
   },
