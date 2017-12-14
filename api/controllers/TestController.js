@@ -5,7 +5,8 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails EtherscanService BitstampService */
+/* global sails EtherscanService BitstampService ExchangeRates */
+
 module.exports = {
   txlist: function (req, res) {
     EtherscanService.txlist({address: sails.config.koraEtherWallet})
@@ -31,6 +32,18 @@ module.exports = {
 
   tickerHourEthUsd: function (req, res) {
     BitstampService.tickerHourEthUsd()
+      .then(result => res.ok(result))
+      .catch(err => res.negotiate(err));
+  },
+
+  lastExchangeRate: function (req, res) {
+    ExchangeRates.findLast({type: 'ETH'})
+      .then(result => res.ok(result))
+      .catch(err => res.negotiate(err));
+  },
+
+  lastExchangeRates: function (req, res) {
+    ExchangeRates.findLastByTypes()
       .then(result => res.ok(result))
       .catch(err => res.negotiate(err));
   }

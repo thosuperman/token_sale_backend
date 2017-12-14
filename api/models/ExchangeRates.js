@@ -47,5 +47,14 @@ module.exports = {
     let promise = this.findOne({where: {type}, sort: 'date DESC'});
 
     return MiscService.cbify(promise, cb);
+  },
+
+  findLastByTypes: function (cb) {
+    let promise = Promise.all([
+      this.findLast({type: types.BTC}),
+      this.findLast({type: types.ETH})
+    ]);
+
+    return MiscService.cbify(promise, cb);
   }
 };

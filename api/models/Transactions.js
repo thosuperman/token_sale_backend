@@ -32,7 +32,7 @@ module.exports = {
 
     USD: { type: 'float' },
 
-    KTN: { type: 'float' },
+    KNT: { type: 'float' },
 
     exchangeRate: { model: 'exchangerates' },
 
@@ -77,7 +77,7 @@ module.exports = {
             if (record) {
               // TODO: Сhange koraExchangeRate logic
               values.USD = +(values.value * record.USD).toFixed(10);
-              values.KTN = +(values.USD * sails.config.koraExchangeRate).toFixed(10);
+              values.KNT = +(values.USD * sails.config.koraExchangeRate).toFixed(10);
               values.exchangeRate = record.id;
             }
           })
