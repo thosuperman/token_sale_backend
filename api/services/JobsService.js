@@ -27,7 +27,13 @@ module.exports = {
         return Transactions.create(txs);
       })
       .then(records => sails.log.info(records.length, 'new ETH transactions was received'))
-      .catch((err) => sails.log.error(err));
+      .catch((err) => {
+        if (err === 'No transactions found') {
+          sails.log.info(err);
+        } else {
+          sails.log.error(err);
+        }
+      });
   },
 
   copyExchangeRates: function () {
