@@ -10,11 +10,11 @@
 module.exports = {
   find: function (req, res) {
     const userId = req.user.id;
-    const sort = 'date DESC';
     const {
       type,
       limit = 10,
-      skip = 0
+      page = 1,
+      sort = 'date DESC'
     } = req.allParams();
 
     let where = { from: userId };
@@ -24,10 +24,10 @@ module.exports = {
     }
 
     Promise.all([
-      Transactions.find({ where, limit, skip, sort }),
+      Transactions.find({ where, sort }).paginate({page, limit}),
       Transactions.count(where)
     ])
-    .then(([data, total]) => ({data, total}))
+    .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
     .then(result => res.json(result))
     .catch(err => res.negotiate(err));
   },
