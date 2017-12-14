@@ -26,7 +26,8 @@ module.exports = {
   attributes: {
     phone: { type: 'string', unique: true, phoneNumber: true },
 
-    userName: { type: 'string', unique: true, required: true, alphanumericdashed: true },
+    // TODO: Add connection throught userName
+    userName: { type: 'string', unique: true, alphanumericdashed: true },
 
     userNameOrigin: { type: 'string' },
 
@@ -87,7 +88,7 @@ module.exports = {
       unique: 'Phone number is already taken'
     },
     userName: {
-      required: 'Username is required',
+      // required: 'Username is required',
       alphanumericdashed: 'Provide valid username',
       unique: 'Username is already taken'
     },
@@ -138,7 +139,10 @@ module.exports = {
       }
     }, {
       attributes: { userName: 1 },
-      options: { unique: true }
+      options: {
+        unique: true,
+        partialFilterExpression: {userName: {$exists: true}}
+      }
     }, {
       attributes: { email: 1 },
       options: { unique: true }
