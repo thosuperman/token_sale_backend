@@ -5,7 +5,7 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global sails _ MiscService User ExchangeRates */
+/* global sails _ MiscService User ExchangeRates KoraService */
 
 const Web3Utils = require('web3-utils');
 
@@ -53,31 +53,34 @@ module.exports = {
         let date = values.date || new Date();
 
         promises.push(
-          ExchangeRates.findOne({
-            where: {
-              type: ExchangeRates.constants.types.ETH,
-              date: {'<=': date}
-            },
-            sort: 'date DESC'
-          })
-          .then(record => {
-            if (!record) {
-              return ExchangeRates.findOne({
-                where: {
-                  type: ExchangeRates.constants.types.ETH,
-                  date: {'>': date}
-                },
-                sort: 'date ASC'
-              });
-            }
+          Promise.all([
+            KoraService.exchangeRates(),
+            ExchangeRates.findOne({
+              where: {
+                type: ExchangeRates.constants.types.ETH,
+                date: {'<=': date}
+              },
+              sort: 'date DESC'
+            })
+            .then(record => {
+              if (!record) {
+                return ExchangeRates.findOne({
+                  where: {
+                    type: ExchangeRates.constants.types.ETH,
+                    date: {'>': date}
+                  },
+                  sort: 'date ASC'
+                });
+              }
 
-            return record;
-          })
-          .then(record => {
+              return record;
+            })
+          ])
+          .then(([{KNT_USD}, record]) => {
             if (record) {
               // TODO: Сhange koraExchangeRate logic
               values.USD = +(values.value * record.USD).toFixed(10);
-              values.KNT = +(values.USD * sails.config.koraExchangeRate).toFixed(10);
+              values.KNT = +(values.USD * KNT_USD).toFixed(10);
               values.exchangeRate = record.id;
             }
           })

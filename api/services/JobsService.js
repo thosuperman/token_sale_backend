@@ -3,9 +3,7 @@
  * description:: Jobs for scheduler
  */
 
-/* global sails Transactions EtherscanService ExchangeRates BitstampService */
-
-const koraEtherWallet = sails.config.koraEtherWallet.toLowerCase();
+/* global sails Transactions EtherscanService ExchangeRates BitstampService KoraService */
 
 module.exports = {
   copyEthTransactions: function () {
@@ -13,13 +11,18 @@ module.exports = {
 
     const type = Transactions.constants.types.ETH;
 
-    Transactions.findLast({type})
+    Promise.all([
+      KoraService.wallets(),
+      Transactions.findLast({type})
       .then(tx => {
         let startblock = tx ? +tx.raw.blockNumber + 1 : 0;
 
         return EtherscanService.koraWalletTxlist({startblock});
       })
-      .then(response => {
+    ])
+      .then(([{ETH}, response]) => {
+        const koraEtherWallet = ETH.toLowerCase();
+
         let txs = response.result
           .filter(tx => (+tx.value && tx.to.toLowerCase() === koraEtherWallet))
           .map(r => ({type, raw: r}));

@@ -19,7 +19,7 @@ module.exports = {
     ])
       .then(([KNTBalance, exchangeRates]) => {
         let result = exchangeRates.reduce((previous, {type, USD}) => {
-          previous[type + '-USD'] = USD;
+          previous[type + '_USD'] = USD;
 
           return previous;
         }, {KNTBalance});

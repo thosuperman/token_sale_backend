@@ -5,22 +5,29 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails EtherscanService BitstampService ExchangeRates */
+/* global EtherscanService BitstampService ExchangeRates KoraService */
 
 module.exports = {
   txlist: function (req, res) {
-    EtherscanService.txlist({address: sails.config.koraEtherWallet})
+    KoraService.wallets()
+      .then(({ETH}) => EtherscanService.txlist({address: ETH}))
       .then(result => res.ok(result))
       .catch(err => res.negotiate(err));
   },
 
   txlistcb: function (req, res) {
-    EtherscanService.txlist({address: sails.config.koraEtherWallet}, (err, result) => {
+    KoraService.wallets((err, {ETH}) => {
       if (err) {
         return res.negotiate(err);
       }
 
-      return res.ok(result);
+      EtherscanService.txlist({address: ETH}, (err, result) => {
+        if (err) {
+          return res.negotiate(err);
+        }
+
+        return res.ok(result);
+      });
     });
   },
 
