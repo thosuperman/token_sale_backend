@@ -17,21 +17,13 @@ module.exports = {
   index: function (req, res) {
     Promise.all([
       calcUserKNTBalance({userId: req.user.id}),
-      ExchangeRates.findLastByTypes(),
-      KoraService.exchangeRates(),
+      fetchExchangeRates(),
+      fetchSaleValues(),
       fetchKoraWallets()
     ])
-      .then(([KNTBalance, exchangeRates, koraExchangeRates, wallets]) => {
-        let result = exchangeRates.reduce((previous, {type, USD}) => {
-          previous[type + '_USD'] = USD;
-
-          return previous;
-        }, {KNTBalance});
-
-        Object.assign(result, koraExchangeRates, wallets);
-
-        return result;
-      })
+      .then(([KNTBalance, exchangeRates, saleValues, wallets]) => Object.assign({
+        KNTBalance
+      }, exchangeRates, saleValues, wallets))
       .then(result => res.json(result))
       .catch(err => res.negotiate(err));
   }
@@ -50,6 +42,23 @@ function calcUserKNTBalance ({userId}, cb) {
       }, 0);
     })
     .then(sum => +sum.toFixed(10));
+
+  return MiscService.cbify(promise, cb);
+}
+
+function fetchExchangeRates (cb) {
+  let promise = ExchangeRates.findLastByTypes()
+    .then(exchangeRates => exchangeRates.reduce((previous, {type, USD}) => {
+      previous[type + '_USD'] = USD;
+      return previous;
+    }, {}));
+
+  return MiscService.cbify(promise, cb);
+}
+
+function fetchSaleValues (cb) {
+  let promise = KoraService.saleValues()
+    .then(({current: {discount, USD_KNT, KNT_USD}}) => ({discount, USD_KNT, KNT_USD}));
 
   return MiscService.cbify(promise, cb);
 }

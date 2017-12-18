@@ -5,7 +5,7 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global sails _ MiscService User ExchangeRates KoraService */
+/* global sails _ MiscService User ExchangeRates KoraService TotalAmount */
 
 const Web3Utils = require('web3-utils');
 
@@ -54,7 +54,7 @@ module.exports = {
 
         promises.push(
           Promise.all([
-            KoraService.exchangeRates(),
+            KoraService.saleValues(),
             ExchangeRates.findOne({
               where: {
                 type: ExchangeRates.constants.types.ETH,
@@ -76,12 +76,19 @@ module.exports = {
               return record;
             })
           ])
-          .then(([{KNT_USD}, record]) => {
-            if (record) {
-              // TODO: Сhange koraExchangeRate logic
-              values.USD = +(values.value * record.USD).toFixed(10);
-              values.KNT = +(values.USD * KNT_USD).toFixed(10);
-              values.exchangeRate = record.id;
+          .then(([saleValues, exchangeRate]) => {
+            if (exchangeRate) {
+              values.USD = +(values.value * exchangeRate.USD).toFixed(10);
+              values.exchangeRate = exchangeRate.id;
+
+              if (saleValues.next && saleValues.currentRemainAmountUSD < values.USD) {
+                values.KNT = +(
+                  saleValues.currentRemainAmountUSD * saleValues.current.KNT_USD +
+                  (values.USD - saleValues.currentRemainAmountUSD) * saleValues.next.KNT_USD
+                ).toFixed(10);
+              } else {
+                values.KNT = +(values.USD * saleValues.current.KNT_USD).toFixed(10);
+              }
             }
           })
         );
@@ -101,14 +108,17 @@ module.exports = {
       if (promises.length) {
         return Promise.all(promises)
           .then(() => cb())
-          .catch(err => {
-            sails.log.error(err);
-            return cb(err);
-          });
+          .catch(err => cb(err));
       }
     }
 
     return cb();
+  },
+
+  afterCreate: function ({id, USD, KNT}, cb) {
+    TotalAmount.addNew({USD, KNT, transaction: id})
+      .then(() => cb())
+      .catch(err => cb(err));
   },
 
   findLast: function ({type}, cb) {

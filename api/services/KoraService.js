@@ -3,7 +3,7 @@
  * @description :: Kora wallets and KNT exchange rates service (fake yet)
  */
 
-/* global sails MiscService */
+/* global sails MiscService TotalAmount */
 
 const USD_KNT = 10;
 
@@ -17,6 +17,7 @@ const preSaleRaw = [
 ];
 
 const preSale = preSaleRaw.map((s, i, arr) => {
+  // s.amountUSD = s.amountUSD / 100; // TODO: Remove after testing
   s.USD_KNT = +(USD_KNT * 100 / (100 - s.discount)).toFixed(10);
   s.KNT_USD = +(1 / s.USD_KNT).toFixed(10);
   s.amountKNT = +(s.USD_KNT * s.amountUSD).toFixed(10);
@@ -37,10 +38,28 @@ module.exports = {
     return MiscService.cbify(promise, cb);
   },
 
-  exchangeRates: function (cb) {
-    let promise = Promise.resolve({
-      KNT_USD: sails.config.koraExchangeRate
-    });
+  saleValues: function (cb) {
+    let promise = TotalAmount.findLast()
+      .then(({USD, KNT}) => {
+        let i = preSale.findIndex(s => (USD <= s.fullAmountUSD));
+
+        if (i === -1) {
+          i = preSale.length - 1;
+        }
+
+        return {
+          currentIndex: i,
+          current: preSale[i],
+          next: preSale[i + 1],
+          currentAmountUSD: USD,
+          currentAmountKNT: KNT,
+          currentRemainAmountUSD: +(preSale[i].fullAmountUSD - USD).toFixed(10),
+          preSale
+        };
+      });
+    // Promise.resolve({
+    //   KNT_USD: sails.config.koraExchangeRate
+    // });
 
     return MiscService.cbify(promise, cb);
   }

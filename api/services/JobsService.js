@@ -27,7 +27,15 @@ module.exports = {
           .filter(tx => (+tx.value && tx.to.toLowerCase() === koraEtherWallet))
           .map(r => ({type, raw: r}));
 
-        return Transactions.create(txs);
+        let records = [];
+
+        // For correct calculation of TotalAmount
+        let promise = txs.reduce((promise, tx) => promise
+          .then(() => Transactions.create(tx))
+          .then((record) => records.push(record)),
+          Promise.resolve());
+
+        return promise.then(() => records);
       })
       .then(records => sails.log.info(records.length, 'new ETH transactions was received'))
       .catch((err) => {
