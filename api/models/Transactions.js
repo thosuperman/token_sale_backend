@@ -81,6 +81,7 @@ module.exports = {
               values.USD = +(values.value * exchangeRate.USD).toFixed(10);
               values.exchangeRate = exchangeRate.id;
 
+              // TODO: Need complete this logic
               if (saleValues.next && saleValues.currentRemainAmountUSD < values.USD) {
                 values.KNT = +(
                   saleValues.currentRemainAmountUSD * saleValues.current.KNT_USD +

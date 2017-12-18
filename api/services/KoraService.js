@@ -6,6 +6,7 @@
 /* global sails MiscService TotalAmount */
 
 const USD_KNT = 10;
+const KNT_USD = +(1 / USD_KNT).toFixed(10);
 
 const preSaleRaw = [
   {discount: 90, amountUSD: 500000, note: 'Reserved for core team and early advisors.'},
@@ -43,24 +44,29 @@ module.exports = {
       .then(({USD, KNT}) => {
         let i = preSale.findIndex(s => (USD <= s.fullAmountUSD));
 
-        if (i === -1) {
-          i = preSale.length - 1;
-        }
-
         return {
+          USD_KNT,
+          KNT_USD,
+          discount: ~i ? 0 : preSale[i].discount,
           currentIndex: i,
           current: preSale[i],
           next: preSale[i + 1],
           currentAmountUSD: USD,
           currentAmountKNT: KNT,
           currentRemainAmountUSD: +(preSale[i].fullAmountUSD - USD).toFixed(10),
-          preSale
+          allSale: preSale
         };
       });
-    // Promise.resolve({
-    //   KNT_USD: sails.config.koraExchangeRate
-    // });
 
     return MiscService.cbify(promise, cb);
   }
 };
+
+// const publicSaleRaw = [
+//   {discount: 30, amountUSD: 2500000, note: 'Open to the public.'},
+//   {discount: 25, amountUSD: 2500000, note: 'Open to the public.'},
+//   {discount: 20, amountUSD: 2500000, note: 'Open to the public.'},
+//   {discount: 15, amountUSD: 2500000, note: 'Open to the public.'},
+//   {discount: 10, amountUSD: 5000000, note: 'Open to the public.'},
+//   {discount: 0, amountUSD: 5000000, note: 'Open to the public.'}
+// ]

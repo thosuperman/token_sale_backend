@@ -58,7 +58,7 @@ function fetchExchangeRates (cb) {
 
 function fetchSaleValues (cb) {
   let promise = KoraService.saleValues()
-    .then(({current: {discount, USD_KNT, KNT_USD}}) => ({discount, USD_KNT, KNT_USD}));
+    .then(({discount, USD_KNT, KNT_USD}) => ({discount, USD_KNT, KNT_USD}));
 
   return MiscService.cbify(promise, cb);
 }
