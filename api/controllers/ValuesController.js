@@ -18,7 +18,7 @@ module.exports = {
     Promise.all([
       calcUserKNTBalance({userId: req.user.id}),
       fetchExchangeRates(),
-      fetchSaleValues(),
+      fetchSaleValues({needDiscount: true}), // TODO: Add needDiscount logic
       fetchKoraWallets()
     ])
       .then(([KNTBalance, exchangeRates, saleValues, wallets]) => Object.assign({
@@ -56,8 +56,8 @@ function fetchExchangeRates (cb) {
   return MiscService.cbify(promise, cb);
 }
 
-function fetchSaleValues (cb) {
-  let promise = KoraService.saleValues()
+function fetchSaleValues ({needDiscount}, cb) {
+  let promise = KoraService.saleValues({needDiscount})
     .then(({discount, USD_KNT, KNT_USD}) => ({discount, USD_KNT, KNT_USD}));
 
   return MiscService.cbify(promise, cb);

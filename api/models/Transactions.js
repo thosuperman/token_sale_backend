@@ -5,7 +5,7 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global sails _ MiscService User ExchangeRates KoraService TotalAmount */
+/* global _ MiscService User ExchangeRates KoraService TotalAmount */
 
 const Web3Utils = require('web3-utils');
 
@@ -53,44 +53,42 @@ module.exports = {
         let date = values.date || new Date();
 
         promises.push(
-          Promise.all([
-            KoraService.saleValues(),
-            ExchangeRates.findOne({
-              where: {
-                type: ExchangeRates.constants.types.ETH,
-                date: {'<=': date}
-              },
-              sort: 'date DESC'
-            })
-            .then(record => {
-              if (!record) {
-                return ExchangeRates.findOne({
-                  where: {
-                    type: ExchangeRates.constants.types.ETH,
-                    date: {'>': date}
-                  },
-                  sort: 'date ASC'
-                });
-              }
+          ExchangeRates.findOne({
+            where: {
+              type: ExchangeRates.constants.types.ETH,
+              date: {'<=': date}
+            },
+            sort: 'date DESC'
+          })
+          .then(record => {
+            if (!record) {
+              return ExchangeRates.findOne({
+                where: {
+                  type: ExchangeRates.constants.types.ETH,
+                  date: {'>': date}
+                },
+                sort: 'date ASC'
+              });
+            }
 
-              return record;
-            })
-          ])
-          .then(([saleValues, exchangeRate]) => {
+            return record;
+          })
+          .then((exchangeRate) => {
             if (exchangeRate) {
               values.USD = +(values.value * exchangeRate.USD).toFixed(10);
               values.exchangeRate = exchangeRate.id;
 
               // TODO: Need complete this logic
-              if (saleValues.next && saleValues.currentRemainAmountUSD < values.USD) {
-                values.KNT = +(
-                  saleValues.currentRemainAmountUSD * saleValues.current.KNT_USD +
-                  (values.USD - saleValues.currentRemainAmountUSD) * saleValues.next.KNT_USD
-                ).toFixed(10);
-              } else {
-                values.KNT = +(values.USD * saleValues.current.KNT_USD).toFixed(10);
-              }
+              return KoraService.calcKNT({
+                valueUSD: values.USD,
+                needDiscount: true // TODO: Is registered in MVP
+              });
             }
+
+            return 0;
+          })
+          .then(valueKNT => {
+            values.KNT = valueKNT;
           })
         );
       }
