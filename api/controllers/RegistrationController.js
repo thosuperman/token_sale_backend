@@ -92,6 +92,80 @@ module.exports = {
   },
 
   /**
+   * `RegistrationController.sendMVPCode()`
+   */
+  sendMVPCode: function (req, res) {
+    const userName = req.param('userName');
+
+    if (!userName) {
+      return res.badRequest({
+        message: 'Username must be set'
+      });
+    }
+
+    request({
+      uri: sails.config.mvp.baseURL + '/registrationICO/sendCode',
+      qs: {userName},
+      method: 'POST'
+    }, (err, response, body) => {
+      if (err) {
+        return res.negotiate(err);
+      }
+
+      req.session.isMVPCodeSent = true;
+      req.session.userName = userName;
+
+      return res.json(response.statusCode, body);
+    });
+  },
+
+  /**
+   * `RegistrationController.verifyMVPCode()`
+   */
+  verifyMVPCode: function (req, res) {
+    const code = req.param('code');
+
+    if (!req.session.isMVPCodeSent) {
+      return res.badRequest({
+        message: 'Verification code was not sent throught Kora MVP'
+      });
+    }
+
+    if (!code) {
+      return res.badRequest({
+        message: 'Verification code must be set'
+      });
+    }
+
+    request({
+      uri: sails.config.mvp.baseURL + '/registrationICO/verifyCode',
+      qs: {userName: req.session.userName, code},
+      method: 'POST'
+    }, (err, response, body) => {
+      if (err) {
+        return res.negotiate(err);
+      }
+
+      req.session.isMVPCodeVerified = true;
+
+      return res.json(response.statusCode, body);
+    });
+  },
+
+  /**
+   * `RegistrationController.disableMVPCode()`
+   */
+  disableMVPCode: function (req, res) {
+    delete req.session.isMVPCodeSent;
+    delete req.session.isMVPCodeVerified;
+    delete req.session.userName;
+
+    return res.ok({
+      message: 'Verification code throught Kora MVP is disabled'
+    });
+  },
+
+  /**
    * `RegistrationController.validateCaptcha()`
    * Google Captcha Validation Action
    * @description :: Server-side logic to validate captcha with google recaptcha api
@@ -193,7 +267,14 @@ module.exports = {
       });
     }
 
+    if (req.session.isMVPCodeSent && !req.session.isMVPCodeVerified) {
+      return res.badRequest({
+        message: 'Verification code throught Kora MVP was sent but not verified'
+      });
+    }
+
     let allParams = req.allParams();
+
     const verified = speakeasy.totp.verify({
       secret: twoFactorSecret,
       encoding: 'base32',
@@ -213,8 +294,20 @@ module.exports = {
     // delete allParams.confirmPassword
 
     delete allParams.role;
+    delete allParams.userName;
 
-    Object.assign(allParams, {twoFactorSecret, registeredFromUSIP: req.session.hasUSIP});
+    Object.assign(allParams, {
+      twoFactorSecret,
+      registeredFromUSIP: req.session.hasUSIP,
+      isMVPUser: false
+    });
+
+    if (req.session.isMVPCodeSent && req.session.isMVPCodeVerified) {
+      Object.assign(allParams, {
+        isMVPUser: true,
+        userName: req.session.userName
+      });
+    }
 
     User.create(allParams)
       .then(user => {
@@ -222,6 +315,9 @@ module.exports = {
         delete req.session.isIPChecked;
         delete req.session.hasUSIP;
         delete req.session.twoFactorSecret;
+        delete req.session.isMVPCodeSent;
+        delete req.session.isMVPCodeVerified;
+        delete req.session.userName;
 
         req.session.userId = user.id;
         req.user = user;

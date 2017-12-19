@@ -55,6 +55,8 @@ module.exports = {
 
     registeredFromUSIP: { type: 'boolean', required: true },
 
+    isMVPUser: { type: 'boolean' },
+
     enabled: {type: 'boolean', defaultsTo: true},
 
     toJSON: function () {
