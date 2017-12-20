@@ -26,7 +26,6 @@ module.exports = {
   attributes: {
     phone: { type: 'string', unique: true, phoneNumber: true },
 
-    // TODO: Add connection throught userName
     userName: { type: 'string', unique: true, alphanumericdashed: true },
 
     userNameOrigin: { type: 'string' },

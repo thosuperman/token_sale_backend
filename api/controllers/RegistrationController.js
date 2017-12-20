@@ -115,7 +115,11 @@ module.exports = {
       req.session.isMVPCodeSent = true;
       req.session.userName = userName;
 
-      return res.json(response.statusCode, body);
+      if (response.statusCode === 422) {
+        response.statusCode = 400;
+      }
+
+      return res.json(response.statusCode, JSON.parse(body));
     });
   },
 
@@ -148,7 +152,11 @@ module.exports = {
 
       req.session.isMVPCodeVerified = true;
 
-      return res.json(response.statusCode, body);
+      if (response.statusCode === 422) {
+        response.statusCode = 400;
+      }
+
+      return res.json(response.statusCode, JSON.parse(body));
     });
   },
 
