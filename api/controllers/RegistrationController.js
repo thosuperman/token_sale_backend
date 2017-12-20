@@ -20,28 +20,39 @@ const captchaErrors = {
   'bad-request': 'The request is invalid or malformed'
 };
 
+const checkUserAttrsNamesHash = {
+  userName: 'username',
+  email: 'email',
+  phone: 'phone number',
+  sendingEthereumAddress: 'sending ethereum address',
+  receivingEthereumAddress: 'receiving ethereum address',
+  bitcoinAddress: 'bitcoin address'
+};
+const checkUserAttrs = Object.keys(checkUserAttrsNamesHash);
+const checkUserAttrsNames = _.values(checkUserAttrsNamesHash);
+
 module.exports = {
 
   /**
    * `RegistrationController.checkUserInfo()`
    */
   checkUserInfo: function (req, res) {
-    let {userName, email, phone, sendingEthereumAddress, receivingEthereumAddress} = req.allParams();
+    let temp = _.pick(req.allParams(), checkUserAttrs);
 
-    if ([userName, email, phone, sendingEthereumAddress, receivingEthereumAddress].every(p => !p)) {
+    if (_.isEmpty(temp)) {
       return res.badRequest({
-        message: 'Some of userName, email, phone, sendingEthereumAddress, receivingEthereumAddress parameters must be set'
+        message: `Some of ${checkUserAttrsNames.join(', ')} parameters must be set`
       });
     }
 
-    let temp = {userName, email, phone, sendingEthereumAddress, receivingEthereumAddress};
     let allParams = Object.keys(temp).reduce((result, el) => {
-      if (temp[el]) {
-        result[el] = temp[el].toLowerCase();
-      }
+      result[el] = (el === 'bitcoinAddress') ? temp[el] : temp[el].toLowerCase();
       return result;
     }, {});
+
     let allParamsKeys = Object.keys(allParams);
+    let allParamsNames = _.values(_.pick(checkUserAttrsNamesHash, allParamsKeys));
+    let pluralize = allParamsKeys.length > 1;
 
     User.validate(allParams, err => {
       if (err && err.Errors) {
@@ -57,17 +68,17 @@ module.exports = {
       )
         .then(results => {
           if (results.every(r => !r)) {
-            return {message: `No users with ${allParamsKeys.join(', ')} attributes`};
+            return {message: `No users with ${allParamsNames.join(', ')} attribute${pluralize ? 's' : ''}`};
           }
 
-          let err = new Error(`User with some of ${allParamsKeys.join(', ')} attributes is already exists`);
+          let err = new Error(`User with ${pluralize ? 'some of' : 'such'} ${allParamsNames.join(', ')} attribute${pluralize ? 's' : ''} is already exists`);
 
           err.status = 400;
 
           err.Errors = results.reduce((previous, current, index) => {
             if (current) {
               let key = allParamsKeys[index];
-              previous[key] = [{message: `User whitch such ${key} is already exists`}];
+              previous[key] = [{message: `User with such ${checkUserAttrsNamesHash[key]} is already exists`}];
             }
 
             return previous;

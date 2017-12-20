@@ -41,9 +41,11 @@ module.exports = {
 
     nationality: { type: 'string', required: true, in: CountriesService.list.map(el => el.countryCode) },
 
-    sendingEthereumAddress: { type: 'string', unique: true, required: true, ethereumAddress: true },
+    sendingEthereumAddress: { type: 'string', unique: true, ethereumAddress: true },
 
     receivingEthereumAddress: { type: 'string', unique: true, ethereumAddress: true },
+
+    bitcoinAddress: { type: 'string', unique: true, bitcoinAddress: true },
 
     role: { type: 'string', in: rolesList, defaultsTo: roles.user },
 
@@ -79,7 +81,8 @@ module.exports = {
 
   types: {
     phoneNumber: value => ValidationService.phoneNumber(value),
-    ethereumAddress: value => ValidationService.address(value)
+    ethereumAddress: value => ValidationService.ethereumAddress(value),
+    bitcoinAddress: value => ValidationService.bitcoinAddress(value)
   },
 
   validationMessages: {
@@ -114,13 +117,17 @@ module.exports = {
       in: 'Provide valid nationality'
     },
     sendingEthereumAddress: {
-      required: 'Sending ethereum address is required',
+      // required: 'Sending ethereum address is required',
       ethereumAddress: 'Provide valid sending ethereum address',
       unique: 'Sending ethereum address is already taken'
     },
     receivingEthereumAddress: {
       ethereumAddress: 'Provide valid receiving ethereum address',
       unique: 'Receiving ethereum address is already taken'
+    },
+    bitcoinAddress: {
+      bitcoinAddress: 'Provide valid bitcoin address',
+      unique: 'Bitcoin address is already taken'
     },
     encryptedPassword: {
       required: 'Password is required'
@@ -148,12 +155,21 @@ module.exports = {
       options: { unique: true }
     }, {
       attributes: { sendingEthereumAddress: 1 },
-      options: { unique: true }
+      options: {
+        unique: true,
+        partialFilterExpression: {sendingEthereumAddress: {$exists: true}}
+      }
     }, {
       attributes: { receivingEthereumAddress: 1 },
       options: {
         unique: true,
         partialFilterExpression: {receivingEthereumAddress: {$exists: true}}
+      }
+    }, {
+      attributes: { bitcoinAddress: 1 },
+      options: {
+        unique: true,
+        partialFilterExpression: {bitcoinAddress: {$exists: true}}
       }
     }
   ],
