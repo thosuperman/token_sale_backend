@@ -225,6 +225,10 @@ module.exports = {
       return cb(new WLError({status: 400, message: 'Password must be set'}));
     }
 
+    if (!(values.sendingEthereumAddress || values.bitcoinAddress)) {
+      return cb(new WLError({status: 400, message: 'Sending ethereum address or bitcoin address must be set'}));
+    }
+
     return cb();
   },
 
