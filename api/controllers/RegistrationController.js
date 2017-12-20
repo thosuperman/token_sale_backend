@@ -112,8 +112,10 @@ module.exports = {
         return res.negotiate(err);
       }
 
-      req.session.isMVPCodeSent = true;
-      req.session.userName = userName;
+      if (response.statusCode === 200) {
+        req.session.isMVPCodeSent = true;
+        req.session.userName = userName;
+      }
 
       if (response.statusCode === 422) {
         response.statusCode = 400;
@@ -150,7 +152,9 @@ module.exports = {
         return res.negotiate(err);
       }
 
-      req.session.isMVPCodeVerified = true;
+      if (response.statusCode === 200) {
+        req.session.isMVPCodeVerified = true;
+      }
 
       if (response.statusCode === 422) {
         response.statusCode = 400;
