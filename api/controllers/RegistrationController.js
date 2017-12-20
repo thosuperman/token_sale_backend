@@ -103,25 +103,35 @@ module.exports = {
       });
     }
 
-    request({
-      uri: sails.config.mvp.baseURL + '/registrationICO/sendCode',
-      qs: {userName},
-      method: 'POST'
-    }, (err, response, body) => {
+    User.findOne({userName}).exec((err, user) => {
       if (err) {
         return res.negotiate(err);
       }
 
-      if (response.statusCode === 200) {
-        req.session.isMVPCodeSent = true;
-        req.session.userName = userName;
+      if (user) {
+        return res.badRequest({message: 'User with such Kora MVP username is already registered'});
       }
 
-      if (response.statusCode === 422) {
-        response.statusCode = 400;
-      }
+      request({
+        uri: sails.config.mvp.baseURL + '/registrationICO/sendCode',
+        qs: {userName},
+        method: 'POST'
+      }, (err, response, body) => {
+        if (err) {
+          return res.negotiate(err);
+        }
 
-      return res.json(response.statusCode, JSON.parse(body));
+        if (response.statusCode === 200) {
+          req.session.isMVPCodeSent = true;
+          req.session.userName = userName;
+        }
+
+        if (response.statusCode === 422) {
+          response.statusCode = 400;
+        }
+
+        return res.json(response.statusCode, JSON.parse(body));
+      });
     });
   },
 
