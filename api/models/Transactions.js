@@ -78,17 +78,8 @@ module.exports = {
               values.USD = +(values.value * exchangeRate.USD).toFixed(10);
               values.exchangeRate = exchangeRate.id;
 
-              // TODO: Need complete this logic
-              return KoraService.calcKNT({
-                valueUSD: values.USD,
-                needDiscount: true // TODO: Is registered in MVP
-              });
+              return exchangeRate;
             }
-
-            return 0;
-          })
-          .then(valueKNT => {
-            values.KNT = valueKNT;
           })
         );
       }
@@ -99,13 +90,36 @@ module.exports = {
             .then(user => {
               if (user) {
                 values.from = user.id;
+
+                return user;
               }
             })
         );
       }
 
       if (promises.length) {
-        return Promise.all(promises)
+        let finalPromise = Promise.all(promises);
+
+        if (promises.length === 2) {
+          finalPromise = finalPromise
+            .then(([exchangeRate, user]) => {
+              if (exchangeRate && user) {
+                return KoraService.calcKNT({
+                  valueUSD: values.USD,
+                  needDiscountMVP: user.isMVPUser
+                });
+              }
+
+              return null;
+            })
+            .then(valueKNT => {
+              if (valueKNT) {
+                values.KNT = valueKNT;
+              }
+            });
+        }
+
+        return finalPromise
           .then(() => cb())
           .catch(err => cb(err));
       }
@@ -114,10 +128,14 @@ module.exports = {
     return cb();
   },
 
-  afterCreate: function ({id, USD, KNT}, cb) {
-    TotalAmount.addNew({USD, KNT, transaction: id})
-      .then(() => cb())
-      .catch(err => cb(err));
+  afterCreate: function ({id, USD, KNT, from}, cb) {
+    if (from) {
+      return TotalAmount.addNew({USD, KNT, transaction: id})
+        .then(() => cb())
+        .catch(err => cb(err));
+    }
+
+    return cb();
   },
 
   findLast: function ({type}, cb) {

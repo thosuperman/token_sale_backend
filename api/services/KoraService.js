@@ -8,8 +8,12 @@
 const isDiscount = true;
 const isPreSale = true;
 
+const discountMVP = 2;
+
 const USD_KNT = 10;
 const KNT_USD = +(1 / USD_KNT).toFixed(10);
+const USD_KNT_MVP = +(USD_KNT * 100 / (100 - discountMVP)).toFixed(10);
+const KNT_USD_MVP = +(1 / USD_KNT_MVP).toFixed(10);
 
 const preSaleRaw = [
   {discount: 90, amountUSD: 500000, note: 'Reserved for core team and early advisors.'},
@@ -36,11 +40,13 @@ const sale = saleRaw.map((s, i, arr) => {
   s.KNT_USD = +(1 / s.USD_KNT).toFixed(10);
   s.amountKNT = +(s.USD_KNT * s.amountUSD).toFixed(10);
   s.fullAmountUSD = i === 0 ? s.amountUSD : +(arr[i - 1].fullAmountUSD + s.amountUSD).toFixed(10);
+  s.USD_KNT_MVP = +(s.USD_KNT * 100 / (100 - discountMVP)).toFixed(10);
+  s.KNT_USD_MVP = +(1 / s.USD_KNT_MVP).toFixed(10);
 
   return s;
 });
 
-// sails.log.info('Pre-sale info:', sale);
+// sails.log.info('Sale info:', sale);
 
 module.exports = {
   wallets: function (cb) {
@@ -52,55 +58,70 @@ module.exports = {
     return MiscService.cbify(promise, cb);
   },
 
-  saleValues: function ({needDiscount = false}, cb) {
-    let promise = !(isDiscount && needDiscount)
-      ? Promise.resolve({ USD_KNT, KNT_USD, discount: 0 })
+  saleValues: function ({needDiscountMVP = false}, cb) {
+    const noDiscountSale = { USD_KNT, KNT_USD, discount: 0 };
+
+    let promise = !isDiscount ? Promise.resolve(noDiscountSale)
       : TotalAmount.findLast()
           .then(({USD, KNT}) => {
             let s = sale.find(s => (USD <= s.fullAmountUSD));
 
-            return {
-              USD_KNT,
-              KNT_USD,
-              discount: !s ? 0 : s.discount
-            };
+            if (s) {
+              return {
+                needDiscountMVP,
+                discountMVP,
+                discount: s.discount,
+                USD_KNT: s.USD_KNT,
+                KNT_USD: s.KNT_USD,
+                USD_KNT_MVP: s.KNT_USD_MVP,
+                KNT_USD_MVP: s.KNT_USD_MVP
+              };
+            }
+
+            return Object.assign({noDiscountSale}, {
+              needDiscountMVP,
+              discountMVP,
+              USD_KNT_MVP,
+              KNT_USD_MVP
+            });
           });
 
     return MiscService.cbify(promise, cb);
   },
 
-  calcKNT: function ({valueUSD, needDiscount}, cb) {
-    let promise = !(isDiscount && needDiscount)
-      ? Promise.resolve(+(valueUSD * KNT_USD).toFixed(10))
+  calcKNT: function ({valueUSD, needDiscountMVP}, cb) {
+    let promise = !isDiscount ? Promise.resolve(+(valueUSD * KNT_USD).toFixed(10))
       : TotalAmount.findLast()
           .then(({USD: totalUSD}) => {
             let i = sale.findIndex(s => (totalUSD <= s.fullAmountUSD));
 
-            return convertUSDKNT({ i, valueUSD, totalUSD });
+            return convertUSDKNT({ i, valueUSD, totalUSD, needDiscountMVP });
           });
 
     return MiscService.cbify(promise, cb);
   }
 };
 
-function convertUSDKNT ({i, valueUSD, totalUSD}) {
+function convertUSDKNT ({i, valueUSD, totalUSD, needDiscountMVP}) {
   let result;
   let s = sale[i];
 
   if (s) {
     let remainAmountUSD = +(s.fullAmountUSD - totalUSD).toFixed(10);
+    let currentKTNUSD = needDiscountMVP ? s.KNT_USD_MVP : s.KNT_USD;
 
     if (remainAmountUSD < valueUSD) {
-      result = remainAmountUSD * s.KNT_USD + convertUSDKNT({
+      result = remainAmountUSD * currentKTNUSD + convertUSDKNT({
         i: i + 1,
         valueUSD: +(valueUSD - remainAmountUSD).toFixed(10),
-        totalUSD: s.fullAmountUSD
+        totalUSD: s.fullAmountUSD,
+        needDiscountMVP
       });
     } else {
-      result = valueUSD * s.KNT_USD;
+      result = valueUSD * currentKTNUSD;
     }
   } else {
-    result = valueUSD * KNT_USD;
+    result = valueUSD * (needDiscountMVP ? KNT_USD_MVP : KNT_USD);
   }
 
   return +(result).toFixed(10);
