@@ -29,6 +29,10 @@ module.exports = {
     USD: { type: 'float', required: true }
   },
 
+  indexes: [
+    { attributes: { date: -1 } }
+  ],
+
   beforeValidate: function (values, cb) {
     if (values.raw) {
       if (values.raw.timestamp) {

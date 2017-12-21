@@ -17,6 +17,10 @@ module.exports = {
     transaction: { model: 'transactions', required: true }
   },
 
+  indexes: [
+    { attributes: { updatedAt: -1 } }
+  ],
+
   findLast: function (cb) {
     let promise = this.find({sort: 'updatedAt DESC', limit: 1})
       .then(([record]) => record || {USD: 0, KNT: 0});

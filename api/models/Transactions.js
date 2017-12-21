@@ -39,6 +39,10 @@ module.exports = {
     from: { model: 'user' }
   },
 
+  indexes: [
+    { attributes: { from: 1 } }
+  ],
+
   beforeValidate: function (values, cb) {
     if (values.raw) {
       if (values.raw.timeStamp) {
