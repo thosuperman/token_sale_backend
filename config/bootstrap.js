@@ -27,9 +27,7 @@ module.exports.bootstrap = function (cb) {
     //   sails.log.info(`[${process.env.NODE_APP_INSTANCE}]`, new Date().toISOString(), '- The answer to life, the universe, and everything!');
     // });
 
-    scheduler.scheduleJob('*/20 * * * * *', JobsService.copyEthTransactions);
-
-    scheduler.scheduleJob('*/20 * * * * *', JobsService.copyBtcTransactions);
+    scheduler.scheduleJob('*/20 * * * * *', JobsService.copyTransactions);
 
     scheduler.scheduleJob('*/30 * * * *', JobsService.copyExchangeRates);
   }

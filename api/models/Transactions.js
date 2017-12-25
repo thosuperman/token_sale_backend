@@ -48,15 +48,15 @@ module.exports = {
 
   beforeValidate: function (values, cb) {
     if (values.raw) {
-      // Etherscan
-      if (values.raw.timeStamp) {
-        values.date = new Date(values.raw.timeStamp * 1000);
-      }
+      // // Etherscan
+      // if (values.raw.timeStamp) {
+      //   values.date = new Date(values.raw.timeStamp * 1000);
+      // }
 
-      // Bitstamp
-      if (values.raw.time) {
-        values.date = new Date(values.raw.time);
-      }
+      // // Bitstamp
+      // if (values.raw.time) {
+      //   values.date = new Date(values.raw.time);
+      // }
 
       if (values.raw.hash) {
         values.hash = values.raw.hash;
