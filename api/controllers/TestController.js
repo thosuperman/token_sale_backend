@@ -5,9 +5,30 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global EtherscanService BitstampService ExchangeRates KoraService */
+/* global EtherscanService BitstampService ExchangeRates KoraService BlockchainService */
 
 module.exports = {
+  blocktrailTxs: function (req, res) {
+    const {address, page, limit, sortDir} = req.allParams();
+
+    BlockchainService.addressTransactions({
+      address: address || '2NB2jorwjeRsxUhsLjq5oTH334f3TUys26e',
+      page,
+      limit,
+      sortDir
+    })
+      .then(result => res.ok(result))
+      .catch(err => res.negotiate(err));
+  },
+
+  blockchainInfoTxs: function (req, res) {
+    const address = req.param('address');
+
+    BlockchainService.getAddress({address: address || '2NB2jorwjeRsxUhsLjq5oTH334f3TUys26e'})
+      .then(result => res.ok(result))
+      .catch(err => res.negotiate(err));
+  },
+
   txlist: function (req, res) {
     KoraService.wallets()
       .then(({ETH}) => EtherscanService.txlist({address: ETH}))

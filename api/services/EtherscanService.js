@@ -6,8 +6,9 @@
 
 /* global sails MiscService KoraService */
 
-// TODO; Remove 'rinkeby' after all logic implementation
-const api = require('etherscan-api').init(sails.config.etherscanApiKey, 'rinkeby');
+const {etherscanApiKey, blockchains: {testnet}} = sails.config;
+
+const api = require('etherscan-api').init(etherscanApiKey, (testnet ? 'rinkeby' : undefined));
 
 module.exports = {
   txlist,
