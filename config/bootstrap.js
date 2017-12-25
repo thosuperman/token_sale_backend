@@ -29,6 +29,8 @@ module.exports.bootstrap = function (cb) {
 
     scheduler.scheduleJob('*/20 * * * * *', JobsService.copyEthTransactions);
 
+    scheduler.scheduleJob('*/20 * * * * *', JobsService.copyBtcTransactions);
+
     scheduler.scheduleJob('*/30 * * * *', JobsService.copyExchangeRates);
   }
 

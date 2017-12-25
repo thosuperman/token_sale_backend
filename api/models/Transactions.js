@@ -5,15 +5,14 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global _ MiscService User ExchangeRates KoraService TotalAmount */
+/* global MiscService User KoraService TotalAmount ExchangeRates BlockchainService */
 
 const Web3Utils = require('web3-utils');
 
-const types = {
-  BTC: 'BTC',
-  ETH: 'ETH'
-};
-const typesList = _.values(types);
+const {constants} = require('./ExchangeRates');
+
+const types = constants.types;
+const typesList = constants.typesList;
 
 module.exports = {
   constants: {
@@ -27,6 +26,10 @@ module.exports = {
     raw: { type: 'json', required: true },
 
     date: { type: 'date', required: true },
+
+    hash: { type: 'string' },
+
+    // confirmations: { type: 'integer' },
 
     value: { type: 'float' },
 
@@ -45,21 +48,41 @@ module.exports = {
 
   beforeValidate: function (values, cb) {
     if (values.raw) {
+      // Etherscan
       if (values.raw.timeStamp) {
         values.date = new Date(values.raw.timeStamp * 1000);
       }
 
+      // Bitstamp
+      if (values.raw.time) {
+        values.date = new Date(values.raw.time);
+      }
+
+      if (values.raw.hash) {
+        values.hash = values.raw.hash;
+      }
+
+      // if (values.raw.confirmations) {
+      //   values.confirmations = parseInt(values.raw.confirmations, 10);
+      // }
+
       let promises = [];
 
-      if (values.raw.value) {
-        values.value = +Web3Utils.fromWei(values.raw.value, 'ether');
+      if (values.raw.value && values.type) {
+        if (values.type === types.ETH) {
+          values.value = +Web3Utils.fromWei(values.raw.value, 'ether');
+        }
+
+        if (values.type === types.BTC) {
+          values.value = +BlockchainService.toBTC(values.raw.value);
+        }
 
         let date = values.date || new Date();
 
         promises.push(
           ExchangeRates.findOne({
             where: {
-              type: ExchangeRates.constants.types.ETH,
+              type: values.type,
               date: {'<=': date}
             },
             sort: 'date DESC'
@@ -68,7 +91,7 @@ module.exports = {
             if (!record) {
               return ExchangeRates.findOne({
                 where: {
-                  type: ExchangeRates.constants.types.ETH,
+                  type: values.type,
                   date: {'>': date}
                 },
                 sort: 'date ASC'
@@ -88,9 +111,19 @@ module.exports = {
         );
       }
 
-      if (values.raw.from) {
+      if (values.raw.from && values.type) {
+        let key;
+
+        if (values.type === types.ETH) {
+          key = 'sendingEthereumAddress';
+        }
+
+        if (values.type === types.BTC) {
+          key = 'bitcoinAddress';
+        }
+
         promises.push(
-          User.findOne({sendingEthereumAddress: values.raw.from})
+          User.findOne({[key]: values.raw.from})
             .then(user => {
               if (user) {
                 values.from = user.id;
@@ -146,5 +179,17 @@ module.exports = {
     let promise = this.findOne({where: {type}, sort: 'date DESC'});
 
     return MiscService.cbify(promise, cb);
+  // },
+  //
+  // findNotConfirmed: function ({type}, cb) {
+  //   let promise = this.find({
+  //     where: {
+  //       type,
+  //       confirmations: { '<=': 1 }
+  //     },
+  //     sort: 'date DESC'
+  //   });
+  //
+  //   return MiscService.cbify(promise, cb);
   }
 };
