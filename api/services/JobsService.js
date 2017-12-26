@@ -114,14 +114,17 @@ function fetchBtcTransactions () {
 
       txs = txs
         .filter(tx => (
-          Array.isArray(tx.inputs) && tx.inputs[0] && tx.inputs[0].address !== koraBitcoinWallet &&
+          Array.isArray(tx.outputs) && tx.outputs.find(o => o.address === koraBitcoinWallet) &&
           tx.confirmations >= 1
         ))
-        .map(r => {
-          r.from = r.inputs[0].address;
-          r.value = r.outputs[r.inputs[0].output_index].value;
+        .map(tx => {
+          let output = tx.outputs.find(o => o.address === koraBitcoinWallet);
 
-          return { type, raw: r, date: new Date(r.time) };
+          // For look like etherscan transactions
+          tx.from = tx.inputs[output.spent_index].address;
+          tx.value = output.value;
+
+          return { type, raw: tx, date: new Date(tx.time) };
         });
 
       txs.reverse();
