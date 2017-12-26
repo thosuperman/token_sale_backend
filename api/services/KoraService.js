@@ -111,17 +111,17 @@ function convertUSDKNT ({i, valueUSD, totalUSD, needDiscountMVP}) {
     let currentKTNUSD = needDiscountMVP ? s.KNT_USD_MVP : s.KNT_USD;
 
     if (remainAmountUSD < valueUSD) {
-      result = remainAmountUSD * currentKTNUSD + convertUSDKNT({
+      result = remainAmountUSD / currentKTNUSD + convertUSDKNT({
         i: i + 1,
         valueUSD: +(valueUSD - remainAmountUSD).toFixed(10),
         totalUSD: s.fullAmountUSD,
         needDiscountMVP
       });
     } else {
-      result = valueUSD * currentKTNUSD;
+      result = valueUSD / currentKTNUSD;
     }
   } else {
-    result = valueUSD * (needDiscountMVP ? KNT_USD_MVP : KNT_USD);
+    result = valueUSD / (needDiscountMVP ? KNT_USD_MVP : KNT_USD);
   }
 
   return +(result).toFixed(10);
