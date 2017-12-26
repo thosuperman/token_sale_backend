@@ -3,6 +3,10 @@
  * @description :: Set of validation functions
  */
 
+/* global sails */
+
+const {blockchains: {testnet}} = sails.config;
+
 const Web3Utils = require('web3-utils');
 const WAValidator = require('wallet-address-validator');
 
@@ -13,7 +17,7 @@ module.exports = {
 
   hex: value => Web3Utils.isHex(value),
 
-  bitcoinAddress: value => WAValidator.validate(value),
+  bitcoinAddress: value => WAValidator.validate(value, 'bitcoin', (testnet ? 'both' : 'prod')),
 
   password: value => /^(?=.*\d)(?=.*[a-zA-Z]).{9,}$/.test(value)
 };
