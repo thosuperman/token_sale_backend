@@ -80,5 +80,10 @@ module.exports.policies = {
 
   TestController: {
     '*': true
+  },
+
+  TotalAmountController: {
+    find: ['isAuthorized'],
+    '*': false
   }
 };
