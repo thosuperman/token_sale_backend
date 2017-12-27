@@ -106,10 +106,13 @@ function fetchBtcTransactions () {
     .then(([{BTC: koraBitcoinWallet}, lastRecord, response]) => {
       let txs = response.data;
 
+      // TODO: Update fetching of bitcoin txs to lastRecord with pages for case of unexpected situations
       if (lastRecord) {
         let lastIndex = txs.findIndex(tx => (tx.hash === lastRecord.hash));
 
-        txs = txs.slice(0, lastIndex);
+        if (lastIndex !== -1) {
+          txs = txs.slice(0, lastIndex);
+        }
       }
 
       txs = txs
