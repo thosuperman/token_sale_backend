@@ -51,12 +51,9 @@ module.exports.policies = {
   '*': ['isAuthorized'],
 
   UserController: {
-    '*': ['isAuthorized', 'isMyProfile'],
-    create: true,
-    destroy: true,
-    // Remove this laater
-    find: true,
-    findOne: true
+    // TODO: Enable UserController for admin in future
+    '*': false
+    // destroy: false
   },
 
   CountriesController: {
@@ -83,6 +80,7 @@ module.exports.policies = {
   },
 
   TotalAmountController: {
+    // TODO: Enable TotalAmountController.find for admin in future
     find: ['isAuthorized'],
     '*': false
   }
