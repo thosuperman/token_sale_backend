@@ -47,7 +47,7 @@ module.exports = {
     /**
      * Shortcut routes disable
      */
-    // shortcuts: false
+    shortcuts: false
   },
 
   /***************************************************************************
