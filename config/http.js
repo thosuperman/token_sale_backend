@@ -9,6 +9,9 @@
  * http://sailsjs.org/#!/documentation/reference/sails.config/sails.config.http.html
  */
 
+const lusca = require('lusca');
+const helmet = require('helmet');
+
 module.exports.http = {
 
   /****************************************************************************
@@ -30,23 +33,35 @@ module.exports.http = {
   *                                                                          *
   ***************************************************************************/
 
-    // order: [
-    //   'startRequestTimer',
-    //   'cookieParser',
-    //   'session',
-    //   'myRequestLogger',
-    //   'bodyParser',
-    //   'handleBodyParserError',
-    //   'compress',
-    //   'methodOverride',
-    //   'poweredBy',
-    //   '$custom',
-    //   'router',
-    //   'www',
-    //   'favicon',
-    //   '404',
-    //   '500'
-    // ],
+    order: [
+      'startRequestTimer',
+      'cookieParser',
+      'session',
+      'myRequestLogger',
+      'bodyParser',
+      'handleBodyParserError',
+      'compress',
+      'methodOverride',
+      'poweredBy',
+      '$custom',
+      'helmetProtection',
+      'xframe',
+      'router',
+      'www',
+      'favicon',
+      '404',
+      '500'
+    ],
+
+    xframe: function (req, res, next) {
+      return lusca.xframe('SAMEORIGIN')(req, res, next);
+    },
+
+    helmetProtection: function (req, res, next) {
+      return helmet({
+        frameguard: false
+      })(req, res, next);
+    }
 
   /****************************************************************************
   *                                                                           *
@@ -58,7 +73,6 @@ module.exports.http = {
     //     console.log("Requested :: ", req.method, req.url);
     //     return next();
     // }
-
 
   /***************************************************************************
   *                                                                          *
@@ -77,7 +91,7 @@ module.exports.http = {
 
     // bodyParser: require('skipper')({strict: true})
 
-  },
+  }
 
   /***************************************************************************
   *                                                                          *
