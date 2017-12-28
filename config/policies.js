@@ -71,7 +71,6 @@ module.exports.policies = {
 
   TransactionsController: {
     find: ['isAuthorized'],
-    balance: ['isAuthorized'],
     '*': false
   },
 
@@ -81,7 +80,7 @@ module.exports.policies = {
 
   TotalAmountController: {
     // TODO: Enable TotalAmountController.find for admin in future
-    find: ['isAuthorized'],
+    // find: ['isAuthorized'],
     '*': false
   }
 };
