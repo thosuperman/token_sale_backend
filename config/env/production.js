@@ -50,6 +50,10 @@ module.exports = {
     shortcuts: false
   },
 
+  /****************************************************************************
+  * Security settings                                    *
+  ****************************************************************************/
+
   // TODO: Enable secure cookie session and try domain setting on production when will be SSL
   // session: {
   //   cookie: {
@@ -57,6 +61,9 @@ module.exports = {
   //     secure: true
   //   }
   // },
+
+  // TODO: Enable CSRF protection on production and update routes methods
+  // csrf: true,
 
   /***************************************************************************
    * Enable morgan logger sails-hook-requestlogger                           *
