@@ -50,6 +50,14 @@ module.exports = {
     shortcuts: false
   },
 
+  // TODO: Enable secure cookie session and try domain setting on production when will be SSL
+  // session: {
+  //   cookie: {
+  //     // domain: 'kora.foundation',
+  //     secure: true
+  //   }
+  // },
+
   /***************************************************************************
    * Enable morgan logger sails-hook-requestlogger                           *
    ***************************************************************************/
