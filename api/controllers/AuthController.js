@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global User */
+/* global User ValidationService */
 
 const speakeasy = require('speakeasy');
 
@@ -15,10 +15,10 @@ module.exports = {
    * `AuthController.login()`
    */
   login: function (req, res) {
-    const {userName, password, token} = req.allParams();
+    let {userName, password, token} = req.allParams();
 
     if (!userName) {
-      return res.badRequest({ message: 'Username can not be empty' });
+      return res.badRequest({ message: 'Username/email can not be empty' });
     }
 
     if (!password) {
@@ -28,6 +28,8 @@ module.exports = {
     if (!token) {
       return res.badRequest({ message: 'Google Authenticator Code can not be empty' });
     }
+
+    userName = ValidationService.escape(userName);
 
     User.findOne({
       or: [

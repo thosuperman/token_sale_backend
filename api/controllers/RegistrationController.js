@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails _ User */
+/* global sails _ User ValidationService */
 
 const request = require('request');
 const speakeasy = require('speakeasy');
@@ -95,7 +95,7 @@ module.exports = {
    * `RegistrationController.sendMVPCode()`
    */
   sendMVPCode: function (req, res) {
-    const userName = req.param('userName');
+    const userName = ValidationService.escape(req.param('userName'));
 
     if (!userName) {
       return res.badRequest({
@@ -130,7 +130,13 @@ module.exports = {
           response.statusCode = 400;
         }
 
-        return res.json(response.statusCode, JSON.parse(body));
+        try {
+          var parsedBody = JSON.parse(body);
+        } catch (e) {
+          return res.negotiate(e);
+        }
+
+        return res.json(response.statusCode, parsedBody);
       });
     });
   },
@@ -139,7 +145,7 @@ module.exports = {
    * `RegistrationController.verifyMVPCode()`
    */
   verifyMVPCode: function (req, res) {
-    const code = req.param('code');
+    const code = ValidationService.escape(req.param('code'));
 
     if (!req.session.isMVPCodeSent) {
       return res.badRequest({
@@ -170,7 +176,13 @@ module.exports = {
         response.statusCode = 400;
       }
 
-      return res.json(response.statusCode, JSON.parse(body));
+      try {
+        var parsedBody = JSON.parse(body);
+      } catch (e) {
+        return res.negotiate(e);
+      }
+
+      return res.json(response.statusCode, parsedBody);
     });
   },
 
@@ -194,7 +206,6 @@ module.exports = {
    */
   validateCaptcha: function (req, res) {
     let responseText = req.param('response');
-    sails.log.debug('Validate Captcha response: ', JSON.stringify(responseText));
 
     request({
       uri: 'https://www.google.com/recaptcha/api/siteverify',
@@ -205,9 +216,12 @@ module.exports = {
         return res.negotiate(err);
       }
 
-      sails.log.debug(response.statusCode, body);
+      try {
+        var apiResponse = JSON.parse(body);
+      } catch (e) {
+        return res.badRequest(e);
+      }
 
-      let apiResponse = JSON.parse(body);
       let errorCodes = apiResponse['error-codes'] || [];
 
       req.session.isCaptchaValid = apiResponse.success;

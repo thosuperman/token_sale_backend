@@ -9,6 +9,7 @@ const {blockchains: {testnet}} = sails.config;
 
 const Web3Utils = require('web3-utils');
 const WAValidator = require('wallet-address-validator');
+const validator = require('validator');
 
 module.exports = {
   phoneNumber: value => /^[1-9]\d{9,12}$/i.test(value),
@@ -19,5 +20,7 @@ module.exports = {
 
   bitcoinAddress: value => WAValidator.validate(value, 'bitcoin', (testnet ? 'both' : 'prod')),
 
-  password: value => /^(?=.*\d)(?=.*[a-zA-Z]).{9,}$/.test(value)
+  password: value => /^(?=.*\d)(?=.*[a-zA-Z]).{9,}$/.test(value),
+
+  escape: value => validator.escape(value + '')
 };
