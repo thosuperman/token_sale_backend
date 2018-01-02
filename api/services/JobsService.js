@@ -3,7 +3,7 @@
  * description:: Jobs for scheduler
  */
 
-/* global sails Transactions EtherscanService ExchangeRates BitstampService KoraService BlockchainService */
+/* global _ sails Transactions EtherscanService ExchangeRates BitstampService KoraService BlockchainService */
 
 module.exports = {
   copyTransactions: function () {
@@ -33,7 +33,7 @@ module.exports = {
             .then((record) => records.push(record)),
             Promise.resolve());
 
-          return promise.then(() => records);
+          return promise.then(() => _.flatten(records));
         }
 
         return [];
@@ -67,7 +67,7 @@ function fetchEthTransactions () {
   sails.log.info(new Date().toISOString(), '-', 'Fetch ETH transactions ');
 
   const type = Transactions.constants.types.ETH;
-  const cache = {};
+  let cache = {};
 
   return Promise.all([
     KoraService.wallets(),
@@ -113,7 +113,7 @@ function fetchEthTransactions () {
     })
     .catch((err) => {
       if (err === 'No transactions found') {
-        sails.log.info('0 ETH transactions was received');
+        sails.log.info('0 new and 0 not confirmed ETH transactions was received');
 
         return [];
       }
@@ -126,29 +126,48 @@ function fetchBtcTransactions () {
   sails.log.info(new Date().toISOString(), '-', 'Fetch BTC transactions');
 
   const type = Transactions.constants.types.BTC;
+  let cache = {};
 
   return Promise.all([
     KoraService.wallets(),
-    Transactions.findLast({type}),
-    BlockchainService.koraWalletTransactions({sortDir: 'desc'})
-  ])
-    .then(([{BTC: koraBitcoinWallet}, lastRecord, response]) => {
-      let txs = response.data;
+    Promise.all([
+      Transactions.findLast({type}),
+      Transactions.findNotConfirmed({type})
+    ])
+      .then(([lastTx, notConfirmedTxs]) => {
+        cache.notConfirmedTxs = notConfirmedTxs;
 
-      // TODO: Update fetching of bitcoin txs to lastRecord with pages for case of unexpected situations
-      if (lastRecord) {
-        let lastIndex = txs.findIndex(tx => (tx.hash === lastRecord.hash));
+        const limit = 200;
+        let page = 1;
+        let promise = BlockchainService.koraWalletTransactions({page, limit, sortDir: 'desc'});
+        let lastRecord;
 
-        if (lastIndex !== -1) {
-          txs = txs.slice(0, lastIndex);
+        if (notConfirmedTxs.length) {
+          lastRecord = notConfirmedTxs[notConfirmedTxs.length - 1];
+        } else if (lastTx) {
+          lastRecord = lastTx;
         }
-      }
 
+        return promise
+          .then(response => {
+            let txs = response.data;
+
+            // TODO: Update fetching of bitcoin txs to lastRecord with pages for case of unexpected situations
+            if (lastRecord) {
+              let lastIndex = txs.findIndex(tx => (tx.hash === lastRecord.hash));
+
+              if (lastIndex !== -1) {
+                txs = txs.slice(0, lastIndex);
+              }
+            }
+
+            return txs;
+          });
+      })
+  ])
+    .then(([{BTC: koraBitcoinWallet}, txs]) => {
       txs = txs
-        .filter(tx => (
-          Array.isArray(tx.outputs) && tx.outputs.find(o => o.address === koraBitcoinWallet) &&
-          tx.confirmations >= 1
-        ))
+        .filter(tx => Array.isArray(tx.outputs) && tx.outputs.find(o => o.address === koraBitcoinWallet))
         .map(tx => {
           let output = tx.outputs.find(o => o.address === koraBitcoinWallet);
 
@@ -156,12 +175,23 @@ function fetchBtcTransactions () {
           tx.from = tx.inputs[output.spent_index].address;
           tx.value = output.value;
 
-          return { type, raw: tx, date: new Date(tx.time), hash: tx.hash };
+          return {
+            type,
+            raw: tx,
+            date: new Date(tx.time),
+            hash: tx.hash,
+            needUpdate: cache.notConfirmedTxs ? !!cache.notConfirmedTxs.find(el => el.hash === tx.hash) : false
+          };
         });
 
       txs.reverse();
 
-      sails.log.info(txs.length, 'new BTC transactions was received');
+      sails.log.info(
+        txs.length - cache.notConfirmedTxs.length,
+        'new and',
+        cache.notConfirmedTxs.length,
+        'not confirmed BTC transactions was received'
+      );
 
       return txs;
     })
