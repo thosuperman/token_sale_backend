@@ -19,7 +19,7 @@ module.exports.bootstrap = function (cb) {
 
   if (
     // Run job in development environment
-    process.env.NODE_ENV === 'development' || // TODO: Remove after task will be done
+    process.env.NODE_ENV === 'development' ||
     // Run job only for one instance of PM2
     process.env.NODE_APP_INSTANCE == 0 // eslint-disable-line eqeqeq
   ) {

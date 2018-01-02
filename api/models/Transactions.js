@@ -5,7 +5,7 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global MiscService User KoraService TotalAmount ExchangeRates BlockchainService */
+/* global _ MiscService User KoraService TotalAmount ExchangeRates BlockchainService */
 
 const Web3Utils = require('web3-utils');
 
@@ -14,22 +14,34 @@ const {constants} = require('./ExchangeRates');
 const types = constants.types;
 const typesList = constants.typesList;
 
+const statuses = {
+  pending: 'Pending',
+  confirmed: 'Confirmed'
+};
+const statusesList = _.values(statuses);
+
+const CONFIRMATIONS_NUM = 6;
+
 module.exports = {
   constants: {
     types,
-    typesList
+    typesList,
+    statuses,
+    statusesList
   },
 
   attributes: {
     type: { type: 'string', in: typesList, required: true },
 
+    status: { type: 'string', in: statusesList, defaultsTo: statuses.pending },
+
     raw: { type: 'json', required: true },
 
     date: { type: 'date', required: true },
 
-    hash: { type: 'string' },
+    hash: { type: 'string', unique: true },
 
-    // confirmations: { type: 'integer' },
+    confirmations: { type: 'integer' },
 
     value: { type: 'float' },
 
@@ -43,29 +55,30 @@ module.exports = {
   },
 
   indexes: [
-    { attributes: { from: 1 } }
+    {
+      attributes: { from: 1 }
+    }, {
+      attributes: { hash: 1 },
+      options: { unique: true }
+    }
   ],
 
   beforeValidate: function (values, cb) {
     if (values.raw) {
-      // // Etherscan
-      // if (values.raw.timeStamp) {
-      //   values.date = new Date(values.raw.timeStamp * 1000);
-      // }
+      if (values.raw.confirmations) {
+        values.confirmations = parseInt(values.raw.confirmations, 10);
 
-      // // Bitstamp
-      // if (values.raw.time) {
-      //   values.date = new Date(values.raw.time);
-      // }
-
-      if (values.raw.hash) {
-        values.hash = values.raw.hash;
+        if (values.confirmations >= CONFIRMATIONS_NUM) {
+          values.status = statuses.confirmed;
+        }
       }
+    }
 
-      // if (values.raw.confirmations) {
-      //   values.confirmations = parseInt(values.raw.confirmations, 10);
-      // }
+    return cb();
+  },
 
+  beforeCreate: function (values, cb) {
+    if (values.raw) {
       let promises = [];
 
       if (values.raw.value && values.type) {
@@ -179,17 +192,17 @@ module.exports = {
     let promise = this.findOne({where: {type}, sort: 'date DESC'});
 
     return MiscService.cbify(promise, cb);
-  // },
-  //
-  // findNotConfirmed: function ({type}, cb) {
-  //   let promise = this.find({
-  //     where: {
-  //       type,
-  //       confirmations: { '<=': 1 }
-  //     },
-  //     sort: 'date DESC'
-  //   });
-  //
-  //   return MiscService.cbify(promise, cb);
+  },
+
+  findNotConfirmed: function ({type}, cb) {
+    let promise = this.find({
+      where: {
+        type,
+        confirmations: { '<': CONFIRMATIONS_NUM }
+      },
+      sort: 'date DESC'
+    });
+
+    return MiscService.cbify(promise, cb);
   }
 };

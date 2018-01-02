@@ -23,16 +23,22 @@ module.exports = {
 
           // For correct calculation of TotalAmount
           let promise = txs.reduce((promise, tx) => promise
-          .then(() => Transactions.create(tx))
-          .then((record) => records.push(record)),
-          Promise.resolve());
+            .then(() => {
+              if (tx.needUpdate) {
+                return Transactions.update({hash: tx.hash}, tx);
+              }
+
+              return Transactions.create(tx);
+            })
+            .then((record) => records.push(record)),
+            Promise.resolve());
 
           return promise.then(() => records);
         }
 
         return [];
       })
-      .then(records => sails.log.info(records.length, 'new transactions was created'))
+      .then(records => sails.log.info(records.length, 'transactions was created/updated'))
       .catch((err) => sails.log.error(err));
   },
 
@@ -61,30 +67,53 @@ function fetchEthTransactions () {
   sails.log.info(new Date().toISOString(), '-', 'Fetch ETH transactions ');
 
   const type = Transactions.constants.types.ETH;
+  const cache = {};
 
   return Promise.all([
     KoraService.wallets(),
-    Transactions.findLast({type})
-    .then(tx => {
-      let startblock = tx ? +tx.raw.blockNumber + 1 : 0;
+    Promise.all([
+      Transactions.findLast({type}),
+      Transactions.findNotConfirmed({type})
+    ])
+      .then(([lastTx, notConfirmedTxs]) => {
+        cache.notConfirmedTxs = notConfirmedTxs;
 
-      return EtherscanService.koraWalletTxlist({startblock});
-    })
+        let startblock = 0;
+
+        if (notConfirmedTxs.length) {
+          startblock = notConfirmedTxs[notConfirmedTxs.length - 1].raw.blockNumber;
+        } else if (lastTx) {
+          startblock = +lastTx.raw.blockNumber + 1;
+        }
+
+        return EtherscanService.koraWalletTxlist({startblock});
+      })
   ])
     .then(([{ETH}, response]) => {
       const koraEtherWallet = ETH.toLowerCase();
 
       let txs = response.result
         .filter(tx => (+tx.value && tx.to.toLowerCase() === koraEtherWallet))
-        .map(r => ({ type, raw: r, date: new Date(r.timeStamp * 1000) }));
+        .map(tx => ({
+          type,
+          raw: tx,
+          date: new Date(tx.timeStamp * 1000),
+          hash: tx.hash,
+          needUpdate: cache.notConfirmedTxs ? !!cache.notConfirmedTxs.find(el => el.hash === tx.hash) : false
+        }));
 
-      sails.log.info(txs.length, 'new ETH transactions was received');
+      sails.log.info(
+        txs.length - cache.notConfirmedTxs.length,
+        'new and',
+        cache.notConfirmedTxs.length,
+        'not connfirmed ETH transactions was received'
+      );
 
       return txs;
     })
     .catch((err) => {
       if (err === 'No transactions found') {
-        sails.log.info('0 new ETH transactions was received');
+        sails.log.info('0 ETH transactions was received');
 
         return [];
       }
@@ -127,7 +156,7 @@ function fetchBtcTransactions () {
           tx.from = tx.inputs[output.spent_index].address;
           tx.value = output.value;
 
-          return { type, raw: tx, date: new Date(tx.time) };
+          return { type, raw: tx, date: new Date(tx.time), hash: tx.hash };
         });
 
       txs.reverse();
