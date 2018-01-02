@@ -106,7 +106,7 @@ function fetchEthTransactions () {
         txs.length - cache.notConfirmedTxs.length,
         'new and',
         cache.notConfirmedTxs.length,
-        'not connfirmed ETH transactions was received'
+        'not confirmed ETH transactions was received'
       );
 
       return txs;
@@ -137,32 +137,34 @@ function fetchBtcTransactions () {
       .then(([lastTx, notConfirmedTxs]) => {
         cache.notConfirmedTxs = notConfirmedTxs;
 
-        const limit = 200;
+        const limit = 200; // max == 200
         let page = 1;
-        let promise = BlockchainService.koraWalletTransactions({page, limit, sortDir: 'desc'});
-        let lastRecord;
+        let txs = [];
+        let lastRecord = notConfirmedTxs.length ? notConfirmedTxs[notConfirmedTxs.length - 1] : lastTx;
 
-        if (notConfirmedTxs.length) {
-          lastRecord = notConfirmedTxs[notConfirmedTxs.length - 1];
-        } else if (lastTx) {
-          lastRecord = lastTx;
-        }
-
-        return promise
+        let recursiveFetch = () => BlockchainService.koraWalletTransactions({page, limit, sortDir: 'desc'})
           .then(response => {
-            let txs = response.data;
-
-            // TODO: Update fetching of bitcoin txs to lastRecord with pages for case of unexpected situations
             if (lastRecord) {
-              let lastIndex = txs.findIndex(tx => (tx.hash === lastRecord.hash));
+              let lastIndex = response.data.findIndex(tx => (tx.hash === lastRecord.hash));
 
               if (lastIndex !== -1) {
-                txs = txs.slice(0, lastIndex);
+                txs.push.apply(txs, response.data.slice(0, notConfirmedTxs.length ? lastIndex + 1 : lastIndex));
+
+                return txs;
               }
+            }
+
+            txs.push.apply(txs, response.data);
+
+            if (page * limit <= response.total) {
+              page++;
+              return recursiveFetch();
             }
 
             return txs;
           });
+
+        return recursiveFetch();
       })
   ])
     .then(([{BTC: koraBitcoinWallet}, txs]) => {

@@ -65,7 +65,7 @@ module.exports = {
 
   beforeValidate: function (values, cb) {
     if (values.raw) {
-      if (values.raw.confirmations) {
+      if (typeof values.raw.confirmations !== 'undefined') {
         values.confirmations = parseInt(values.raw.confirmations, 10);
 
         if (values.confirmations >= CONFIRMATIONS_NUM) {
