@@ -9,10 +9,12 @@
 
 const Web3Utils = require('web3-utils');
 
-const {constants} = require('./ExchangeRates');
-
-const types = constants.types;
-const typesList = constants.typesList;
+const types = {
+  BTC: 'BTC Purchase',
+  ETH: 'ETH Purchase',
+  KNT: 'KNT Withdrawal'
+};
+const typesList = _.values(types);
 
 const statuses = {
   pending: 'Pending',
@@ -82,12 +84,16 @@ module.exports = {
       let promises = [];
 
       if (values.raw.value && values.type) {
+        let exchangeRateType;
+
         if (values.type === types.ETH) {
           values.value = +Web3Utils.fromWei(values.raw.value, 'ether');
+          exchangeRateType = ExchangeRates.constants.types.ETH;
         }
 
         if (values.type === types.BTC) {
           values.value = +BlockchainService.toBTC(values.raw.value);
+          exchangeRateType = ExchangeRates.constants.types.BTC;
         }
 
         let date = values.date || new Date();
@@ -95,7 +101,7 @@ module.exports = {
         promises.push(
           ExchangeRates.findOne({
             where: {
-              type: values.type,
+              type: exchangeRateType,
               date: {'<=': date}
             },
             sort: 'date DESC'
@@ -104,7 +110,7 @@ module.exports = {
             if (!record) {
               return ExchangeRates.findOne({
                 where: {
-                  type: values.type,
+                  type: exchangeRateType,
                   date: {'>': date}
                 },
                 sort: 'date ASC'
