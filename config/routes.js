@@ -71,7 +71,10 @@ module.exports.routes = {
 
   [`GET ${prefix}/values`]: {controller: 'ValuesController', action: 'index'},
 
-  [`PUT ${prefix}/password/change`]: {controller: 'PasswordController', action: 'change'}
+  [`PUT ${prefix}/password/change`]: {controller: 'PasswordController', action: 'change'},
+
+  [`PUT ${prefix}/authenticator/regenerate`]: {controller: 'AuthenticatorController', action: 'regenerate'},
+  [`PUT ${prefix}/authenticator/reEnable`]: {controller: 'AuthenticatorController', action: 'reEnable'}
 
   // [`${prefix}/custom`]: {controller: 'User', action: 'find'},
   // '/routes': (req, res) => res.ok(sails.config.routes)
