@@ -11,6 +11,10 @@ const speakeasy = require('speakeasy');
 
 module.exports = {
 
+  _config: {
+    actions: true
+  },
+
   /**
    * `ProfileController.index()`
    */

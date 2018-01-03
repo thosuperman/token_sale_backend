@@ -22,8 +22,8 @@
 
 // /* global sails */
 
-// const {blueprints} = require('./blueprints');
-// const prefix = blueprints.prefix || '';
+const {blueprints} = require('./blueprints');
+const prefix = blueprints.prefix || '';
 
 module.exports.routes = {
 
@@ -53,6 +53,25 @@ module.exports.routes = {
   * for configuration options and examples.                                  *
   *                                                                          *
   ***************************************************************************/
+
+  [`GET ${prefix}/countries`]: {controller: 'CountriesController', action: 'index'},
+  [`GET ${prefix}/countries/collection`]: {controller: 'CountriesController', action: 'collection'},
+
+  [`GET ${prefix}/registration/checkUserInfo`]: {controller: 'RegistrationController', action: 'checkUserInfo'},
+  [`PUT ${prefix}/registration/sendMVPCode`]: {controller: 'RegistrationController', action: 'sendMVPCode'},
+  [`PUT ${prefix}/registration/verifyMVPCode`]: {controller: 'RegistrationController', action: 'verifyMVPCode'},
+  [`PUT ${prefix}/registration/disableMVPCode`]: {controller: 'RegistrationController', action: 'disableMVPCode'},
+  [`PUT ${prefix}/registration/validateCaptcha`]: {controller: 'RegistrationController', action: 'validateCaptcha'},
+  [`PUT ${prefix}/registration/checkIp`]: {controller: 'RegistrationController', action: 'checkIp'},
+  [`PUT ${prefix}/registration/generateQRCode`]: {controller: 'RegistrationController', action: 'generateQRCode'},
+  [`POST ${prefix}/registration/confirm`]: {controller: 'RegistrationController', action: 'confirm'},
+
+  [`POST ${prefix}/auth/login`]: {controller: 'AuthController', action: 'login'},
+  [`DELETE ${prefix}/auth/logout`]: {controller: 'AuthController', action: 'logout'},
+
+  [`GET ${prefix}/values`]: {controller: 'ValuesController', action: 'index'},
+
+  [`PUT ${prefix}/password/change`]: {controller: 'PasswordController', action: 'change'}
 
   // [`${prefix}/custom`]: {controller: 'User', action: 'find'},
   // '/routes': (req, res) => res.ok(sails.config.routes)
