@@ -5,9 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global User */
-
-const speakeasy = require('speakeasy');
+/* global User AuthenticatorService */
 
 module.exports = {
 
@@ -30,14 +28,7 @@ module.exports = {
           return res.badRequest({ message: 'Google Authenticator Code can not be empty' });
         }
 
-        // TODO: Move Google Authenticator logic to service
-        const verified = speakeasy.totp.verify({
-          secret: req.user.twoFactorSecret,
-          encoding: 'base32',
-          token: allParams.token
-        });
-
-        if (!verified) {
+        if (!AuthenticatorService.verify(req.user.twoFactorSecret, allParams.token)) {
           return res.badRequest({
             message: 'Google Authenticator Code is expired or invalid'
           });

@@ -5,9 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global Transactions ExchangeRates MiscService KoraService */
-
-const qrcode = require('qrcode');
+/* global Transactions ExchangeRates MiscService KoraService AuthenticatorService */
 
 module.exports = {
 
@@ -67,7 +65,7 @@ function fetchKoraWallets (cb) {
       cache.BTCWallet.address = BTC;
       cache.ETHWallet.address = ETH;
 
-      return Promise.all([BTC, ETH].map(a => generageQRCode(a)));
+      return Promise.all([BTC, ETH].map(a => AuthenticatorService.generageQRCode(a)));
     })
     .then(([BTC, ETH]) => {
       cache.BTCWallet.qrcode = BTC;
@@ -75,19 +73,6 @@ function fetchKoraWallets (cb) {
 
       return cache;
     });
-
-  return MiscService.cbify(promise, cb);
-}
-
-function generageQRCode (text, cb) {
-  let promise = new Promise((resolve, reject) =>
-    qrcode.toDataURL(text, (err, url) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(url);
-    }));
 
   return MiscService.cbify(promise, cb);
 }

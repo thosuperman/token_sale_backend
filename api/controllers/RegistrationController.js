@@ -5,11 +5,9 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails _ User ValidationService */
+/* global sails _ User ValidationService AuthenticatorService */
 
 const request = require('request');
-const speakeasy = require('speakeasy');
-const qrcode = require('qrcode');
 const geoip = require('geoip-country');
 
 const captchaErrors = {
@@ -260,17 +258,11 @@ module.exports = {
       });
     }
 
-    const secret = speakeasy.generateSecret({name: 'Kora'});
+    const secret = AuthenticatorService.generateSecret();
 
-    return new Promise((resolve, reject) => qrcode.toDataURL(secret.otpauth_url, (err, url) => {
-      if (err) {
-        return reject(err);
-      }
+    req.session.twoFactorSecret = secret.base32;
 
-      req.session.twoFactorSecret = secret.base32;
-
-      return resolve(url);
-    }))
+    return AuthenticatorService.generageQRCode(secret.otpauth_url)
       .then(url => ({
         qrcode: url,
         key: secret.base32
@@ -311,13 +303,7 @@ module.exports = {
 
     let allParams = req.allParams();
 
-    const verified = speakeasy.totp.verify({
-      secret: twoFactorSecret,
-      encoding: 'base32',
-      token: allParams.token
-    });
-
-    if (!verified) {
+    if (!AuthenticatorService.verify(twoFactorSecret, allParams.token)) {
       return res.badRequest({
         message: 'Google Authenticator Code is invalid or expired'
       });
