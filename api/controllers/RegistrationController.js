@@ -319,7 +319,7 @@ module.exports = {
 
     if (!verified) {
       return res.badRequest({
-        message: 'Token verification fails'
+        message: 'Google Authenticator Code is invalid or expired'
       });
     }
 
