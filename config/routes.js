@@ -69,6 +69,8 @@ module.exports.routes = {
   [`POST ${prefix}/auth/login`]: {controller: 'AuthController', action: 'login'},
   [`DELETE ${prefix}/auth/logout`]: {controller: 'AuthController', action: 'logout'},
 
+  [`${prefix}/profile`]: {controller: 'ProfileController', action: 'index'},
+
   [`GET ${prefix}/values`]: {controller: 'ValuesController', action: 'index'},
 
   [`PUT ${prefix}/password/change`]: {controller: 'PasswordController', action: 'change'},
@@ -77,6 +79,7 @@ module.exports.routes = {
   [`PUT ${prefix}/authenticator/reEnable`]: {controller: 'AuthenticatorController', action: 'reEnable'},
 
   [`POST ${prefix}/authenticator/recovery`]: {model: 'authenticatorrecovery', blueprint: 'create'}
+  // [`PUT ${prefix}/authenticator/recovery`]: {model: 'authenticatorrecovery', blueprint: 'update'}
 
   // [`${prefix}/custom`]: {controller: 'User', action: 'find'},
   // '/routes': (req, res) => res.ok(sails.config.routes)

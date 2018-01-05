@@ -9,10 +9,6 @@
 
 module.exports = {
 
-  _config: {
-    actions: true
-  },
-
   /**
    * `ProfileController.index()`
    */

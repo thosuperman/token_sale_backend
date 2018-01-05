@@ -5,9 +5,14 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global EtherscanService BitstampService ExchangeRates KoraService BlockchainService */
+/* global sails EtherscanService BitstampService ExchangeRates KoraService BlockchainService */
 
 module.exports = {
+
+  _config: {
+    actions: (sails.config.environment === 'development')
+  },
+
   blocktrailTxs: function (req, res) {
     const {address, page, limit, sortDir} = req.allParams();
 
