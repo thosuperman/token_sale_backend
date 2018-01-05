@@ -5,11 +5,9 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global _ ValidationService CountriesService */
+/* global _ ValidationService CountriesService ErrorService */
 
 const bcrypt = require('bcrypt');
-
-const WLError = require('waterline/lib/waterline/error/WLError');
 
 const roles = {
   admin: 'admin',
@@ -195,7 +193,7 @@ module.exports = {
 
     if (values.password) {
       if (!ValidationService.password(values.password)) {
-        return cb(new WLError({
+        return cb(ErrorService.throw({
           status: 400,
           message: 'Password must be over 8 characters, have at least 1 uppercase English letter, 1 lowercase English letter and 1 number'
         }));
@@ -223,11 +221,11 @@ module.exports = {
 
   beforeCreate: function (values, cb) {
     if (!values.password) {
-      return cb(new WLError({status: 400, message: 'Password must be set'}));
+      return cb(ErrorService.throw({status: 400, message: 'Password must be set'}));
     }
 
     if (!(values.sendingEthereumAddress || values.bitcoinAddress)) {
-      return cb(new WLError({status: 400, message: 'Sending ethereum address or bitcoin address must be set'}));
+      return cb(ErrorService.throw({status: 400, message: 'Sending ethereum address or bitcoin address must be set'}));
     }
 
     return cb();
