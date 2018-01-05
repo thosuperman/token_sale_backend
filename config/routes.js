@@ -74,7 +74,9 @@ module.exports.routes = {
   [`PUT ${prefix}/password/change`]: {controller: 'PasswordController', action: 'change'},
 
   [`PUT ${prefix}/authenticator/regenerate`]: {controller: 'AuthenticatorController', action: 'regenerate'},
-  [`PUT ${prefix}/authenticator/reEnable`]: {controller: 'AuthenticatorController', action: 'reEnable'}
+  [`PUT ${prefix}/authenticator/reEnable`]: {controller: 'AuthenticatorController', action: 'reEnable'},
+
+  [`POST ${prefix}/authenticator/recovery`]: {model: 'authenticatorrecovery', blueprint: 'create'}
 
   // [`${prefix}/custom`]: {controller: 'User', action: 'find'},
   // '/routes': (req, res) => res.ok(sails.config.routes)
