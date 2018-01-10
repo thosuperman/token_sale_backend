@@ -13,25 +13,37 @@ module.exports = {
    * `AuthenticatorController.regenerate()`
    */
   regenerate: function (req, res) {
-    const {token} = req.allParams();
+    const {token, password} = req.allParams();
 
-    if (!AuthenticatorService.verify(req.user.twoFactorSecret, token)) {
-      return res.badRequest({
-        message: 'Google Authenticator Code is expired or invalid'
-      });
-    }
+    User.comparePassword(password, req.user, (err, valid) => {
+      if (err) {
+        return res.negotiate(err);
+      }
 
-    const secret = AuthenticatorService.generateSecret();
+      if (!valid) {
+        return res.badRequest({
+          message: 'Password is invalid'
+        });
+      }
 
-    req.session.newTwoFactorSecret = secret.base32;
+      if (!AuthenticatorService.verify(req.user.twoFactorSecret, token)) {
+        return res.badRequest({
+          message: 'Google Authenticator Code is expired or invalid'
+        });
+      }
 
-    return AuthenticatorService.generageQRCode(secret.otpauth_url)
-      .then(url => ({
-        qrcode: url,
-        key: secret.base32
-      }))
-      .then(result => res.ok(result))
-      .catch(err => res.negotiate(err));
+      const secret = AuthenticatorService.generateSecret();
+
+      req.session.newTwoFactorSecret = secret.base32;
+
+      return AuthenticatorService.generageQRCode(secret.otpauth_url)
+        .then(url => ({
+          qrcode: url,
+          key: secret.base32
+        }))
+        .then(result => res.ok(result))
+        .catch(err => res.negotiate(err));
+    });
   },
 
   /**
