@@ -275,17 +275,31 @@ module.exports = {
    * `RegistrationController.confirm()`
    */
   confirm: function (req, res) {
+    let allParams = req.allParams();
     const twoFactorSecret = req.session.twoFactorSecret;
-
-    if (!req.session.isCaptchaValid) {
-      return res.badRequest({
-        message: `User didn't pass reCaptcha validation`
-      });
-    }
 
     if (!req.session.isIPChecked) {
       return res.badRequest({
         message: `User didn't check his IP`
+      });
+    }
+
+    // TODO: Check US citizens registration logic
+    if (req.session.hasUSIP) {
+      return res.badRequest({
+        message: `User can't has US IP`
+      });
+    }
+
+    if (allParams.country === 'USA') {
+      return res.badRequest({
+        message: `User can't has US country`
+      });
+    }
+
+    if (!req.session.isCaptchaValid) {
+      return res.badRequest({
+        message: `User didn't pass reCaptcha validation`
       });
     }
 
@@ -300,8 +314,6 @@ module.exports = {
         message: 'Verification code throught Kora MVP was sent but not verified'
       });
     }
-
-    let allParams = req.allParams();
 
     if (!AuthenticatorService.verify(twoFactorSecret, allParams.token)) {
       return res.badRequest({
