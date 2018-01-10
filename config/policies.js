@@ -89,7 +89,7 @@ module.exports.policies = {
     update: true
   },
 
-  FileController: {
+  FilesController: {
     // TODO: Add isAdmin policy
     // findOne: true,
     '*': false
