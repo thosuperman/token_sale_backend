@@ -11,7 +11,21 @@ module.exports = {
   attributes: {
     email: { type: 'string', required: true, email: true },
 
-    user: { model: 'user' }
+    user: { model: 'user' },
+
+    photo: { model: 'files' },
+
+    accepted: { type: 'boolean', defaultsTo: false },
+
+    toJSON: function () {
+      var obj = this.toObject();
+
+      if (obj.photo) {
+        obj.photoUrl = '/file/' + this.photo;
+      }
+
+      return obj;
+    }
   },
 
   validationMessages: {

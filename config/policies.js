@@ -82,5 +82,16 @@ module.exports.policies = {
     // TODO: Enable TotalAmountController.find for admin in future
     // find: ['isAuthorized'],
     '*': false
+  },
+
+  AuthenticatorRecoveryController: {
+    '*': false,
+    update: true
+  },
+
+  FileController: {
+    // TODO: Add isAdmin policy
+    // findOne: true,
+    '*': false
   }
 };
