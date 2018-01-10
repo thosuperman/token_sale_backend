@@ -62,8 +62,8 @@ module.exports = {
   //   }
   // },
 
-  // TODO: Enable CSRF protection on production and update routes methods
-  // csrf: true,
+  // Enable CSRF protection
+  csrf: true,
 
   /***************************************************************************
    * Enable morgan logger sails-hook-requestlogger                           *
