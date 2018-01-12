@@ -13,12 +13,17 @@ module.exports = {
    * `ValuesController.index()`
    */
   index: function (req, res) {
-    Promise.all([
+    let promises = [
       calcUserKNTBalance({userId: req.user.id}),
       fetchExchangeRates(),
-      KoraService.saleValues({needDiscountMVP: req.user.isMVPUser}),
-      fetchKoraWallets()
-    ])
+      KoraService.saleValues({needDiscountMVP: req.user.isMVPUser})
+    ];
+
+    if (req.user.verified) {
+      promises.push(fetchKoraWallets());
+    }
+
+    Promise.all(promises)
       .then(([KNTBalance, exchangeRates, saleValues, wallets]) => Object.assign({
         KNTBalance
       }, exchangeRates, saleValues, wallets))
