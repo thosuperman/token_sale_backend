@@ -10,6 +10,8 @@
 const path = require('path');
 const fs = require('fs');
 
+const updateAttrs = ['email', 'sendingEthereumAddress', 'bitcoinAddress'];
+
 const needVerifyAttrs = [
   'firstName',
   'lastName',
@@ -35,7 +37,8 @@ module.exports = {
         return res.json(req.user);
 
       case 'PUT':
-        let allParams = _.pick(req.allParams(), ['email', 'sendingEthereumAddress', 'bitcoinAddress']);
+        const user = req.user;
+        let allParams = _.pick(req.allParams(), updateAttrs);
 
         // if (!allParams.token) {
         //   return res.badRequest({ message: 'Google Authenticator Code can not be empty' });
@@ -47,7 +50,15 @@ module.exports = {
         //   });
         // }
 
-        return User.update({id: req.user.id}, allParams)
+        allParams = _.pick(allParams, (value, key) => (user[key] !== value));
+
+        if (_.isEmpty(allParams)) {
+          return res.badRequest({
+            message: 'Nothing was changed'
+          });
+        }
+
+        return User.update({id: user.id}, allParams)
           .then(([user]) => {
             req.user = user;
             return user;
