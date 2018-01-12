@@ -70,6 +70,9 @@ module.exports.routes = {
   [`DELETE ${prefix}/auth/logout`]: {controller: 'AuthController', action: 'logout'},
 
   [`${prefix}/profile`]: {controller: 'ProfileController', action: 'index'},
+  [`PUT ${prefix}/profile/verify`]: {controller: 'ProfileController', action: 'verify'},
+  [`GET ${prefix}/profile/document`]: {controller: 'ProfileController', action: 'document'},
+  [`GET ${prefix}/profile/selects`]: {controller: 'ProfileController', action: 'selects'},
 
   [`GET ${prefix}/values`]: {controller: 'ValuesController', action: 'index'},
 

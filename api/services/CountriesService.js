@@ -23,8 +23,11 @@ const collection = list.reduce((result, current) => {
   return result;
 }, {});
 
+const codesList = worldCountries.map(c => c.cca3);
+
 module.exports = {
   list,
   collection,
+  codesList,
   flagImg
 };

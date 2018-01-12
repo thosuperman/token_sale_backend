@@ -22,5 +22,7 @@ module.exports = {
 
   password: value => /^(?=.*\d)(?=.*[a-zA-Z]).{9,}$/.test(value),
 
+  postalCode: value => validator.isPostalCode(value + '', 'any'),
+
   escape: value => validator.escape(value + '')
 };

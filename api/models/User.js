@@ -15,15 +15,29 @@ const roles = {
 };
 const rolesList = _.values(roles);
 
+const identificationTypesNames = {
+  driver: 'Driver\'s License',
+  nonDriver: 'Non-driver Government ID',
+  passport: 'Passport',
+  other: 'Other'
+};
+const identificationTypes = Object.keys(identificationTypesNames).reduce((obj, key) => {
+  obj[key] = key;
+  return obj;
+}, {});
+const identificationTypesList = _.values(identificationTypes);
+
 module.exports = {
   constants: {
     roles,
-    rolesList
+    rolesList,
+    identificationTypes,
+    identificationTypesList,
+    identificationTypesNames,
+    identificationTypesSelect: _.map(identificationTypesNames, (value, key) => ({id: key, name: value}))
   },
 
   attributes: {
-    phone: { type: 'string', unique: true, phoneNumber: true },
-
     userName: { type: 'string', unique: true, alphanumericdashed: true },
 
     userNameOrigin: { type: 'string' },
@@ -34,9 +48,33 @@ module.exports = {
 
     lastName: { type: 'string', required: true, alpha: true },
 
-    country: { type: 'string', required: true, in: CountriesService.list.map(el => el.countryCode) },
+    phone: { type: 'string', unique: true, phoneNumber: true },
 
-    nationality: { type: 'string', required: true, in: CountriesService.list.map(el => el.countryCode) },
+    country: { type: 'string', required: true, in: CountriesService.codesList },
+
+    nationality: { type: 'string', required: true, in: CountriesService.codesList },
+
+    dateOfBirth: { type: 'date', after: new Date('1900-01-01') },
+
+    streetAddress: { type: 'string' },
+
+    aptSte: { type: 'string' },
+
+    city: { type: 'string' },
+
+    state: { type: 'string' },
+
+    zip: { type: 'string', postalCode: true },
+
+    identificationType: { type: 'string', in: identificationTypesList },
+
+    documentCountry: { type: 'string', in: CountriesService.codesList },
+
+    document: { model: 'files' },
+
+    needVerify: { type: 'boolean', defaultsTo: false },
+
+    verified: { type: 'boolean', defaultsTo: false },
 
     sendingEthereumAddress: { type: 'string', unique: true, ethereumAddress: true },
 
@@ -74,6 +112,11 @@ module.exports = {
         obj.nationalityName = CountriesService.collection[obj.nationality].name;
       }
 
+      // TODO: Update documentUrl for admin
+      // if (obj.document) {
+      //   obj.documentUrl = '/files/' + obj.document;
+      // }
+
       return obj;
     }
   },
@@ -81,14 +124,11 @@ module.exports = {
   types: {
     phoneNumber: value => ValidationService.phoneNumber(value),
     ethereumAddress: value => ValidationService.ethereumAddress(value),
-    bitcoinAddress: value => ValidationService.bitcoinAddress(value)
+    bitcoinAddress: value => ValidationService.bitcoinAddress(value),
+    postalCode: value => ValidationService.postalCode(value)
   },
 
   validationMessages: {
-    phone: {
-      phoneNumber: 'Provide valid phone number',
-      unique: 'Phone number is already taken'
-    },
     userName: {
       // required: 'Username is required',
       alphanumericdashed: 'Provide valid username',
@@ -107,6 +147,10 @@ module.exports = {
       required: 'Last name is required',
       alpha: 'Provide valid last name'
     },
+    phone: {
+      phoneNumber: 'Provide valid phone number',
+      unique: 'Phone number is already taken'
+    },
     country: {
       required: 'Country is required',
       in: 'Provide valid country'
@@ -114,6 +158,30 @@ module.exports = {
     nationality: {
       required: 'Nationality is required',
       in: 'Provide valid nationality'
+    },
+    dateOfBirth: {
+      date: 'Provide valid date of birth'
+    },
+    streetAddress: {
+      string: 'Provide valid street address'
+    },
+    aptSte: {
+      string: 'Provide valid apt/ste'
+    },
+    city: {
+      string: 'Provide valid city'
+    },
+    state: {
+      string: 'Provide valid state'
+    },
+    zip: {
+      postalCode: 'Provide valid zip'
+    },
+    identificationType: {
+      in: 'Provide valid identification type'
+    },
+    documentCountry: {
+      in: 'Provide valid document country'
     },
     sendingEthereumAddress: {
       // required: 'Sending ethereum address is required',
@@ -190,6 +258,12 @@ module.exports = {
     if (values.receivingEthereumAddress) {
       values.receivingEthereumAddress = values.receivingEthereumAddress.toLowerCase();
     }
+
+    ['streetAddress', 'aptSte', 'city', 'state'].forEach(key => {
+      if (values[key]) {
+        values[key] = ValidationService.escape(values[key]);
+      }
+    });
 
     if (values.password) {
       if (!ValidationService.password(values.password)) {
