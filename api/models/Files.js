@@ -6,6 +6,10 @@
  */
 
 module.exports = {
+  constants: {
+    maxBytes: 20 * 1024 * 1024
+  },
+
   attributes: {
     fd: { type: 'string', required: true },
 

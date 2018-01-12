@@ -9,8 +9,6 @@
 
 var path = require('path');
 
-const maxBytes = 20 * 1024 * 1024;
-
 module.exports = {
   update: function (req, res) {
     let id = req.param('id');
@@ -30,7 +28,7 @@ module.exports = {
         }
 
         req.file('photo').upload({
-          maxBytes,
+          maxBytes: Files.constants.maxBytes,
           dirname: path.resolve('uploads/recovery')
         }, function (err, uploads) {
           if (err) {
