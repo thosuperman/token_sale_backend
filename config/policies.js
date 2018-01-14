@@ -79,8 +79,7 @@ module.exports.policies = {
   },
 
   TotalAmountController: {
-    // TODO: Enable TotalAmountController.find for admin in future
-    // find: ['isAuthorized'],
+    find: ['isAdmin'],
     '*': false
   },
 
