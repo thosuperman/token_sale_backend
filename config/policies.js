@@ -51,8 +51,10 @@ module.exports.policies = {
   '*': ['isAuthorized'],
 
   UserController: {
-    // TODO: Enable UserController for admin in future
-    '*': false
+    find: ['isAdmin'],
+    findOne: ['isAdmin'],
+    update: ['isAdmin'],
+    '*': ['deny']
     // destroy: false
   },
 
@@ -89,8 +91,7 @@ module.exports.policies = {
   },
 
   FilesController: {
-    // TODO: Add isAdmin policy
-    // findOne: true,
-    '*': false
+    findOne: ['isAdmin'],
+    '*': ['deny']
   }
 };

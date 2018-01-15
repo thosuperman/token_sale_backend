@@ -9,6 +9,9 @@
 
 const bcrypt = require('bcrypt');
 
+const {blueprints} = require('../../config/blueprints');
+const prefix = blueprints.prefix || '';
+
 const roles = {
   admin: 'admin',
   user: 'user'
@@ -113,9 +116,9 @@ module.exports = {
       }
 
       // TODO: Update documentUrl for admin
-      // if (obj.document) {
-      //   obj.documentUrl = '/files/' + obj.document;
-      // }
+      if (obj.document) {
+        obj.documentUrl = `/${prefix}/files/` + obj.document;
+      }
 
       return obj;
     }
