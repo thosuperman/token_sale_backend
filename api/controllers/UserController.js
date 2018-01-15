@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global _ User ErrorService */
+/* global _ User */
 
 module.exports = {
   // TODO: Review blueprints global logic
@@ -15,7 +15,11 @@ module.exports = {
 
   find: function (req, res) {
     const {
+      search = '',
       role,
+      enabled,
+      verified,
+      needVerify,
       limit = 10,
       page = 1,
       sort = 'email ASC'
@@ -23,8 +27,33 @@ module.exports = {
 
     let where = {};
 
+    if (search) {
+      where.or = [
+        {phone: {contains: search}},
+        {userName: {contains: search}},
+        {email: {contains: search}},
+        {firstName: {contains: search}},
+        {lastName: {contains: search}},
+        {sendingEthereumAddress: {contains: search}},
+        {receivingEthereumAddress: {contains: search}},
+        {bitcoinAddress: {contains: search}}
+      ];
+    }
+
     if (role) {
       where.role = role;
+    }
+
+    if (enabled) {
+      where.enabled = enabled;
+    }
+
+    if (verified) {
+      where.verified = verified;
+    }
+
+    if (needVerify) {
+      where.needVerify = needVerify;
     }
 
     Promise.all([
