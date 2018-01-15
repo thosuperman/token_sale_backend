@@ -122,9 +122,10 @@ nbproject
 
 
 ################################################
-# Uploads
+# Static files
 #
-# Uploaded files
+# Static files that don't need to be commited
 ################################################
 
 uploads
+www
