@@ -70,5 +70,20 @@ module.exports = {
       })
       .then(result => res.json(result))
       .catch(err => res.negotiate(err));
+  },
+
+  blockChange: function (req, res) {
+    let id = req.param('id');
+
+    User.findOne({id})
+      .then(record => {
+        if (!record) {
+          return res.notFound();
+        }
+
+        return User.update({id: record.id}, {enabled: !record.enabled});
+      })
+      .then(result => res.json(result))
+      .catch(err => res.negotiate(err));
   }
 };

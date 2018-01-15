@@ -55,6 +55,7 @@ module.exports.policies = {
     findOne: ['isAdmin'],
     update: ['isAdmin'],
     verify: ['isAdmin'],
+    blockChange: ['isAdmin'],
     '*': ['deny']
     // destroy: false
   },
