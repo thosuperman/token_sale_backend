@@ -117,7 +117,7 @@ module.exports = {
 
       // TODO: Update documentUrl for admin
       if (obj.document) {
-        obj.documentUrl = `/${prefix}/files/` + obj.document;
+        obj.documentUrl = `${prefix}/files/` + obj.document;
       }
 
       return obj;
