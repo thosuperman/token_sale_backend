@@ -54,6 +54,7 @@ module.exports.policies = {
     find: ['isAdmin'],
     findOne: ['isAdmin'],
     update: ['isAdmin'],
+    verify: ['isAdmin'],
     '*': ['deny']
     // destroy: false
   },

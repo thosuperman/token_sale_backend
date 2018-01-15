@@ -85,7 +85,8 @@ module.exports.routes = {
   [`PUT ${prefix}/authenticator/recovery/:id`]: {controller: 'AuthenticatorRecoveryController', action: 'update'},
 
   [`GET ${prefix}/users`]: {controller: 'UserController', action: 'find'},
-  [`GET ${prefix}/users/:id`]: {controller: 'UserController', action: 'findOne'}
+  [`GET ${prefix}/users/:id`]: {controller: 'UserController', action: 'findOne'},
+  [`PUT ${prefix}/users/verify/:id`]: {controller: 'UserController', action: 'verify'}
 
   // [`${prefix}/custom`]: {controller: 'User', action: 'find'},
   // '/routes': (req, res) => res.ok(sails.config.routes)

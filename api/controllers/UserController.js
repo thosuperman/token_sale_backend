@@ -13,7 +13,7 @@ module.exports = {
       role,
       limit = 10,
       page = 1,
-      sort = 'userName ASC'
+      sort = 'email ASC'
     } = req.allParams();
 
     let where = {};
@@ -35,6 +35,39 @@ module.exports = {
     let id = req.param('id');
 
     User.findOne({id})
+      .then(record => {
+        if (!record) {
+          return res.notFound();
+        }
+
+        return res.ok(record);
+      })
+      .catch(err => res.negotiate(err));
+  },
+
+  verify: function (req, res) {
+    let id = req.param('id');
+
+    User.findOne({id})
+      .then(record => {
+        if (!record) {
+          return res.notFound();
+        }
+
+        if (record.verified) {
+          return res.badRequest({
+            message: 'User already verified'
+          });
+        }
+
+        if (!record.needVerify) {
+          return res.badRequest({
+            message: 'User didn\'t fill verify data'
+          });
+        }
+
+        return User.update({id: record.id}, {needVerify: false, verified: true});
+      })
       .then(result => res.json(result))
       .catch(err => res.negotiate(err));
   }
