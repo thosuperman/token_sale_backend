@@ -87,7 +87,8 @@ module.exports.routes = {
   [`GET ${prefix}/users`]: {controller: 'UserController', action: 'find'},
   [`GET ${prefix}/users/:id`]: {controller: 'UserController', action: 'findOne'},
   [`PUT ${prefix}/users/verify/:id`]: {controller: 'UserController', action: 'verify'},
-  [`PUT ${prefix}/users/blockChange/:id`]: {controller: 'UserController', action: 'blockChange'}
+  [`PUT ${prefix}/users/blockChange/:id`]: {controller: 'UserController', action: 'blockChange'},
+  [`PUT ${prefix}/users/:id`]: {controller: 'UserController', action: 'update'}
 
   // [`${prefix}/custom`]: {controller: 'User', action: 'find'},
   // '/routes': (req, res) => res.ok(sails.config.routes)

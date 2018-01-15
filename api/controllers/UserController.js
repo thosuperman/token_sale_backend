@@ -5,9 +5,14 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global User */
+/* global _ User ErrorService */
 
 module.exports = {
+  // TODO: Review blueprints global logic
+  _config: {
+    blueprints: false
+  },
+
   find: function (req, res) {
     const {
       role,
@@ -82,6 +87,22 @@ module.exports = {
         }
 
         return User.update({id: record.id}, {enabled: !record.enabled});
+      })
+      .then(result => res.json(result))
+      .catch(err => res.negotiate(err));
+  },
+
+  update: function (req, res) {
+    let id = req.param('id');
+    let allParams = _.pick(req.allParams(), ['email', 'sendingEthereumAddress', 'bitcoinAddress']);
+
+    User.findOne({id})
+      .then(record => {
+        if (!record) {
+          return res.notFound();
+        }
+
+        return User.update({id: record.id}, allParams);
       })
       .then(result => res.json(result))
       .catch(err => res.negotiate(err));
