@@ -29,5 +29,13 @@ module.exports = {
     .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
     .then(result => res.json(result))
     .catch(err => res.negotiate(err));
+  },
+
+  findOne: function (req, res) {
+    let id = req.param('id');
+
+    User.findOne({id})
+      .then(result => res.json(result))
+      .catch(err => res.negotiate(err));
   }
 };
