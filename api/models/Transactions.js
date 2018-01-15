@@ -159,7 +159,8 @@ module.exports = {
         if (promises.length === 2) {
           finalPromise = finalPromise
             .then(([exchangeRate, user]) => {
-              if (exchangeRate && user) {
+              // TODO: Review logic of KNt calc for unverified or blocked users
+              if (exchangeRate && user && user.enabled && user.verified) {
                 return KoraService.calcKNT({
                   valueUSD: values.USD,
                   needDiscountMVP: user.isMVPUser
@@ -184,8 +185,8 @@ module.exports = {
     return cb();
   },
 
-  afterCreate: function ({id, USD, KNT, from}, cb) {
-    if (from) {
+  afterCreate: function ({id, USD, KNT}, cb) {
+    if (KNT) {
       return TotalAmount.addNew({USD, KNT, transaction: id})
         .then(() => cb())
         .catch(err => cb(err));
