@@ -19,7 +19,7 @@ module.exports = {
       KoraService.saleValues({needDiscountMVP: req.user.isMVPUser})
     ];
 
-    if (req.user.verified) {
+    if (req.user.verified && req.user.enabled) {
       promises.push(fetchKoraWallets());
     }
 
