@@ -5,11 +5,19 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global Files */
+/* global sails Files */
 
-const fs = require('fs');
+const skipperS3 = require('skipper-better-s3')({
+  key: sails.config.s3ApiKey,
+  secret: sails.config.s3ApiSecret,
+  bucket: sails.config.s3Bucket,
+  region: sails.config.s3Region
+});
 
 module.exports = {
+  _config: {
+    actions: true
+  },
 
   /**
    * `FilesController.findOne()`
@@ -27,39 +35,17 @@ module.exports = {
           return res.notFound();
         }
 
-        res.set('Content-Type', file.type);
+        // res.set('Content-Type', file.type);
 
-        fs.createReadStream(file.fd)
-          .on('error', function (err) {
-            return res.serverError(err);
-          })
-          .pipe(res);
-      });
-  },
+        // skipperS3.read(file.fd)
+        //   .on('error', function (err) {
+        //     return res.serverError(err);
+        //   })
+        //   .pipe(res);
 
-  /**
-   * `FilesController.download()`
-   */
-  download: function (req, res) {
-    var fileID = req.param('id');
+        const url = skipperS3.url('getObject', { s3params: { Key: file.fd } });
 
-    Files.findOne({ id: fileID })
-      .exec((err, file) => {
-        if (err) {
-          return res.serverError(err);
-        }
-
-        if (!file) {
-          return res.notFound();
-        }
-
-        res.download(file.fd, function (err) {
-          if (err) {
-            return res.serverError(err);
-          }
-
-          return res.ok();
-        });
+        return res.redirect(303, url);
       });
   }
 };

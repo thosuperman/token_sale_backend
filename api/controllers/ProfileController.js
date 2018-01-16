@@ -7,8 +7,13 @@
 
 /* global sails _ User Files CountriesService */
 
-const fs = require('fs');
-const skipperS3 = require('skipper-s3');
+const skipperS3 = require('skipper-better-s3');
+const skipperS3Adapter = skipperS3({
+  key: sails.config.s3ApiKey,
+  secret: sails.config.s3ApiSecret,
+  bucket: sails.config.s3Bucket,
+  region: sails.config.s3Region
+});
 
 const updateAttrs = ['email', 'sendingEthereumAddress', 'bitcoinAddress'];
 
@@ -136,13 +141,17 @@ module.exports = {
           return res.notFound();
         }
 
-        res.set('Content-Type', file.type);
+        // res.set('Content-Type', file.type);
 
-        fs.createReadStream(file.fd)
-          .on('error', function (err) {
-            return res.serverError(err);
-          })
-          .pipe(res);
+        // skipperS3Adapter.read(file.fd)
+        //   .on('error', function (err) {
+        //     return res.serverError(err);
+        //   })
+        //   .pipe(res);
+
+        const url = skipperS3Adapter.url('getObject', { s3params: { Key: file.fd } });
+
+        return res.redirect(303, url);
       });
   },
 

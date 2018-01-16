@@ -7,7 +7,7 @@
 
 /* global sails AuthenticatorRecovery Files */
 
-const skipperS3 = require('skipper-s3');
+const skipperS3 = require('skipper-better-s3');
 
 module.exports = {
   update: function (req, res) {
