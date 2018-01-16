@@ -17,6 +17,8 @@ module.exports = {
 
     type: { type: 'string', required: true },
 
-    filename: { type: 'string', required: true }
+    filename: { type: 'string', required: true },
+
+    extra: { type: 'json' }
   }
 };

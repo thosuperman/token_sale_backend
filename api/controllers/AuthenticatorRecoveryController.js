@@ -5,9 +5,9 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global AuthenticatorRecovery Files */
+/* global sails AuthenticatorRecovery Files */
 
-var path = require('path');
+const skipperS3 = require('skipper-s3');
 
 module.exports = {
   update: function (req, res) {
@@ -28,8 +28,14 @@ module.exports = {
         }
 
         req.file('photo').upload({
-          maxBytes: Files.constants.maxBytes,
-          dirname: path.resolve('uploads/recovery')
+          adapter: skipperS3,
+          key: sails.config.s3ApiKey,
+          secret: sails.config.s3ApiSecret,
+          bucket: sails.config.s3Bucket,
+          region: sails.config.s3Region
+          // headers: {
+          //   'x-amz-acl': 'YOUR_FILE_PERMISSIONS'
+          // }
         }, function (err, uploads) {
           if (err) {
             return res.negotiate(err);

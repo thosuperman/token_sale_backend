@@ -5,10 +5,10 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global _ User Files CountriesService */
+/* global sails _ User Files CountriesService */
 
-const path = require('path');
 const fs = require('fs');
+const skipperS3 = require('skipper-s3');
 
 const updateAttrs = ['email', 'sendingEthereumAddress', 'bitcoinAddress'];
 
@@ -85,8 +85,11 @@ module.exports = {
     }
 
     req.file('document').upload({
-      maxBytes: Files.constants.maxBytes,
-      dirname: path.resolve('uploads/documents')
+      adapter: skipperS3,
+      key: sails.config.s3ApiKey,
+      secret: sails.config.s3ApiSecret,
+      bucket: sails.config.s3Bucket,
+      region: sails.config.s3Region
     }, function (err, uploads) {
       if (err) {
         return res.negotiate(err);
