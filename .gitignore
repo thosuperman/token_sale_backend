@@ -129,3 +129,19 @@ nbproject
 
 uploads
 www
+
+
+
+
+
+################################################
+# Assets
+#
+# Assets that need to be commited
+################################################
+
+!assets
+assets/*
+!assets/countries
+!assets/favicon.ico
+!assets/robots.txt
