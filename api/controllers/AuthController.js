@@ -34,8 +34,7 @@ module.exports = {
         {phone: userName},
         {userName: userName.toLowerCase()},
         {email: userName.toLowerCase()}
-      ],
-      enabled: true
+      ]
     })
       .exec((err, user) => {
         if (err) {
