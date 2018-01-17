@@ -65,6 +65,7 @@ module.exports.routes = {
   [`PUT ${prefix}/registration/checkIp`]: {controller: 'RegistrationController', action: 'checkIp'},
   [`PUT ${prefix}/registration/generateQRCode`]: {controller: 'RegistrationController', action: 'generateQRCode'},
   [`POST ${prefix}/registration/confirm`]: {controller: 'RegistrationController', action: 'confirm'},
+  [`GET ${prefix}/registration/confirmEmail`]: {controller: 'RegistrationController', action: 'confirmEmail'},
 
   [`POST ${prefix}/auth/login`]: {controller: 'AuthController', action: 'login'},
   [`DELETE ${prefix}/auth/logout`]: {controller: 'AuthController', action: 'logout'},

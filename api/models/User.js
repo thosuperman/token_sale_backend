@@ -11,6 +11,7 @@ const bcrypt = require('bcrypt');
 
 const {blueprints} = require('../../config/blueprints');
 const prefix = blueprints.prefix || '';
+const mailer = require('../services/SendgridService');
 
 const roles = {
   admin: 'admin',
@@ -29,6 +30,16 @@ const identificationTypes = Object.keys(identificationTypesNames).reduce((obj, k
   return obj;
 }, {});
 const identificationTypesList = _.values(identificationTypes);
+
+const generateVerificationToken = function() {
+  let text = "";
+  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (let i = 0; i < 30; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+};
 
 module.exports = {
   constants: {
@@ -79,6 +90,10 @@ module.exports = {
 
     verified: { type: 'boolean', defaultsTo: false },
 
+    emailVerificationToken: { type: 'string', defaultsTo: generateVerificationToken()},
+
+    emailVerified: { type: 'boolean', defaultsTo: false },
+
     sendingEthereumAddress: { type: 'string', unique: true, ethereumAddress: true },
 
     receivingEthereumAddress: { type: 'string', unique: true, ethereumAddress: true },
@@ -104,6 +119,7 @@ module.exports = {
       delete obj.userNameOrigin;
       delete obj.encryptedPassword;
       delete obj.twoFactorSecret;
+      delete obj.emailVerificationToken;
 
       if (obj.country) {
         obj.countryFlag = CountriesService.flagImg(obj.country);
@@ -305,6 +321,20 @@ module.exports = {
       return cb(ErrorService.throw({status: 400, message: 'Sending ethereum address or bitcoin address must be set'}));
     }
 
+    return cb();
+  },
+
+  afterCreate: function (values, cb) {
+    mailer.sendConfirmationEmail(values);
+    return cb();
+  },
+
+  beforeUpdate: function (valuesToUpdate, cb) {
+    if (valuesToUpdate.email) {
+      valuesToUpdate.emailVerified = false;
+      valuesToUpdate.emailVerificationToken = generateVerificationToken();
+      mailer.sendConfirmationEmail(values);
+    }
     return cb();
   },
 

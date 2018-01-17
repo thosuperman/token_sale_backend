@@ -5,6 +5,7 @@
   "description": "a Sails application",
   "keywords": [],
   "dependencies": {
+    "@sendgrid/mail": "^6.2.0",
     "bcrypt": "^1.0.3",
     "bitstamp": "^1.0.4",
     "blockchain.info": "^2.11.0",

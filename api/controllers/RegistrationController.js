@@ -360,5 +360,16 @@ module.exports = {
       })
       .then(result => res.ok(result))
       .catch(err => res.negotiate(err));
+  },
+
+  confirmEmail: function (req, res) {
+    const token = req.param('token');
+
+    User.findOne({emailVerificationToken: token})
+      .then(user => {
+        User.update({id: user.id}, {emailVerified: true})
+          .then(result => res.ok(result))
+      })
+      .catch(err => res.notFound({message: 'No user with such token found'}))
   }
 };
