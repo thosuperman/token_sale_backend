@@ -17,19 +17,20 @@ const skipperS3Adapter = skipperS3({
 
 const updateAttrs = ['email', 'sendingEthereumAddress', 'bitcoinAddress'];
 
-const needVerifyAttrs = [
-  'firstName',
-  'lastName',
-  'phone',
-  'country',
-  'dateOfBirth',
-  'streetAddress',
-  'city',
-  'state',
-  'zip',
-  'identificationType',
-  'documentCountry'
-];
+const needVerifyNames = {
+  'firstName': 'First Name',
+  'lastName': 'Last Name',
+  'phone': 'Phone Number',
+  'country': 'Country',
+  'dateOfBirth': 'Birthday',
+  'streetAddress': 'Street Address',
+  'city': 'City',
+  'state': 'State',
+  'zip': 'Zip',
+  'identificationType': 'Identification Type',
+  'documentCountry': 'Document Country'
+};
+const needVerifyAttrs = Object.keys(needVerifyNames);
 
 module.exports = {
 
@@ -87,7 +88,7 @@ module.exports = {
 
     if (notFilledAttr) {
       return res.badRequest({
-        message: `Field ${notFilledAttr} must be filled`
+        message: `Field ${needVerifyNames[notFilledAttr]} must be filled`
       });
     }
 
