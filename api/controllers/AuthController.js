@@ -47,6 +47,12 @@ module.exports = {
           });
         }
 
+        if (!user.enabled) {
+          return res.badRequest({
+            message: 'User was blocked by admin'
+          });
+        }
+
         User.comparePassword(password, user, (err, valid) => {
           if (err) {
             return res.negotiate(err);
