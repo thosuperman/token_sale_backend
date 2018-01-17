@@ -83,9 +83,11 @@ module.exports = {
 
     let allParams = _.pick(req.allParams(), ['aptSte'].concat(needVerifyAttrs));
 
-    if (needVerifyAttrs.some(key => !allParams[key])) {
+    let notFilledAttr = needVerifyAttrs.find(key => !allParams[key]);
+
+    if (notFilledAttr) {
       return res.badRequest({
-        message: 'All required Verify ID fields must be filled'
+        message: `Field ${notFilledAttr} must be filled`
       });
     }
 
