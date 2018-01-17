@@ -95,5 +95,10 @@ module.exports.policies = {
   FilesController: {
     findOne: ['isAdmin'],
     '*': ['deny']
+  },
+
+  SaleController: {
+    findLast: ['isAdmin'],
+    '*': ['deny']
   }
 };
