@@ -109,6 +109,10 @@ module.exports = {
   blockChange: function (req, res) {
     let id = req.param('id');
 
+    if (id === req.user.id) {
+      return res.badRequest({ message: 'Admin can\'t block himself' });
+    }
+
     User.findOne({id})
       .then(record => {
         if (!record) {
