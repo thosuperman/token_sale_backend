@@ -21,6 +21,7 @@ module.exports = {
 
   WLError,
 
+  // TODO: Rename ErrorService.throw method or rewrite logic
   throw: function ({status = 500, message}) {
     return new WLError({status, message});
   }

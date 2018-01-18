@@ -74,6 +74,11 @@ function mapRecord (record) {
   record.preSale = mapSale(record, record.preSale);
   record.publicSale = mapSale(record, record.publicSale);
 
+  record.totalAmountUSD = record.preSale[record.preSale.length - 1].fullAmountUSD +
+                          record.publicSale[record.publicSale.length - 1].fullAmountUSD;
+  record.totalAmountKNT = record.preSale[record.preSale.length - 1].fullAmountKNT +
+                          record.publicSale[record.publicSale.length - 1].fullAmountKNT;
+
   // record.sale = record.isPublicSale ? record.publicSale : record.preSale;
 
   return record;
@@ -85,6 +90,7 @@ function mapSale (record, sale) {
     s.KNT_USD = +(1 / s.USD_KNT).toFixed(10);
     s.amountKNT = +(s.USD_KNT * s.amountUSD).toFixed(10);
     s.fullAmountUSD = i === 0 ? s.amountUSD : +(arr[i - 1].fullAmountUSD + s.amountUSD).toFixed(10);
+    s.fullAmountKNT = i === 0 ? s.amountKNT : +(arr[i - 1].fullAmountKNT + s.amountKNT).toFixed(10);
     s.USD_KNT_MVP = +(s.USD_KNT * 100 / (100 - record.discountMVP)).toFixed(10);
     s.KNT_USD_MVP = +(1 / s.USD_KNT_MVP).toFixed(10);
 
