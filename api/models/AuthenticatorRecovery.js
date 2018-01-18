@@ -21,7 +21,7 @@ module.exports = {
       var obj = this.toObject();
 
       if (obj.photo) {
-        obj.photoUrl = '/api/files/' + obj.photo.id || obj.photo;
+        obj.photoUrl = '/api/files/' + (obj.photo.id || obj.photo);
         delete obj.photo;
       }
 
