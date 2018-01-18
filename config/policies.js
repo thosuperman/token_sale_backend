@@ -97,6 +97,7 @@ module.exports.policies = {
     update: true,
     find: ['isAdmin'],
     findOne: ['isAdmin'],
+    reset: ['isAdmin'],
     destroy: ['isAdmin']
   },
 

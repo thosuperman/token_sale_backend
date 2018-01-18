@@ -22,8 +22,17 @@ function sendConfirmationEmail (user) {
   });
 }
 
+function sendAuthenticatorRecoveryEmail (user, {key, qrcode}) {
+  return sendEmail({
+    to: user.email,
+    subject: 'Kora new Google Authenticator secret seed',
+    html: `<p>Your new Google Authenticator secret seed: ${key}<br/><div><img src="${qrcode}" alt="QR Code"></div></p>`
+  });
+}
+
 const mailer = {
-  sendConfirmationEmail
+  sendConfirmationEmail,
+  sendAuthenticatorRecoveryEmail
 };
 
 module.exports = mailer;

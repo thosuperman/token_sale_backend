@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails AuthenticatorRecovery Files */
+/* global sails AuthenticatorRecovery Files AuthenticatorService User MailerService */
 
 const skipperS3 = require('skipper-better-s3');
 
@@ -81,6 +81,43 @@ module.exports = {
             .catch(err => res.negotiate(err));
           });
         });
+      });
+  },
+
+  reset: function (req, res) {
+    let id = req.param('id');
+
+    AuthenticatorRecovery.findOne({id}).populate('user')
+      .exec((err, record) => {
+        if (err) {
+          return res.negotiate(err);
+        }
+
+        if (!record) {
+          return res.notFound({message: 'Google Authenticator secret code recovery request record not found'});
+        }
+
+        if (!record.accepted) {
+          return res.badRequest({message: 'Google Authenticator secret code recovery request not accepted'});
+        }
+
+        const secret = AuthenticatorService.generateSecret();
+
+        req.session.newTwoFactorSecret = secret.base32;
+
+        return User.update({id: record.user.id}, {twoFactorSecret: secret.base32})
+          .then(user => AuthenticatorService.generageQRCode(secret.otpauth_url))
+          .then(url => {
+            MailerService.sendAuthenticatorRecoveryEmail(record.user, { qrcode: url, key: secret.base32 });
+
+            return AuthenticatorRecovery.destroy({id});
+          })
+          .then(([record]) => {
+            return res.ok({
+              message: 'Email with new Google Authenticator secret seed was sent to user'
+            });
+          })
+          .catch(err => res.negotiate(err));
       });
   }
 };
