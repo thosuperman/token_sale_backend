@@ -7,6 +7,9 @@
 
 /* global sails _ User Files CountriesService ErrorService */
 
+const {blueprints} = require('../../config/blueprints');
+const prefix = blueprints.prefix || '';
+
 const skipperS3 = require('skipper-better-s3');
 const skipperS3Adapter = skipperS3({
   key: sails.config.s3ApiKey,
@@ -43,7 +46,7 @@ module.exports = {
     switch (req.method) {
       case 'GET':
         if (user.document) {
-          user.documentUrl = '/api/profile/document';
+          user.documentUrl = `${prefix.slice(1)}/files/document`;
           delete user.document;
         }
 

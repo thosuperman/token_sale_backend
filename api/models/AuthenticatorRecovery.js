@@ -7,6 +7,9 @@
 
 /* global User ErrorService */
 
+const {blueprints} = require('../../config/blueprints');
+const prefix = blueprints.prefix || '';
+
 module.exports = {
   attributes: {
     email: { type: 'string', required: true, email: true },
@@ -21,7 +24,7 @@ module.exports = {
       var obj = this.toObject();
 
       if (obj.photo) {
-        obj.photoUrl = '/api/files/' + (obj.photo.id || obj.photo);
+        obj.photoUrl = `${prefix.slice(1)}/files/` + (obj.photo.id || obj.photo);
         delete obj.photo;
       }
 
