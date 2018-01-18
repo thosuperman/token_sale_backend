@@ -96,7 +96,8 @@ module.exports.routes = {
   [`GET ${prefix}/sale`]: {controller: 'SaleController', action: 'findLast'},
 
   [`GET ${prefix}/authenticatorRecovery`]: {controller: 'AuthenticatorRecoveryController', action: 'find'},
-  [`GET ${prefix}/authenticatorRecovery/:id`]: {model: 'authenticatorrecovery', blueprint: 'findOne'}
+  [`GET ${prefix}/authenticatorRecovery/:id`]: {model: 'authenticatorrecovery', blueprint: 'findOne'},
+  [`DELETE ${prefix}/authenticatorRecovery/:id`]: {model: 'authenticatorrecovery', blueprint: 'delete'}
 
   // [`${prefix}/custom`]: {controller: 'User', action: 'find'},
   // '/routes': (req, res) => res.ok(sails.config.routes)

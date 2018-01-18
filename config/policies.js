@@ -96,7 +96,8 @@ module.exports.policies = {
     '*': false,
     update: true,
     find: ['isAdmin'],
-    findOne: ['isAdmin']
+    findOne: ['isAdmin'],
+    destroy: ['isAdmin']
   },
 
   FilesController: {
