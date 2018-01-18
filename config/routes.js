@@ -92,6 +92,7 @@ module.exports.routes = {
   [`PUT ${prefix}/users/:id`]: {controller: 'UserController', action: 'update'},
 
   [`GET ${prefix}/manageTokens`]: {controller: 'ManageTokensController', action: 'index'},
+  [`POST ${prefix}/manageTokens/sale`]: {controller: 'SaleController', action: 'create'},
   [`GET ${prefix}/sale`]: {controller: 'SaleController', action: 'findLast'}
 
   // [`${prefix}/custom`]: {controller: 'User', action: 'find'},

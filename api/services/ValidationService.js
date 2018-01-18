@@ -11,6 +11,8 @@ const Web3Utils = require('web3-utils');
 const WAValidator = require('wallet-address-validator');
 const validator = require('validator');
 
+const floatMin0 = value => validator.isFloat(value + '', {min: 0});
+
 module.exports = {
   phoneNumber: value => /^[1-9]\d{9,12}$/i.test(value),
 
@@ -24,5 +26,11 @@ module.exports = {
 
   postalCode: value => validator.isPostalCode(value + '', 'any'),
 
-  escape: value => validator.escape(value + '')
+  escape: value => validator.escape(value + ''),
+
+  float: value => validator.isFloat(value + ''),
+
+  floatMin0,
+
+  saleArray: value => Array.isArray(value) && value.every(s => (floatMin0(s.discount) && floatMin0(s.amountUSD)))
 };

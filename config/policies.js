@@ -104,6 +104,7 @@ module.exports.policies = {
 
   SaleController: {
     findLast: ['isAdmin'],
+    create: ['isAdmin'],
     '*': ['deny']
   },
 

@@ -5,7 +5,7 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global MiscService */
+/* global _ MiscService ValidationService */
 
 const defaultRecord = {
   isDiscount: true,
@@ -33,17 +33,17 @@ const defaultRecord = {
 module.exports = {
 
   attributes: {
-    isDiscount: { type: 'boolean', defaultsTo: defaultRecord.isDiscount },
+    isDiscount: { type: 'boolean', required: true, defaultsTo: defaultRecord.isDiscount },
 
-    isPublicSale: { type: 'boolean', defaultsTo: defaultRecord.isPublicSale },
+    isPublicSale: { type: 'boolean', required: true, defaultsTo: defaultRecord.isPublicSale },
 
-    discountMVP: { type: 'float', defaultsTo: defaultRecord.discountMVP },
+    discountMVP: { type: 'float', required: true, defaultsTo: defaultRecord.discountMVP },
 
     USD_KNT: { type: 'float', required: true, defaultsTo: defaultRecord.USD_KNT },
 
-    preSale: { type: 'json', required: true, defaultsTo: defaultRecord.preSale },
+    preSale: { type: 'json', required: true, saleArray: true, defaultsTo: defaultRecord.preSale },
 
-    publicSale: { type: 'json', required: true, defaultsTo: defaultRecord.publicSale },
+    publicSale: { type: 'json', required: true, saleArray: true, defaultsTo: defaultRecord.publicSale },
 
     user: { model: 'user', required: true },
 
@@ -58,9 +58,39 @@ module.exports = {
     }
   },
 
+  types: {
+    saleArray: value => ValidationService.saleArray(value)
+  },
+
+  beforeValidate: function (values, cb) {
+    this.findLast((err, last) => {
+      if (err) {
+        return cb(err);
+      }
+
+      // For prevent editing this fields
+      values.isDiscount = last.isDiscount;
+      values.discountMVP = last.discountMVP;
+
+      // Admin can only once switch to public sale
+      if (last.isPublicSale) {
+        values.isPublicSale = true;
+      }
+
+      // TODO: Remove line above when public sale total amounts logic will be done
+      values.isPublicSale = last.isPublicSale;
+
+      values.preSale = values.preSale ? saleArrayParse(values.preSale) : last.preSale;
+
+      values.publicSale = values.publicSale ? saleArrayParse(values.publicSale) : last.publicSale;
+
+      return cb();
+    });
+  },
+
   findLast: function (cb) {
     let promise = this.find({sort: 'updatedAt DESC', limit: 1})
-      .then(([record]) => mapRecord(record || defaultRecord));
+      .then(([record]) => mapRecord(record || _.cloneDeep(defaultRecord)));
 
     return MiscService.cbify(promise, cb);
   }
@@ -96,4 +126,11 @@ function mapSale (record, sale) {
 
     return s;
   });
+}
+
+function saleArrayParse (sale) {
+  return Array.isArray(sale) && sale.map(s => ({
+    discount: parseFloat(s.discount),
+    amountUSD: parseFloat(s.amountUSD)
+  }));
 }
