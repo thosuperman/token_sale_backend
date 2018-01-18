@@ -41,6 +41,7 @@
   "scripts": {
     "debug": "node debug app.js",
     "start": "node app.js",
+    "dev": "nodemon --ignore node_modules app.js",
     "lint": "semistandard"
   },
   "main": "app.js",

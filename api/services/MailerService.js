@@ -1,8 +1,10 @@
+/* globals MailerService */
+
 const sgMail = require('@sendgrid/mail');
 
 sgMail.setApiKey(sails.config.sendgridApiKey);
 
-function sendEmail({to = '', subject = '', html = 'Sample template'}) {
+function sendEmail({to, subject, html}) {
   const msg = {
     to: to,
     from: 'kora@no-reply.com',
@@ -17,7 +19,7 @@ function sendConfirmationEmail(user) {
   return sendEmail({
     to: user.email,
     subject: 'Kora email confirmation instructions',
-    html: `<p>To confirm your email click the <a href="${sails.config.HOST}/api/registration/confirmEmail/${user.emailVerificationToken}">link</a></p>`
+    html: `<p>To confirm your email click the <a href="${sails.config.HOST}/api/users/confirmEmail/${user.emailVerificationToken}">link</a></p>`
   })
 }
 

@@ -65,7 +65,6 @@ module.exports.routes = {
   [`PUT ${prefix}/registration/checkIp`]: {controller: 'RegistrationController', action: 'checkIp'},
   [`PUT ${prefix}/registration/generateQRCode`]: {controller: 'RegistrationController', action: 'generateQRCode'},
   [`POST ${prefix}/registration/confirm`]: {controller: 'RegistrationController', action: 'confirm'},
-  [`GET ${prefix}/registration/confirmEmail`]: {controller: 'RegistrationController', action: 'confirmEmail'},
 
   [`POST ${prefix}/auth/login`]: {controller: 'AuthController', action: 'login'},
   [`DELETE ${prefix}/auth/logout`]: {controller: 'AuthController', action: 'logout'},
@@ -74,6 +73,7 @@ module.exports.routes = {
   [`PUT ${prefix}/profile/verify`]: {controller: 'ProfileController', action: 'verify'},
   [`GET ${prefix}/profile/document`]: {controller: 'ProfileController', action: 'document'},
   [`GET ${prefix}/profile/selects`]: {controller: 'ProfileController', action: 'selects'},
+  [`GET ${prefix}/profile/confirmEmail/:token`]: {controller: 'ProfileController', action: 'confirmEmail'},
 
   [`GET ${prefix}/values`]: {controller: 'ValuesController', action: 'index'},
 

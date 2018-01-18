@@ -163,5 +163,20 @@ module.exports = {
       identificationType: User.constants.identificationTypesSelect,
       country: CountriesService.list
     });
+  },
+
+  confirmEmail: function (req, res) {
+    const token = req.param('token');
+
+    User.findOne({emailVerificationToken: token})
+      .then(user => {
+        if (!user) {
+          return ErrorService.throw({message: 'No user with such token found', status: 404});
+        }
+
+        User.update({id: user.id}, {emailVerified: true})
+          .then(result => res.ok(result))
+      })
+      .catch(err => res.negotiate(err));
   }
 };

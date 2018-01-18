@@ -11,7 +11,6 @@ const bcrypt = require('bcrypt');
 
 const {blueprints} = require('../../config/blueprints');
 const prefix = blueprints.prefix || '';
-const mailer = require('../services/SendgridService');
 
 const roles = {
   admin: 'admin',
@@ -30,16 +29,6 @@ const identificationTypes = Object.keys(identificationTypesNames).reduce((obj, k
   return obj;
 }, {});
 const identificationTypesList = _.values(identificationTypes);
-
-const generateVerificationToken = function() {
-  let text = "";
-  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-  for (let i = 0; i < 30; i++)
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-  return text;
-};
 
 module.exports = {
   constants: {
@@ -90,7 +79,7 @@ module.exports = {
 
     verified: { type: 'boolean', defaultsTo: false },
 
-    emailVerificationToken: { type: 'string', defaultsTo: generateVerificationToken()},
+    emailVerificationToken: { type: 'string', defaultsTo: MiscService.generateVerificationToken()},
 
     emailVerified: { type: 'boolean', defaultsTo: false },
 
@@ -325,15 +314,15 @@ module.exports = {
   },
 
   afterCreate: function (values, cb) {
-    mailer.sendConfirmationEmail(values);
+    MailerService.sendConfirmationEmail(values);
     return cb();
   },
 
   beforeUpdate: function (valuesToUpdate, cb) {
     if (valuesToUpdate.email) {
       valuesToUpdate.emailVerified = false;
-      valuesToUpdate.emailVerificationToken = generateVerificationToken();
-      mailer.sendConfirmationEmail(values);
+      valuesToUpdate.emailVerificationToken = MiscService.generateVerificationToken();
+      MailerService.sendConfirmationEmail(valuesToUpdate);
     }
     return cb();
   },

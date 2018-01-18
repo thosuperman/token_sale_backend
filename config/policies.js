@@ -68,6 +68,11 @@ module.exports.policies = {
     '*': true
   },
 
+  ProfileController: {
+    '*': ['isAuthorized'],
+    confirmEmail: true
+  },
+
   AuthController: {
     '*': ['isAuthorized'],
     login: true
