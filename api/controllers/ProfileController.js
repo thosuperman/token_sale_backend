@@ -171,7 +171,7 @@ module.exports = {
     User.findOne({emailVerificationToken: token})
       .then(user => {
         if (!user) {
-          return ErrorService.throw({message: 'No user with such token found', status: 404});
+          return Promise.reject(ErrorService.throw({message: 'No user with such token found', status: 404}));
         }
 
         User.update({id: user.id}, {emailVerified: true})
