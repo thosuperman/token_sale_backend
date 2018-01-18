@@ -10,6 +10,24 @@
 const skipperS3 = require('skipper-better-s3');
 
 module.exports = {
+  find: function (req, res) {
+    const {
+      limit = 10,
+      page = 1,
+      sort = 'updatedAt ASC'
+    } = req.allParams();
+
+    let where = { accepted: true };
+
+    Promise.all([
+      AuthenticatorRecovery.find({ where, sort }).populate('user').paginate({page, limit}),
+      AuthenticatorRecovery.count(where)
+    ])
+    .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
+    .then(result => res.json(result))
+    .catch(err => res.negotiate(err));
+  },
+
   update: function (req, res) {
     let id = req.param('id');
 

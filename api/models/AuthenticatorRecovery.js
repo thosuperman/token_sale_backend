@@ -21,7 +21,8 @@ module.exports = {
       var obj = this.toObject();
 
       if (obj.photo) {
-        obj.photoUrl = '/file/' + this.photo;
+        obj.photoUrl = '/api/files/' + obj.photo.id || obj.photo;
+        delete obj.photo;
       }
 
       return obj;
@@ -41,7 +42,7 @@ module.exports = {
         .then(user => {
           if (!user) {
             return cb(ErrorService.throw({
-              status: 400,
+              status: 404,
               message: 'No user with such email registered in Kora ICO'
             }));
           }

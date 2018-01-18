@@ -94,7 +94,9 @@ module.exports.policies = {
 
   AuthenticatorRecoveryController: {
     '*': false,
-    update: true
+    update: true,
+    find: ['isAdmin'],
+    findOne: ['isAdmin']
   },
 
   FilesController: {
