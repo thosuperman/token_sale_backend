@@ -174,9 +174,9 @@ module.exports = {
           return Promise.reject(ErrorService.throw({message: 'No user with such token found', status: 404}));
         }
 
-        User.update({id: user.id}, {emailVerified: true})
-          .then(result => res.redirect('/'));
+        return User.update({id: user.id}, {emailVerified: true});
       })
+      .then(result => res.redirect('/'))
       .catch(err => {
         if (err.status === 404) {
           return res.notFound(err.message);
