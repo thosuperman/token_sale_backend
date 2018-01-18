@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails _ User Files CountriesService */
+/* global sails _ User Files CountriesService ErrorService */
 
 const skipperS3 = require('skipper-better-s3');
 const skipperS3Adapter = skipperS3({
@@ -175,8 +175,14 @@ module.exports = {
         }
 
         User.update({id: user.id}, {emailVerified: true})
-          .then(result => res.ok(result))
+          .then(result => res.redirect('/'));
       })
-      .catch(err => res.negotiate(err));
+      .catch(err => {
+        if (err.status === 404) {
+          return res.notFound(err.message);
+        }
+
+        return res.serverError('Something went wrong');
+      });
   }
 };

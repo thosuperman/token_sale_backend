@@ -5,7 +5,7 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global _ ValidationService CountriesService ErrorService */
+/* global _ ValidationService CountriesService ErrorService MiscService MailerService */
 
 const bcrypt = require('bcrypt');
 
@@ -79,7 +79,7 @@ module.exports = {
 
     verified: { type: 'boolean', defaultsTo: false },
 
-    emailVerificationToken: { type: 'string', defaultsTo: MiscService.generateVerificationToken()},
+    emailVerificationToken: { type: 'string', defaultsTo: MiscService.generateVerificationToken() },
 
     emailVerified: { type: 'boolean', defaultsTo: false },
 
