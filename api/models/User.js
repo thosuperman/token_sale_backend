@@ -79,6 +79,10 @@ module.exports = {
 
     verified: { type: 'boolean', defaultsTo: false },
 
+    emailVerificationToken: { type: 'string', defaultsTo: MiscService.generateVerificationToken()},
+
+    emailVerified: { type: 'boolean', defaultsTo: false },
+
     sendingEthereumAddress: { type: 'string', unique: true, ethereumAddress: true },
 
     receivingEthereumAddress: { type: 'string', unique: true, ethereumAddress: true },
@@ -104,6 +108,7 @@ module.exports = {
       delete obj.userNameOrigin;
       delete obj.encryptedPassword;
       delete obj.twoFactorSecret;
+      delete obj.emailVerificationToken;
 
       if (obj.country) {
         obj.countryFlag = CountriesService.flagImg(obj.country);
@@ -305,6 +310,20 @@ module.exports = {
       return cb(ErrorService.throw({status: 400, message: 'Sending ethereum address or bitcoin address must be set'}));
     }
 
+    return cb();
+  },
+
+  afterCreate: function (values, cb) {
+    MailerService.sendConfirmationEmail(values);
+    return cb();
+  },
+
+  beforeUpdate: function (valuesToUpdate, cb) {
+    if (valuesToUpdate.email) {
+      valuesToUpdate.emailVerified = false;
+      valuesToUpdate.emailVerificationToken = MiscService.generateVerificationToken();
+      MailerService.sendConfirmationEmail(valuesToUpdate);
+    }
     return cb();
   },
 
