@@ -38,12 +38,18 @@ module.exports = {
    * `ProfileController.index()`
    */
   index: function (req, res) {
+    const user = _.clone(req.user);
+
     switch (req.method) {
       case 'GET':
-        return res.json(req.user);
+        if (user.document) {
+          user.documentUrl = '/api/profile/document';
+          delete user.document;
+        }
+
+        return res.json(user);
 
       case 'PUT':
-        const user = req.user;
         let allParams = _.pick(req.allParams(), updateAttrs);
 
         // if (!allParams.token) {
@@ -144,17 +150,17 @@ module.exports = {
           return res.notFound();
         }
 
-        // res.set('Content-Type', file.type);
+        res.set('Content-Type', file.type);
 
-        // skipperS3Adapter.read(file.fd)
-        //   .on('error', function (err) {
-        //     return res.serverError(err);
-        //   })
-        //   .pipe(res);
+        skipperS3Adapter.read(file.fd)
+          .on('error', function (err) {
+            return res.serverError(err);
+          })
+          .pipe(res);
 
-        const url = skipperS3Adapter.url('getObject', { s3params: { Key: file.fd } });
+        // const url = skipperS3Adapter.url('getObject', { s3params: { Key: file.fd } });
 
-        return res.redirect(303, url);
+        // return res.redirect(303, url);
       });
   },
 

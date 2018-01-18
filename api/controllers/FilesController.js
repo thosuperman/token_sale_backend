@@ -35,17 +35,17 @@ module.exports = {
           return res.notFound();
         }
 
-        // res.set('Content-Type', file.type);
+        res.set('Content-Type', file.type);
 
-        // skipperS3.read(file.fd)
-        //   .on('error', function (err) {
-        //     return res.serverError(err);
-        //   })
-        //   .pipe(res);
+        skipperS3.read(file.fd)
+          .on('error', function (err) {
+            return res.serverError(err);
+          })
+          .pipe(res);
 
-        const url = skipperS3.url('getObject', { s3params: { Key: file.fd } });
+        // const url = skipperS3.url('getObject', { s3params: { Key: file.fd } });
 
-        return res.redirect(303, url);
+        // return res.redirect(303, url);
       });
   }
 };

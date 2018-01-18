@@ -123,6 +123,7 @@ module.exports = {
       // TODO: Update documentUrl for admin
       if (obj.document) {
         obj.documentUrl = `${prefix}/files/` + obj.document;
+        delete obj.document;
       }
 
       return obj;
