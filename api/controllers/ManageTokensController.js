@@ -23,7 +23,7 @@ module.exports = {
 
         return {
           total: {
-            discount: s.discount,
+            discount: s ? s.discount : 0,
             currentAmountUSD: USD,
             currentAmountKNT: KNT,
             expectedAmountUSD: sale.totalAmountUSD,
