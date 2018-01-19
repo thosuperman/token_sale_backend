@@ -79,7 +79,7 @@ module.exports = {
 
     verified: { type: 'boolean', defaultsTo: false },
 
-    emailVerificationToken: { type: 'string', defaultsTo: MiscService.generateRandomString(50)},
+    emailVerificationToken: { type: 'string', defaultsTo: MiscService.generateRandomString(50) },
 
     emailVerified: { type: 'boolean', defaultsTo: false },
 
@@ -93,7 +93,7 @@ module.exports = {
 
     encryptedPassword: { type: 'string', required: true },
 
-    resetPasswordToken: { type: 'string', defaultsTo: ''},
+    resetPasswordToken: { type: 'string', defaultsTo: '' },
 
     twoFactorSecret: { type: 'string', required: true },
 

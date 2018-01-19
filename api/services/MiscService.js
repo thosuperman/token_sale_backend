@@ -14,6 +14,6 @@ module.exports = {
   },
 
   generateRandomString: function (length = 10) {
-    return secureRandomString({length})
+    return secureRandomString({length});
   }
 };

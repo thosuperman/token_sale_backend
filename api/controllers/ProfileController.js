@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails _ User Files CountriesService ErrorService */
+/* global sails _ User Files CountriesService ErrorService MiscService MailerService */
 
 const {blueprints} = require('../../config/blueprints');
 const prefix = blueprints.prefix || '';
@@ -202,19 +202,18 @@ module.exports = {
     User.findOne({email})
       .then(user => {
         if (!user) {
-          return ErrorService.throw({message: 'No user with such email found', status: 404});
+          return Promise.reject(ErrorService.throw({message: 'No user with such email found', status: 404}));
         }
 
-        User.update({id: user.id}, { resetPasswordToken: MiscService.generateRandomString(50)})
-          .then(updatedUsers => {
-            MailerService.sendResetPwEmail(updatedUsers[0])
-          })
-          .then(() => {
-            res.ok({ message: 'Forgot password request has been successfully sent' })
-          })
-          .catch(err => res.negotiate(err))
+        return User.update({id: user.id}, {resetPasswordToken: MiscService.generateRandomString(50)});
       })
-      .catch(err => res.negotiate(err))
+      .then(updatedUsers => {
+        MailerService.sendResetPwEmail(updatedUsers[0]);
+      })
+      .then(() => {
+        res.ok({ message: 'Forgot password request has been successfully sent' });
+      })
+      .catch(err => res.negotiate(err));
   },
 
   // PUT /api/profile/restorePassword
@@ -230,13 +229,11 @@ module.exports = {
           return Promise.reject(ErrorService.throw({message: 'No user with such token found', status: 404}));
         }
 
-        User.update({id: user.id}, { password, resetPasswordToken: '' })
-          .then(result => {
-            res.ok({ message: 'Password has been successfully restored' })
-          })
-          .catch(err => res.negotiate(err))
+        return User.update({id: user.id}, { password, resetPasswordToken: '' });
       })
-      .catch(err => res.negotiate(err))
-
+      .then(result => {
+        res.ok({ message: 'Password has been successfully restored' });
+      })
+      .catch(err => res.negotiate(err));
   }
 };
