@@ -69,14 +69,14 @@ module.exports = {
             return {message: `No users with ${allParamsNames.join(', ')} attribute${pluralize ? 's' : ''}`};
           }
 
-          let err = new Error(`User with ${pluralize ? 'some of' : 'such'} ${allParamsNames.join(', ')} attribute${pluralize ? 's' : ''} is already exists`);
+          let err = new Error(`User with ${pluralize ? 'some of' : 'such'} ${allParamsNames.join(', ')} attribute${pluralize ? 's' : ''} already exists`);
 
           err.status = 400;
 
           err.Errors = results.reduce((previous, current, index) => {
             if (current) {
               let key = allParamsKeys[index];
-              previous[key] = [{message: `User with such ${checkUserAttrsNamesHash[key]} is already exists`}];
+              previous[key] = [{message: `User with such ${checkUserAttrsNamesHash[key]} already exists`}];
             }
 
             return previous;
@@ -107,7 +107,7 @@ module.exports = {
       }
 
       if (user) {
-        return res.badRequest({message: 'User with such Kora MVP username is already registered'});
+        return res.badRequest({message: 'User with such Kora MVP username already registered'});
       }
 
       request({
@@ -193,7 +193,7 @@ module.exports = {
     delete req.session.userName;
 
     return res.ok({
-      message: 'Verification code throught Kora MVP is disabled'
+      message: 'Verification code throught Kora MVP disabled'
     });
   },
 
@@ -254,7 +254,7 @@ module.exports = {
   generateQRCode: function (req, res) {
     if (req.user && req.user.enabled) {
       return res.badRequest({
-        message: 'Looks like user is already registered. Logout first'
+        message: 'Looks like user already registered. Logout first'
       });
     }
 
