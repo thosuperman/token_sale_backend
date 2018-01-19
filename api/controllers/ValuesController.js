@@ -40,7 +40,10 @@ function calcUserKNTBalance ({userId}, cb) {
       }
 
       return records.reduce((sum, tx) => {
-        sum += tx.KNT;
+        if (tx.KNT) {
+          sum += tx.KNT;
+        }
+
         return sum;
       }, 0);
     })
