@@ -59,13 +59,13 @@ module.exports = {
 
     dateOfBirth: { type: 'date', after: new Date('1900-01-01') },
 
-    streetAddress: { type: 'string' },
+    streetAddress: { type: 'string', maxLength: 64 },
 
-    aptSte: { type: 'string' },
+    aptSte: { type: 'string', maxLength: 15 },
 
-    city: { type: 'string' },
+    city: { type: 'string', maxLength: 64 },
 
-    state: { type: 'string' },
+    state: { type: 'string', maxLength: 64 },
 
     zip: { type: 'string', postalCode: true },
 
@@ -175,16 +175,20 @@ module.exports = {
       date: 'Provide valid date of birth'
     },
     streetAddress: {
-      string: 'Provide valid street address'
+      string: 'Provide valid street address',
+      maxLength: 'Street address too long'
     },
     aptSte: {
-      string: 'Provide valid apt/ste'
+      string: 'Provide valid apt/ste',
+      maxLength: 'Apt/ste too long'
     },
     city: {
-      string: 'Provide valid city'
+      string: 'Provide valid city',
+      maxLength: 'City too long'
     },
     state: {
-      string: 'Provide valid state'
+      string: 'Provide valid state',
+      maxLength: 'State too long'
     },
     zip: {
       postalCode: 'Provide valid zip'
