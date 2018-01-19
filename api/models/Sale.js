@@ -132,5 +132,7 @@ function saleArrayParse (sale) {
   return Array.isArray(sale) && sale.map(s => ({
     discount: parseFloat(s.discount),
     amountUSD: parseFloat(s.amountUSD)
-  }));
+  }))
+  // TODO: Check saleArray sort logic if discount levels will be editable
+  .sort((a, b) => (a.discount < b.discount));
 }
