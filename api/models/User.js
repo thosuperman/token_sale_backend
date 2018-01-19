@@ -79,7 +79,7 @@ module.exports = {
 
     verified: { type: 'boolean', defaultsTo: false },
 
-    emailVerificationToken: { type: 'string', defaultsTo: MiscService.generateVerificationToken() },
+    emailVerificationToken: { type: 'string', defaultsTo: MiscService.generateRandomString(50)},
 
     emailVerified: { type: 'boolean', defaultsTo: false },
 
@@ -92,6 +92,8 @@ module.exports = {
     role: { type: 'string', in: rolesList, defaultsTo: roles.user },
 
     encryptedPassword: { type: 'string', required: true },
+
+    resetPasswordToken: { type: 'string', defaultsTo: ''},
 
     twoFactorSecret: { type: 'string', required: true },
 
@@ -107,6 +109,7 @@ module.exports = {
       obj.userName = obj.userNameOrigin;
       delete obj.userNameOrigin;
       delete obj.encryptedPassword;
+      delete obj.resetPasswordToken;
       delete obj.twoFactorSecret;
       delete obj.emailVerificationToken;
 
@@ -322,7 +325,7 @@ module.exports = {
   beforeUpdate: function (valuesToUpdate, cb) {
     if (valuesToUpdate.email) {
       valuesToUpdate.emailVerified = false;
-      valuesToUpdate.emailVerificationToken = MiscService.generateVerificationToken();
+      valuesToUpdate.emailVerificationToken = MiscService.generateRandomString(50);
       MailerService.sendConfirmationEmail(valuesToUpdate);
     }
     return cb();

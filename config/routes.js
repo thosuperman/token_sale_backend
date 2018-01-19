@@ -74,6 +74,8 @@ module.exports.routes = {
   [`GET ${prefix}/profile/document`]: {controller: 'ProfileController', action: 'document'},
   [`GET ${prefix}/profile/selects`]: {controller: 'ProfileController', action: 'selects'},
   [`GET ${prefix}/profile/confirmEmail/:token`]: {controller: 'ProfileController', action: 'confirmEmail'},
+  [`POST ${prefix}/profile/forgotPassword`]: {controller: 'ProfileController', action: 'forgotPassword'},
+  [`PUT ${prefix}/profile/restorePassword/:token`]: {controller: 'ProfileController', action: 'restorePassword'},
 
   [`GET ${prefix}/values`]: {controller: 'ValuesController', action: 'index'},
 

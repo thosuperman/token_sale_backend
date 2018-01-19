@@ -30,9 +30,18 @@ function sendAuthenticatorRecoveryEmail (user, {key, qrcode}) {
   });
 }
 
+function sendResetPwEmail(user) {
+  return sendEmail({
+    to: user.email,
+    subject: 'You have requested password restoration at Kora',
+    html: `<p>Please, follow the <a href="${sails.config.HOST}/#/restore_password/${user.resetPasswordToken}">link</a> to restore your password</p>`
+  })
+}
+
 const mailer = {
   sendConfirmationEmail,
-  sendAuthenticatorRecoveryEmail
+  sendAuthenticatorRecoveryEmail,
+  sendResetPwEmail
 };
 
 module.exports = mailer;

@@ -2,6 +2,7 @@
  * MiscService
  * @description :: Set of misc functions
  */
+const secureRandomString = require('secure-random-string');
 
 module.exports = {
   cbify: function (promise, cb) {
@@ -12,14 +13,7 @@ module.exports = {
     return promise;
   },
 
-  generateVerificationToken: function () {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (let i = 0; i < 30; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-
-    return text;
+  generateRandomString: function (length = 10) {
+    return secureRandomString({length})
   }
 };
