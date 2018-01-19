@@ -279,7 +279,7 @@ module.exports = {
 
     if (values.password) {
       if (!ValidationService.password(values.password)) {
-        return cb(ErrorService.throw({
+        return cb(ErrorService.new({
           status: 400,
           message: 'Password must be over 8 characters, have at least 1 uppercase English letter, 1 lowercase English letter and 1 number'
         }));
@@ -311,7 +311,7 @@ module.exports = {
       before.setFullYear(before.getFullYear() - 12);
 
       if (Date.parse(new Date(values.dateOfBirth)) > Date.parse(before)) {
-        return cb(ErrorService.throw({ status: 400, message: 'User must be 12 years old' }));
+        return cb(ErrorService.new({ status: 400, message: 'User must be 12 years old' }));
       }
     }
 
@@ -320,11 +320,11 @@ module.exports = {
 
   beforeCreate: function (values, cb) {
     if (!values.password) {
-      return cb(ErrorService.throw({status: 400, message: 'Password must be set'}));
+      return cb(ErrorService.new({status: 400, message: 'Password must be set'}));
     }
 
     if (!(values.sendingEthereumAddress || values.bitcoinAddress)) {
-      return cb(ErrorService.throw({status: 400, message: 'Sending ethereum address or bitcoin address must be set'}));
+      return cb(ErrorService.new({status: 400, message: 'Sending ethereum address or bitcoin address must be set'}));
     }
 
     return cb();

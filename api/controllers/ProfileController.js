@@ -180,7 +180,7 @@ module.exports = {
     User.findOne({emailVerificationToken: token})
       .then(user => {
         if (!user) {
-          return Promise.reject(ErrorService.throw({message: 'No user with such token found', status: 404}));
+          return Promise.reject(ErrorService.new({message: 'No user with such token found', status: 404}));
         }
 
         return User.update({id: user.id}, {emailVerified: true});
@@ -202,7 +202,7 @@ module.exports = {
     User.findOne({email})
       .then(user => {
         if (!user) {
-          return Promise.reject(ErrorService.throw({message: 'No user with such email found', status: 404}));
+          return Promise.reject(ErrorService.new({message: 'No user with such email found', status: 404}));
         }
 
         return User.update({id: user.id}, {resetPasswordToken: MiscService.generateRandomString(50)});
@@ -226,7 +226,7 @@ module.exports = {
     User.findOne({resetPasswordToken})
       .then(user => {
         if (!user) {
-          return Promise.reject(ErrorService.throw({message: 'No user with such token found', status: 404}));
+          return Promise.reject(ErrorService.new({message: 'No user with such token found', status: 404}));
         }
 
         return User.update({id: user.id}, { password, resetPasswordToken: '' });

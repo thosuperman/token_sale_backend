@@ -44,7 +44,7 @@ module.exports = {
       return User.findOne({email: values.email})
         .then(user => {
           if (!user) {
-            return cb(ErrorService.throw({
+            return cb(ErrorService.new({
               status: 404,
               message: 'No user with such email registered in Kora ICO'
             }));
