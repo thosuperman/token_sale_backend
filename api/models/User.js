@@ -305,6 +305,19 @@ module.exports = {
     return cb();
   },
 
+  afterValidate: function (values, cb) {
+    if (values.dateOfBirth) {
+      let before = new Date();
+      before.setFullYear(before.getFullYear() - 12);
+
+      if (Date.parse(new Date(values.dateOfBirth)) > Date.parse(before)) {
+        return cb(ErrorService.throw({ status: 400, message: 'User must be 12 years old' }));
+      }
+    }
+
+    return cb();
+  },
+
   beforeCreate: function (values, cb) {
     if (!values.password) {
       return cb(ErrorService.throw({status: 400, message: 'Password must be set'}));
