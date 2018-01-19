@@ -46,7 +46,7 @@ module.exports = {
     switch (req.method) {
       case 'GET':
         if (user.document) {
-          user.documentUrl = `${prefix.slice(1)}/files/document`;
+          user.documentUrl = `${prefix}/profile/document`;
           delete user.document;
         }
 
