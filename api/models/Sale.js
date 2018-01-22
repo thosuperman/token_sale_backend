@@ -5,7 +5,7 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global _ MiscService ValidationService */
+/* global _ MiscService ValidationService TotalAmount */
 
 const defaultRecord = {
   isDiscount: true,
@@ -45,15 +45,15 @@ module.exports = {
 
     publicSale: { type: 'json', required: true, saleArray: true, defaultsTo: defaultRecord.publicSale },
 
-    user: { model: 'user', required: true },
+    user: { model: 'user', required: true }
 
-    toJSON: function () {
-      let obj = this.toObject();
-
-      obj = mapRecord(obj);
-
-      return obj;
-    }
+    // toJSON: function () {
+    //   let obj = this.toObject();
+    //
+    //   obj = mapRecord(obj);
+    //
+    //   return obj;
+    // }
   },
 
   types: {
@@ -95,19 +95,22 @@ module.exports = {
   },
 
   findLast: function (cb) {
-    let promise = this.find({sort: 'updatedAt DESC', limit: 1})
-      .then(([record]) => mapRecord(record || _.cloneDeep(defaultRecord)));
+    let promise = Promise.all([
+      this.find({sort: 'updatedAt DESC', limit: 1}),
+      TotalAmount.findLast()
+    ])
+      .then(([[record], {USD}]) => mapRecord(record || _.cloneDeep(defaultRecord), USD));
 
     return MiscService.cbify(promise, cb);
   }
 };
 
-function mapRecord (record) {
+function mapRecord (record, USD) {
   record.KNT_USD = +(1 / record.USD_KNT).toFixed(10);
   record.USD_KNT_MVP = +(record.USD_KNT * 100 / (100 - record.discountMVP)).toFixed(10);
   record.KNT_USD_MVP = +(1 / record.USD_KNT_MVP).toFixed(10);
 
-  record.preSale = mapSale(record, record.preSale);
+  record.preSale = mapSale(record, record.preSale, USD);
   record.publicSale = mapSale(record, record.publicSale);
 
   record.totalAmountUSD = record.preSale[record.preSale.length - 1].fullAmountUSD +
@@ -120,7 +123,7 @@ function mapRecord (record) {
   return record;
 }
 
-function mapSale (record, sale) {
+function mapSale (record, sale, USD) {
   return sale.map((s, i, arr) => {
     s.USD_KNT = +(record.USD_KNT * 100 / (100 - s.discount)).toFixed(10);
     s.KNT_USD = +(1 / s.USD_KNT).toFixed(10);
@@ -129,6 +132,10 @@ function mapSale (record, sale) {
     s.fullAmountKNT = i === 0 ? s.amountKNT : +(arr[i - 1].fullAmountKNT + s.amountKNT).toFixed(10);
     s.USD_KNT_MVP = +(s.USD_KNT * 100 / (100 - record.discountMVP)).toFixed(10);
     s.KNT_USD_MVP = +(1 / s.USD_KNT_MVP).toFixed(10);
+
+    if (typeof USD !== 'undefined') {
+      s.disabled = (USD >= s.fullAmountUSD);
+    }
 
     return s;
   });
