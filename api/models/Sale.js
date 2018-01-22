@@ -52,8 +52,6 @@ module.exports = {
 
       obj = mapRecord(obj);
 
-      delete obj.sale;
-
       return obj;
     }
   },
@@ -86,6 +84,14 @@ module.exports = {
 
       return cb();
     });
+  },
+
+  beforeCreate: function (values, cb) {
+    delete values.id;
+    delete values.createdAt;
+    delete values.updatedAt;
+
+    return cb();
   },
 
   findLast: function (cb) {

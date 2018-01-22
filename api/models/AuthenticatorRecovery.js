@@ -40,6 +40,10 @@ module.exports = {
   },
 
   beforeCreate: function (values, cb) {
+    delete values.id;
+    delete values.createdAt;
+    delete values.updatedAt;
+
     if (values.email) {
       return User.findOne({email: values.email})
         .then(user => {

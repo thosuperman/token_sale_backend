@@ -91,9 +91,12 @@ function convertUSDKNT ({i, currentSale, valueUSD, totalUSD, needDiscountMVP, KN
     if (remainAmountUSD < valueUSD) {
       result = remainAmountUSD / currentKTNUSD + convertUSDKNT({
         i: i + 1,
+        currentSale,
         valueUSD: +(valueUSD - remainAmountUSD).toFixed(10),
         totalUSD: s.fullAmountUSD,
-        needDiscountMVP
+        needDiscountMVP,
+        KNT_USD,
+        KNT_USD_MVP
       });
     } else {
       result = valueUSD / currentKTNUSD;
