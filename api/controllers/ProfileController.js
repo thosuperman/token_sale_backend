@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails _ User Files CountriesService ErrorService MiscService MailerService */
+/* global sails _ User Files CountriesService ErrorService MiscService MailerService AddressHistory */
 
 const {blueprints} = require('../../config/blueprints');
 const prefix = blueprints.prefix || '';
@@ -65,6 +65,11 @@ module.exports = {
         //   });
         // }
 
+        allParams = Object.keys(allParams).reduce((result, el) => {
+          result[el] = (el === 'bitcoinAddress') ? allParams[el] : allParams[el].toLowerCase();
+          return result;
+        }, {});
+
         allParams = _.pick(allParams, (value, key) => (user[key] !== value));
 
         if (_.isEmpty(allParams)) {
@@ -73,9 +78,25 @@ module.exports = {
           });
         }
 
+        let oldParams = _.pick(user, Object.keys(allParams));
+
         return User.update({id: user.id}, allParams)
           .then(([user]) => {
             req.user = user;
+
+            // AddressHistory saving
+            if (AddressHistory.constants.typesList.some(type => oldParams[type])) {
+              let promises = [];
+
+              AddressHistory.constants.typesList.forEach(type => {
+                if (oldParams[type]) {
+                  promises.push(AddressHistory.create({type, user: user.id, address: oldParams[type]}));
+                }
+              });
+
+              Promise.all(promises).catch(err => sails.log.error(err));
+            }
+
             return Object.assign({}, user, {documentUrl: `${prefix}/profile/document/${user.document}`});
           })
           .then(result => res.ok(result))

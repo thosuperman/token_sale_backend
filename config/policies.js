@@ -116,5 +116,10 @@ module.exports.policies = {
 
   ManageTokensController: {
     '*': ['isAdmin']
+  },
+
+  AddressHistoryController: {
+    index: ['isAuthorized'],
+    '*': ['deny']
   }
 };
