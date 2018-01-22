@@ -185,14 +185,8 @@ module.exports = {
 
         return User.update({id: user.id}, {emailVerified: true});
       })
-      .then(result => res.redirect('/'))
-      .catch(err => {
-        if (err.status === 404) {
-          return res.notFound(err.message);
-        }
-
-        return res.serverError('Something went wrong');
-      });
+      .then(result => res.redirect('/?emailVerified'))
+      .catch(err => res.redirect('/?emailUnverified'));
   },
 
   // POST /api/profile/forgotPassword
