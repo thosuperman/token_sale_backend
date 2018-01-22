@@ -28,19 +28,21 @@ module.exports = {
         preSale,
         publicSale
       }) => {
-        const noDiscountSale = { USD_KNT, KNT_USD, discount: 0 };
+        const noDiscountSale = { USD_KNT, KNT_USD, discount: 0, nextDiscount: null };
         const currentSale = isPublicSale ? publicSale : preSale;
 
         return !isDiscount ? Promise.resolve(noDiscountSale)
           : TotalAmount.findLast()
             .then(({USD, KNT}) => {
-              let s = currentSale.find(s => (USD <= s.fullAmountUSD));
+              let i = currentSale.findIndex(s => (USD <= s.fullAmountUSD));
+              let s = currentSale[i];
 
               if (s) {
                 return {
                   needDiscountMVP,
                   discountMVP,
                   discount: s.discount,
+                  nextDiscount: currentSale[i + 1] ? currentSale[i + 1].discount : null,
                   USD_KNT: s.USD_KNT,
                   KNT_USD: s.KNT_USD,
                   USD_KNT_MVP: s.KNT_USD_MVP,

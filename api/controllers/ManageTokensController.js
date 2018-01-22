@@ -19,11 +19,12 @@ module.exports = {
     ])
       .then(([{USD, KNT}, sale]) => {
         let currentSale = sale.isPublicSale ? sale.publicSale : sale.preSale;
-        let s = currentSale.find(s => (USD <= s.fullAmountUSD));
+        let i = currentSale.findIndex(s => (USD <= s.fullAmountUSD));
 
         return {
           total: {
-            discount: s ? s.discount : 0,
+            discount: currentSale[i] ? currentSale[i].discount : 0,
+            nextDiscount: currentSale[i + 1] ? currentSale[i + 1].discount : null,
             currentAmountUSD: USD,
             currentAmountKNT: KNT,
             expectedAmountUSD: sale.totalAmountUSD,
