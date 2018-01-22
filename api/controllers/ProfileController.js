@@ -76,6 +76,7 @@ module.exports = {
         return User.update({id: user.id}, allParams)
           .then(([user]) => {
             req.user = user;
+            user.documentUrl = `${prefix}/profile/document`;
             return user;
           })
           .then(result => res.ok(result))
@@ -128,6 +129,7 @@ module.exports = {
           return User.update({id: req.user.id}, allParams)
             .then(([user]) => {
               req.user = user;
+              user.documentUrl = `${prefix}/profile/document`;
               return user;
             })
             .then(result => res.ok(result))
@@ -186,7 +188,10 @@ module.exports = {
         return User.update({id: user.id}, {emailVerified: true});
       })
       .then(result => res.redirect('/?emailVerified'))
-      .catch(err => res.redirect('/?emailUnverified'));
+      .catch(err => {
+        sails.log.error(err);
+        return res.redirect('/?emailUnverified');
+      });
   },
 
   // POST /api/profile/forgotPassword
