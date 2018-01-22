@@ -46,7 +46,7 @@ module.exports = {
     switch (req.method) {
       case 'GET':
         if (user.document) {
-          user.documentUrl = `${prefix}/profile/document`;
+          user.documentUrl = `${prefix}/profile/document/${user.document}`;
           delete user.document;
         }
 
@@ -76,7 +76,7 @@ module.exports = {
         return User.update({id: user.id}, allParams)
           .then(([user]) => {
             req.user = user;
-            return Object.assign({}, user, {documentUrl: `${prefix}/profile/document`});
+            return Object.assign({}, user, {documentUrl: `${prefix}/profile/document/${user.document}`});
           })
           .then(result => res.ok(result))
           .catch(err => res.negotiate(err));
@@ -128,7 +128,7 @@ module.exports = {
           return User.update({id: req.user.id}, allParams)
             .then(([user]) => {
               req.user = user;
-              return Object.assign({}, user, {documentUrl: `${prefix}/profile/document`});
+              return Object.assign({}, user, {documentUrl: `${prefix}/profile/document/${user.document}`});
             })
             .then(result => res.ok(result))
             .catch(err => res.negotiate(err));
@@ -137,9 +137,9 @@ module.exports = {
   },
 
   document: function (req, res) {
-    var fileID = req.user.document;
+    var fileID = req.param('id');
 
-    if (!fileID) {
+    if (fileID !== req.user.document) {
       return res.notFound();
     }
 
