@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global Transactions */
+/* global Transactions User */
 
 module.exports = {
   find: function (req, res) {
@@ -30,14 +30,26 @@ module.exports = {
   allocate: function (req, res) {
     let {id, KNT} = req.allParams();
 
-    Transactions.create({
-      type: Transactions.constants.types.allocateKNT,
-      date: new Date(),
-      from: id,
-      KNT,
-      admin: req.user.id
-    })
-      .then(result => res.json(result))
-      .catch(err => res.negotiate(err));
+    User.findOne({id})
+     .exec((err, user) => {
+       if (err) {
+         return res.negotiate(err);
+       }
+
+       if (!user) {
+         return res.notFound({message: 'User not found'});
+       }
+
+       return Transactions.create({
+         type: Transactions.constants.types.allocateKNT,
+         status: Transactions.constants.statuses.confirmed,
+         date: new Date(),
+         from: id,
+         KNT,
+         admin: req.user.id
+       })
+       .then(result => res.json(result))
+       .catch(err => res.negotiate(err));
+     });
   }
 };
