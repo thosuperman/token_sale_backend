@@ -50,8 +50,6 @@ module.exports = {
     // toJSON: function () {
     //   let obj = this.toObject();
     //
-    //   obj = mapRecord(obj);
-    //
     //   return obj;
     // }
   },
@@ -95,14 +93,22 @@ module.exports = {
   },
 
   findLast: function (cb) {
-    let promise = Promise.all([
-      this.find({sort: 'updatedAt DESC', limit: 1}),
-      TotalAmount.findLast()
-    ])
-      .then(([[record], {USD}]) => mapRecord(record || _.cloneDeep(defaultRecord), USD));
+    let promise = this.find({sort: 'updatedAt DESC', limit: 1})
+      .then(([record]) => mapRecord(record || _.cloneDeep(defaultRecord)));
 
     return MiscService.cbify(promise, cb);
-  }
+  },
+
+  calcDisabled: function (record, cb) {
+    let types = TotalAmount.constants.types;
+
+    let promise = TotalAmount.findLast({type: record.isPublicSale ? types.publicSale : types.preSale})
+      .then(({USD}) => mapRecord(record, USD));
+
+    return MiscService.cbify(promise, cb);
+  },
+
+  mapRecord
 };
 
 function mapRecord (record, USD) {
@@ -110,8 +116,8 @@ function mapRecord (record, USD) {
   record.USD_KNT_MVP = +(record.USD_KNT * 100 / (100 - record.discountMVP)).toFixed(10);
   record.KNT_USD_MVP = +(1 / record.USD_KNT_MVP).toFixed(10);
 
-  record.preSale = mapSale(record, record.preSale, USD);
-  record.publicSale = mapSale(record, record.publicSale);
+  record.preSale = mapSale(record, record.preSale, record.isPublicSale ? null : USD);
+  record.publicSale = mapSale(record, record.publicSale, record.isPublicSale ? USD : null);
 
   record.totalAmountUSD = record.preSale[record.preSale.length - 1].fullAmountUSD +
                           record.publicSale[record.publicSale.length - 1].fullAmountUSD;
@@ -133,9 +139,7 @@ function mapSale (record, sale, USD) {
     s.USD_KNT_MVP = +(s.USD_KNT * 100 / (100 - record.discountMVP)).toFixed(10);
     s.KNT_USD_MVP = +(1 / s.USD_KNT_MVP).toFixed(10);
 
-    if (typeof USD !== 'undefined') {
-      s.disabled = (USD >= s.fullAmountUSD);
-    }
+    s.disabled = (USD == null) || (USD >= s.fullAmountUSD);
 
     return s;
   });
@@ -145,7 +149,7 @@ function saleArrayParse (sale) {
   return Array.isArray(sale) && sale.map(s => ({
     discount: parseFloat(s.discount),
     amountUSD: parseFloat(s.amountUSD)
-  }))
-  // TODO: Check saleArray sort logic if discount levels will be editable
-  .sort((a, b) => (a.discount < b.discount));
+  }));
+  // NOTE: If need saleArray sort logic
+  // .sort((a, b) => (a.discount < b.discount));
 }

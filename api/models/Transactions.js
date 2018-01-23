@@ -5,16 +5,18 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global _ MiscService User KoraService TotalAmount ExchangeRates BlockchainService */
+/* global _ MiscService User KoraService TotalAmount ExchangeRates BlockchainService Sale */
 
 const Web3Utils = require('web3-utils');
 
-const types = {
+const typesNames = {
   BTC: 'BTC Purchase',
   ETH: 'ETH Purchase',
-  KNT: 'KNT Withdrawal'
+  KNT: 'KNT Withdrawal',
+  allocateKNT: 'Allocate KNT'
 };
-const typesList = _.values(types);
+const typesList = Object.keys(typesNames);
+const types = MiscService.mapArrayToConstantsObject(typesList);
 
 const statuses = {
   pending: 'Pending',
@@ -187,7 +189,15 @@ module.exports = {
 
   afterCreate: function ({id, USD, KNT}, cb) {
     if (KNT) {
-      return TotalAmount.addNew({USD, KNT, transaction: id})
+      const types = TotalAmount.constants.types;
+
+      return Sale.findLast()
+        .then(sale => TotalAmount.addNew({
+          type: sale.isPublicSale ? types.publicSale : types.preSale,
+          USD,
+          KNT,
+          transaction: id
+        }))
         .then(() => cb())
         .catch(err => cb(err));
     }

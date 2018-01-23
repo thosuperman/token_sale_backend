@@ -20,6 +20,7 @@ module.exports = {
     allParams.user = req.user.id;
 
     Sale.create(allParams)
+      .then(record => Sale.calcDisabled(record))
       .then(result => res.json(result))
       .catch(err => res.negotiate(err));
   }

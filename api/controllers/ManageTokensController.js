@@ -14,25 +14,27 @@ module.exports = {
    */
   index: function (req, res) {
     Promise.all([
-      TotalAmount.findLast(),
+      TotalAmount.findLast({type: TotalAmount.constants.types.preSale}),
+      TotalAmount.findLast({type: TotalAmount.constants.types.publicSale}),
+      TotalAmount.findLast({type: TotalAmount.constants.types.allocateKNT}),
       Sale.findLast()
     ])
-      .then(([{USD, KNT}, sale]) => {
+      .then(([TAPreSale, TAPublicSale, TAAllocateKNT, sale]) => {
         let currentSale = sale.isPublicSale ? sale.publicSale : sale.preSale;
-        let i = currentSale.findIndex(s => (USD <= s.fullAmountUSD));
+        let currentUSD = sale.isPublicSale ? TAPublicSale.USD : TAPreSale.USD;
+        let i = currentSale.findIndex(s => (currentUSD <= s.fullAmountUSD));
 
         return {
           total: {
             discount: currentSale[i] ? currentSale[i].discount : 0,
             nextDiscount: currentSale[i + 1] ? currentSale[i + 1].discount : null,
-            currentAmountUSD: USD,
-            currentAmountKNT: KNT,
+            currentAmountUSD: +(TAPreSale.USD + TAPublicSale.USD).toFixed(10),
+            currentAmountKNT: +(TAPreSale.KNT + TAPublicSale.KNT).toFixed(10),
             expectedAmountUSD: sale.totalAmountUSD,
             expectedAmountKNT: sale.totalAmountKNT,
-            // TODO: Change adminAmountKNT when will be admin KNT logic
-            adminAmountKNT: 0
+            adminAmountKNT: TAAllocateKNT.KNT
           },
-          sale
+          sale: Sale.mapRecord(sale, sale.isPublicSale ? TAPublicSale.USD : TAPreSale.USD)
         };
       })
       .then(result => res.json(result))

@@ -30,9 +30,10 @@ module.exports = {
       }) => {
         const noDiscountSale = { USD_KNT, KNT_USD, discount: 0, nextDiscount: null };
         const currentSale = isPublicSale ? publicSale : preSale;
+        const types = TotalAmount.constants.types;
 
         return !isDiscount ? Promise.resolve(noDiscountSale)
-          : TotalAmount.findLast()
+          : TotalAmount.findLast({type: isPublicSale ? types.publicSale : types.preSale})
             .then(({USD, KNT}) => {
               let i = currentSale.findIndex(s => (USD <= s.fullAmountUSD));
               let s = currentSale[i];
@@ -66,9 +67,10 @@ module.exports = {
     let promise = Sale.findLast()
       .then(({ isDiscount, isPublicSale, KNT_USD, KNT_USD_MVP, preSale, publicSale }) => {
         const currentSale = isPublicSale ? publicSale : preSale;
+        const types = TotalAmount.constants.types;
 
         return !isDiscount ? Promise.resolve(+(valueUSD * KNT_USD).toFixed(10))
-          : TotalAmount.findLast()
+          : TotalAmount.findLast({type: isPublicSale ? types.publicSale : types.preSale})
             .then(({USD: totalUSD}) => {
               let i = currentSale.findIndex(s => (totalUSD <= s.fullAmountUSD));
 
