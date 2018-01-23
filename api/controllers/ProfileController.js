@@ -146,6 +146,8 @@ module.exports = {
           allParams.document = file.id;
           allParams.needVerify = true; // Need admin verification
 
+          // TODO: Add old document remove after update
+
           return User.update({id: req.user.id}, allParams)
             .then(([user]) => {
               req.user = user;

@@ -15,5 +15,10 @@ module.exports = {
 
   generateRandomString: function (length = 10) {
     return secureRandomString({length});
-  }
+  },
+
+  mapArrayToConstantsObject: arr => arr.reduce((obj, key) => {
+    obj[key] = key;
+    return obj;
+  }, {})
 };

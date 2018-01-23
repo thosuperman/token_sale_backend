@@ -24,11 +24,8 @@ const identificationTypesNames = {
   passport: 'Passport',
   other: 'Other'
 };
-const identificationTypes = Object.keys(identificationTypesNames).reduce((obj, key) => {
-  obj[key] = key;
-  return obj;
-}, {});
-const identificationTypesList = _.values(identificationTypes);
+const identificationTypesList = Object.keys(identificationTypesNames);
+const identificationTypes = MiscService.mapArrayToConstantsObject(identificationTypesList);
 
 module.exports = {
   constants: {

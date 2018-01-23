@@ -63,4 +63,6 @@ module.exports = {
 
     return cb();
   }
+
+  // TODO: Add photo remove after model destroy
 };
