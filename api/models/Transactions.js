@@ -39,7 +39,7 @@ module.exports = {
 
     status: { type: 'string', in: statusesList, defaultsTo: statuses.pending },
 
-    raw: { type: 'json', required: true },
+    raw: { type: 'json' },
 
     date: { type: 'date', required: true },
 
@@ -47,15 +47,27 @@ module.exports = {
 
     confirmations: { type: 'integer' },
 
-    value: { type: 'float' },
+    value: { type: 'float', min: 0 },
 
-    USD: { type: 'float' },
+    USD: { type: 'float', min: 0 },
 
-    KNT: { type: 'float' },
+    KNT: { type: 'float', min: 0 },
 
     exchangeRate: { model: 'exchangerates' },
 
-    from: { model: 'user' }
+    from: { model: 'user' },
+
+    admin: { model: 'user' }, // for type allocateKNT
+
+    toJSON: function () {
+      var obj = this.toObject();
+
+      if (obj.type) {
+        obj.type = typesNames[obj.type];
+      }
+
+      return obj;
+    }
   },
 
   indexes: [
@@ -63,11 +75,18 @@ module.exports = {
       attributes: { from: 1 }
     }, {
       attributes: { hash: 1 },
-      options: { unique: true }
+      options: {
+        unique: true,
+        partialFilterExpression: {hash: {$exists: true}}
+      }
     }
   ],
 
   beforeValidate: function (values, cb) {
+    if (values.type === types.allocateKNT) {
+      values.USD = 0;
+    }
+
     if (values.raw) {
       if (typeof values.raw.confirmations !== 'undefined') {
         values.confirmations = parseInt(values.raw.confirmations, 10);
@@ -187,13 +206,13 @@ module.exports = {
     return cb();
   },
 
-  afterCreate: function ({id, USD, KNT}, cb) {
+  afterCreate: function ({type, id, USD, KNT}, cb) {
     if (KNT) {
-      const types = TotalAmount.constants.types;
+      const TATypes = TotalAmount.constants.types;
 
       return Sale.findLast()
         .then(sale => TotalAmount.addNew({
-          type: sale.isPublicSale ? types.publicSale : types.preSale,
+          type: (type === types.allocateKNT) ? TATypes.allocateKNT : sale.isPublicSale ? TATypes.publicSale : TATypes.preSale,
           USD,
           KNT,
           transaction: id

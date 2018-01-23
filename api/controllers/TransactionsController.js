@@ -25,5 +25,19 @@ module.exports = {
     .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
     .then(result => res.json(result))
     .catch(err => res.negotiate(err));
+  },
+
+  allocate: function (req, res) {
+    let {id, KNT} = req.allParams();
+
+    Transactions.create({
+      type: Transactions.constants.types.allocateKNT,
+      date: new Date(),
+      from: id,
+      KNT,
+      admin: req.user.id
+    })
+      .then(result => res.json(result))
+      .catch(err => res.negotiate(err));
   }
 };
