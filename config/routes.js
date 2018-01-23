@@ -95,6 +95,7 @@ module.exports.routes = {
 
   [`GET ${prefix}/manageTokens`]: {controller: 'ManageTokensController', action: 'index'},
   [`POST ${prefix}/manageTokens/sale`]: {controller: 'SaleController', action: 'create'},
+  [`POST ${prefix}/manageTokens/switchToPublicSale`]: {controller: 'SaleController', action: 'switchToPublicSale'},
   [`GET ${prefix}/sale`]: {controller: 'SaleController', action: 'findLast'},
 
   [`GET ${prefix}/authenticatorRecovery`]: {controller: 'AuthenticatorRecoveryController', action: 'find'},

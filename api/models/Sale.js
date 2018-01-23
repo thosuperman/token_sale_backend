@@ -73,12 +73,9 @@ module.exports = {
         values.isPublicSale = true;
       }
 
-      // TODO: Remove line above when public sale total amounts logic will be done
-      values.isPublicSale = last.isPublicSale;
+      values.preSale = (values.preSale && !last.isPublicSale) ? saleArrayParse(values.preSale) : last.preSale;
 
-      values.preSale = values.preSale ? saleArrayParse(values.preSale) : last.preSale;
-
-      values.publicSale = values.publicSale ? saleArrayParse(values.publicSale) : last.publicSale;
+      values.publicSale = (values.publicSale && last.isPublicSale) ? saleArrayParse(values.publicSale) : last.publicSale;
 
       return cb();
     });
