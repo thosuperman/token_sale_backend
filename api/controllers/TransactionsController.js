@@ -68,7 +68,7 @@ module.exports = {
     };
 
     Promise.all([
-      Transactions.find({ where, sort }).paginate({page, limit}),
+      Transactions.find({ where, sort }).populate('admin').paginate({page, limit}),
       Transactions.count(where)
     ])
     .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
