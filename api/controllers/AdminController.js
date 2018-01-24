@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails User MiscService AuthenticatorService MailerService */
+/* global User MiscService AuthenticatorService MailerService */
 
 module.exports = {
 
@@ -73,12 +73,10 @@ module.exports = {
           });
         }
 
+        // TODO: Add emailVerificationToken: null
         return User.update({id: user.id}, {password, emailVerified: true})
-          .then(result => res.redirect('/admin/#/?emailVerified'))
-          .catch(err => {
-            sails.log.error(err);
-            return res.redirect('/admin/#/?emailUnverified');
-          });
+          .then(result => res.ok(result))
+          .catch(err => res.negotiate(err));
       });
   }
 };
