@@ -27,12 +27,13 @@ const identificationTypesNames = {
 const identificationTypesList = Object.keys(identificationTypesNames);
 const identificationTypes = MiscService.mapArrayToConstantsObject(identificationTypesList);
 
-// const userRequiredAttrsNames = {
-//   'firstName': 'First Name',
-//   'lastName': 'Last Name',
-//   'country': 'Country',
-//   'nationality': 'Nationality'
-// };
+const userRequiredAttrsNames = {
+  'firstName': 'First Name',
+  'lastName': 'Last Name',
+  'country': 'Country',
+  'nationality': 'Nationality'
+};
+const userRequiredAttrs = Object.keys(userRequiredAttrsNames);
 
 module.exports = {
   constants: {
@@ -262,6 +263,17 @@ module.exports = {
   ],
 
   beforeValidate: function (values, cb) {
+    if (values.role === roles.user) {
+      let notFilledAttr = userRequiredAttrs.find(key => !values[key]);
+
+      if (notFilledAttr) {
+        return cb(ErrorService.new({
+          status: 400,
+          message: `${userRequiredAttrsNames[notFilledAttr]} is required`
+        }));
+      }
+    }
+
     if (values.userName) {
       values.userNameOrigin = values.userName;
       values.userName = values.userName.toLowerCase();
