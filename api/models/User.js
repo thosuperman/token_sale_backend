@@ -27,6 +27,13 @@ const identificationTypesNames = {
 const identificationTypesList = Object.keys(identificationTypesNames);
 const identificationTypes = MiscService.mapArrayToConstantsObject(identificationTypesList);
 
+// const userRequiredAttrsNames = {
+//   'firstName': 'First Name',
+//   'lastName': 'Last Name',
+//   'country': 'Country',
+//   'nationality': 'Nationality'
+// };
+
 module.exports = {
   constants: {
     roles,
@@ -44,15 +51,15 @@ module.exports = {
 
     email: { type: 'string', unique: true, required: true, email: true },
 
-    firstName: { type: 'string', required: true, alpha: true },
+    firstName: { type: 'string', alpha: true },
 
-    lastName: { type: 'string', required: true, alpha: true },
+    lastName: { type: 'string', alpha: true },
 
     phone: { type: 'string', unique: true, phoneNumber: true },
 
-    country: { type: 'string', required: true, in: CountriesService.codesList },
+    country: { type: 'string', in: CountriesService.codesList },
 
-    nationality: { type: 'string', required: true, in: CountriesService.codesList },
+    nationality: { type: 'string', in: CountriesService.codesList },
 
     dateOfBirth: { type: 'date', after: new Date('1900-01-01') },
 
@@ -94,7 +101,7 @@ module.exports = {
 
     twoFactorSecret: { type: 'string', required: true },
 
-    registeredFromUSIP: { type: 'boolean', required: true },
+    registeredFromUSIP: { type: 'boolean' },
 
     isMVPUser: { type: 'boolean' },
 
@@ -324,7 +331,7 @@ module.exports = {
       return cb(ErrorService.new({status: 400, message: 'Password must be set'}));
     }
 
-    if (!(values.sendingEthereumAddress || values.bitcoinAddress)) {
+    if (values.role === roles.user && !(values.sendingEthereumAddress || values.bitcoinAddress)) {
       return cb(ErrorService.new({status: 400, message: 'Sending ethereum address or bitcoin address must be set'}));
     }
 
@@ -332,7 +339,10 @@ module.exports = {
   },
 
   afterCreate: function (values, cb) {
-    MailerService.sendConfirmationEmail(values);
+    if (values.role === roles.user) {
+      MailerService.sendConfirmationEmail(values);
+    }
+
     return cb();
   },
 

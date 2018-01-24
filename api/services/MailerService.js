@@ -38,10 +38,20 @@ function sendResetPwEmail (user) {
   });
 }
 
+function sendCreateAdminEmail (user, {key, qrcode}) {
+  return sendEmail({
+    to: user.email,
+    subject: 'Kora admin account confirmation instructions',
+    html: `<p>To confirm your admin account and enter password click the <a href="${sails.config.HOST}/#/create_password/${user.emailVerificationToken}">link</a></p>
+          <p>Your Google Authenticator secret seed: ${key}<br/><div><img src="${qrcode}" alt="QR Code"></div></p>`
+  });
+}
+
 const mailer = {
   sendConfirmationEmail,
   sendAuthenticatorRecoveryEmail,
-  sendResetPwEmail
+  sendResetPwEmail,
+  sendCreateAdminEmail
 };
 
 module.exports = mailer;

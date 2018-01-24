@@ -13,8 +13,8 @@ module.exports = {
     return promise;
   },
 
-  generateRandomString: function (length = 10) {
-    return secureRandomString({length});
+  generateRandomString: function (length = 10, alphanumeric = false) {
+    return secureRandomString({length, alphanumeric});
   },
 
   mapArrayToConstantsObject: arr => arr.reduce((obj, key) => {

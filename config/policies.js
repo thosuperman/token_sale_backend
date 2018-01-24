@@ -124,5 +124,9 @@ module.exports.policies = {
   AddressHistoryController: {
     index: ['isAuthorized'],
     '*': ['deny']
+  },
+
+  AdminController: {
+    '*': ['isAdmin']
   }
 };

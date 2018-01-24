@@ -95,6 +95,9 @@ module.exports.routes = {
   [`PUT ${prefix}/users/allocate/:id`]: {controller: 'TransactionsController', action: 'allocate'},
   [`GET ${prefix}/users/allocate/:id`]: {controller: 'TransactionsController', action: 'findAllocate'},
 
+  [`POST ${prefix}/admin`]: {controller: 'AdminController', action: 'create'},
+  [`PUT ${prefix}/admin/confirm`]: {controller: 'AdminController', action: 'confirm'},
+
   [`GET ${prefix}/manageTokens`]: {controller: 'ManageTokensController', action: 'index'},
   [`POST ${prefix}/manageTokens/sale`]: {controller: 'SaleController', action: 'create'},
   [`POST ${prefix}/manageTokens/switchToPublicSale`]: {controller: 'SaleController', action: 'switchToPublicSale'},
