@@ -62,7 +62,10 @@ module.exports = {
       sort = 'date DESC'
     } = req.allParams();
 
-    let where = { from: userId };
+    let where = {
+      from: userId,
+      type: Transactions.constants.types.allocateKNT
+    };
 
     Promise.all([
       Transactions.find({ where, sort }).paginate({page, limit}),
