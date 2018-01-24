@@ -93,6 +93,7 @@ module.exports.routes = {
   [`PUT ${prefix}/users/blockChange/:id`]: {controller: 'UserController', action: 'blockChange'},
   [`PUT ${prefix}/users/:id`]: {controller: 'UserController', action: 'update'},
   [`PUT ${prefix}/users/allocate/:id`]: {controller: 'TransactionsController', action: 'allocate'},
+  [`GET ${prefix}/users/allocate/:id`]: {controller: 'TransactionsController', action: 'findAllocate'},
 
   [`GET ${prefix}/manageTokens`]: {controller: 'ManageTokensController', action: 'index'},
   [`POST ${prefix}/manageTokens/sale`]: {controller: 'SaleController', action: 'create'},

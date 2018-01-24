@@ -51,5 +51,25 @@ module.exports = {
        .then(result => res.json(result))
        .catch(err => res.negotiate(err));
      });
+  },
+
+  findAllocate: function (req, res) {
+    const userId = req.param('id');
+
+    const {
+      limit = 10,
+      page = 1,
+      sort = 'date DESC'
+    } = req.allParams();
+
+    let where = { from: userId };
+
+    Promise.all([
+      Transactions.find({ where, sort }).paginate({page, limit}),
+      Transactions.count(where)
+    ])
+    .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
+    .then(result => res.json(result))
+    .catch(err => res.negotiate(err));
   }
 };
