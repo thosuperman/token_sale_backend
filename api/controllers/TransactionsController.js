@@ -30,6 +30,12 @@ module.exports = {
   allocate: function (req, res) {
     let {id, KNT} = req.allParams();
 
+    KNT = parseFloat(KNT);
+
+    if (isNaN(KNT) && KNT <= 0) {
+      return res.badRequest({message: 'KNT value is invalid'});
+    }
+
     User.findOne({id})
      .exec((err, user) => {
        if (err) {
