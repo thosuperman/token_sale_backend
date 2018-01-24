@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global User MiscService AuthenticatorService MailerService */
+/* global _ User MiscService AuthenticatorService MailerService */
 
 module.exports = {
 
@@ -78,5 +78,18 @@ module.exports = {
           .then(result => res.ok(result))
           .catch(err => res.negotiate(err));
       });
+  },
+
+  update: function (req, res) {
+    let allParams = _.pick(req.allParams(), ['firstName', 'lastName', 'email']);
+
+    return User.update({id: req.user.id}, allParams)
+      .then(([user]) => {
+        req.user = user;
+
+        return user;
+      })
+      .then(result => res.ok(result))
+      .catch(err => res.negotiate(err));
   }
 };

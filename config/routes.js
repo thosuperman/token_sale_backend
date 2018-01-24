@@ -97,6 +97,7 @@ module.exports.routes = {
 
   [`POST ${prefix}/admin`]: {controller: 'AdminController', action: 'create'},
   [`PUT ${prefix}/admin/confirm`]: {controller: 'AdminController', action: 'confirm'},
+  [`PUT ${prefix}/admin/profile`]: {controller: 'AdminController', action: 'update'},
 
   [`GET ${prefix}/manageTokens`]: {controller: 'ManageTokensController', action: 'index'},
   [`POST ${prefix}/manageTokens/sale`]: {controller: 'SaleController', action: 'create'},
