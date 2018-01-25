@@ -26,7 +26,16 @@ module.exports = {
 
     date: { type: 'date', required: true },
 
-    USD: { type: 'float', required: true }
+    USD: { type: 'float', required: true },
+
+    toJSON: function () {
+      var obj = this.toObject();
+
+      delete obj.raw;
+
+      return obj;
+    }
+
   },
 
   indexes: [

@@ -87,6 +87,9 @@ module.exports.routes = {
   [`POST ${prefix}/authenticator/recovery`]: {model: 'authenticatorrecovery', blueprint: 'create'},
   [`PUT ${prefix}/authenticator/recovery/:id`]: {controller: 'AuthenticatorRecoveryController', action: 'update'},
 
+  [`GET ${prefix}/transactions`]: {controller: 'TransactionsController', action: 'find'},
+  [`GET ${prefix}/transactions/findAll`]: {controller: 'TransactionsController', action: 'findAll'},
+
   [`GET ${prefix}/users`]: {controller: 'UserController', action: 'find'},
   [`GET ${prefix}/users/:id`]: {controller: 'UserController', action: 'findOne'},
   [`PUT ${prefix}/users/verify/:id`]: {controller: 'UserController', action: 'verify'},

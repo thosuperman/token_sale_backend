@@ -66,6 +66,8 @@ module.exports = {
         obj.type = typesNames[obj.type];
       }
 
+      delete obj.raw;
+
       return obj;
     }
   },

@@ -82,6 +82,7 @@ module.exports.policies = {
 
   TransactionsController: {
     find: ['isAuthorized'],
+    findAll: ['isAdmin'],
     allocate: ['isAdmin'],
     findAllocate: ['isAdmin'],
     '*': false

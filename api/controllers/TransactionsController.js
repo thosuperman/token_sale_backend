@@ -27,6 +27,43 @@ module.exports = {
     .catch(err => res.negotiate(err));
   },
 
+  findAll: function (req, res) {
+    const {
+      type,
+      status,
+      isFrom,
+      limit = 10,
+      page = 1,
+      sort = 'date DESC'
+    } = req.allParams();
+
+    let where = {};
+
+    if (type) {
+      where.type = type;
+    }
+
+    if (status) {
+      where.status = status;
+    }
+
+    if (isFrom != null) {
+      where.from = isFrom ? {'!': null} : null;
+    }
+
+    Promise.all([
+      Transactions.find({ where, sort })
+        .populate('from')
+        .populate('admin')
+        .populate('exchangeRate')
+        .paginate({page, limit}),
+      Transactions.count(where)
+    ])
+    .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
+    .then(result => res.json(result))
+    .catch(err => res.negotiate(err));
+  },
+
   allocate: function (req, res) {
     let {id, KNT} = req.allParams();
 
