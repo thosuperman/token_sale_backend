@@ -208,10 +208,10 @@ module.exports = {
 
         return User.update({id: user.id}, {emailVerified: true});
       })
-      .then(result => res.redirect('/?emailVerified'))
+      .then(result => res.redirect('/#/?emailVerified'))
       .catch(err => {
         sails.log.error(err);
-        return res.redirect('/?emailUnverified');
+        return res.redirect('/#/?emailUnverified');
       });
   },
 
