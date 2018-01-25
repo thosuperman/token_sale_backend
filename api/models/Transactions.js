@@ -67,6 +67,10 @@ module.exports = {
         obj.type = typesNames[obj.type];
       }
 
+      if (obj.raw && obj.raw.from) {
+        obj.originalAddress = obj.raw.from;
+      }
+
       delete obj.raw;
 
       return obj;
