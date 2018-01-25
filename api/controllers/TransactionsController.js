@@ -16,7 +16,7 @@ module.exports = {
       sort = 'date DESC'
     } = req.allParams();
 
-    let where = { from: userId };
+    let where = { user: userId };
 
     Promise.all([
       Transactions.find({ where, sort }).paginate({page, limit}),
@@ -31,7 +31,8 @@ module.exports = {
     const {
       type,
       status,
-      isFrom,
+      user,
+      isUser, // boolean
       limit = 10,
       page = 1,
       sort = 'date DESC'
@@ -47,13 +48,17 @@ module.exports = {
       where.status = status;
     }
 
-    if (isFrom != null) {
-      where.from = isFrom ? {'!': null} : null;
+    if (user) {
+      where.user = user;
+    }
+
+    if (isUser != null) {
+      where.user = isUser ? {'!': null} : null;
     }
 
     Promise.all([
       Transactions.find({ where, sort })
-        .populate('from')
+        .populate('user')
         .populate('admin')
         .populate('exchangeRate')
         .paginate({page, limit}),
@@ -87,7 +92,7 @@ module.exports = {
          type: Transactions.constants.types.allocateKNT,
          status: Transactions.constants.statuses.confirmed,
          date: new Date(),
-         from: id,
+         user: id,
          KNT,
          admin: req.user.id
        })
@@ -106,7 +111,7 @@ module.exports = {
     } = req.allParams();
 
     let where = {
-      from: userId,
+      user: userId,
       type: Transactions.constants.types.allocateKNT
     };
 

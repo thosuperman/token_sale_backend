@@ -55,7 +55,7 @@ module.exports = {
 
     exchangeRate: { model: 'exchangerates' },
 
-    from: { model: 'user' },
+    user: { model: 'user' },
 
     admin: { model: 'user' }, // for type allocateKNT
 
@@ -74,7 +74,7 @@ module.exports = {
 
   indexes: [
     {
-      attributes: { from: 1 }
+      attributes: { user: 1 }
     }, {
       attributes: { hash: 1 },
       options: {
@@ -168,7 +168,7 @@ module.exports = {
           User.findOne({[key]: values.raw.from})
             .then(user => {
               if (user) {
-                values.from = user.id;
+                values.user = user.id;
 
                 return user;
               }

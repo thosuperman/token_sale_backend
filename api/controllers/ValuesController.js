@@ -33,7 +33,7 @@ module.exports = {
 };
 
 function calcUserKNTBalance ({userId}, cb) {
-  let promise = Transactions.find({ from: userId })
+  let promise = Transactions.find({ user: userId })
     .then(records => {
       if (!records) {
         return 0;
