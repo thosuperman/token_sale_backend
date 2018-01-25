@@ -21,6 +21,14 @@ module.exports = {
       token
     } = req.allParams();
 
+    if (oldPassword) {
+      return res.badRequest({message: 'Old password is required'});
+    }
+
+    if (newPassword) {
+      return res.badRequest({message: 'New password is required'});
+    }
+
     if (newPassword !== newPasswordConfirm) {
       return res.badRequest({message: 'New password and new password confirm doesn\'t match'});
     }
