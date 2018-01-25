@@ -81,7 +81,7 @@ module.exports = {
   },
 
   update: function (req, res) {
-    let allParams = _.pick(req.allParams(), ['firstName', 'lastName', 'email']);
+    let allParams = _.pick(req.allParams(), ['firstName', 'lastName', 'email', 'phone']);
 
     return User.update({id: req.user.id}, allParams)
       .then(([user]) => {
