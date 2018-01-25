@@ -69,6 +69,14 @@ module.exports = {
     .catch(err => res.negotiate(err));
   },
 
+  filters: function (req, res) {
+    return res.json({
+      type: Transactions.constants.typesList,
+      status: Transactions.constants.statusesList,
+      typesNames: Transactions.constants.typesNames
+    });
+  },
+
   allocate: function (req, res) {
     let {id, KNT} = req.allParams();
 

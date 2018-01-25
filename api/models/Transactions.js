@@ -30,6 +30,7 @@ module.exports = {
   constants: {
     types,
     typesList,
+    typesNames,
     statuses,
     statusesList
   },

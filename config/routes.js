@@ -89,6 +89,7 @@ module.exports.routes = {
 
   [`GET ${prefix}/transactions`]: {controller: 'TransactionsController', action: 'find'},
   [`GET ${prefix}/transactions/findAll`]: {controller: 'TransactionsController', action: 'findAll'},
+  [`GET ${prefix}/transactions/filters`]: {controller: 'TransactionsController', action: 'filters'},
 
   [`GET ${prefix}/users`]: {controller: 'UserController', action: 'find'},
   [`GET ${prefix}/users/:id`]: {controller: 'UserController', action: 'findOne'},
