@@ -133,7 +133,14 @@ module.exports = {
 
   update: function (req, res) {
     let id = req.param('id');
-    let allParams = _.pick(req.allParams(), ['email', 'sendingEthereumAddress', 'bitcoinAddress']);
+    let allParams = _.pick(req.allParams(), [
+      'email',
+      'sendingEthereumAddress',
+      'bitcoinAddress',
+      'firstName',
+      'lastName',
+      'phone'
+    ]);
 
     User.findOne({id})
       .then(record => {
