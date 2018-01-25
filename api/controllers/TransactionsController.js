@@ -32,7 +32,7 @@ module.exports = {
       type,
       status,
       user,
-      isUser, // boolean
+      isUser,
       limit = 10,
       page = 1,
       sort = 'date DESC'
@@ -52,8 +52,8 @@ module.exports = {
       where.user = user;
     }
 
-    if (isUser != null) {
-      where.user = isUser ? {'!': null} : null;
+    if (isUser) {
+      where.user = isUser === 'false' ? null : user || {'!': null};
     }
 
     Promise.all([
