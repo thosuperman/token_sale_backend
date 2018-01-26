@@ -98,6 +98,7 @@ module.exports.routes = {
   [`PUT ${prefix}/users/:id`]: {controller: 'UserController', action: 'update'},
   [`PUT ${prefix}/users/allocate/:id`]: {controller: 'TransactionsController', action: 'allocate'},
   [`GET ${prefix}/users/allocate/:id`]: {controller: 'TransactionsController', action: 'findAllocate'},
+  [`POST ${prefix}/users/inviteUS`]: {model: 'invites', blueprint: 'create', policy: 'isAdmin'},
 
   [`POST ${prefix}/admin`]: {controller: 'AdminController', action: 'create'},
   [`PUT ${prefix}/admin/confirm`]: {controller: 'AdminController', action: 'confirm'},

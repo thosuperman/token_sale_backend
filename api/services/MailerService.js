@@ -47,11 +47,20 @@ function sendCreateAdminEmail (user, {key, qrcode}) {
   });
 }
 
+function sendInviteUSEmail ({token, email}) {
+  return sendEmail({
+    to: email,
+    subject: 'You have requested registration invite from Kora',
+    html: `<p>Please, follow the <a href="${sails.config.HOST}/#/register/${token}?email=${email}">link</a> to register at Kora token sale</p>`
+  });
+}
+
 const mailer = {
   sendConfirmationEmail,
   sendAuthenticatorRecoveryEmail,
   sendResetPwEmail,
-  sendCreateAdminEmail
+  sendCreateAdminEmail,
+  sendInviteUSEmail
 };
 
 module.exports = mailer;
