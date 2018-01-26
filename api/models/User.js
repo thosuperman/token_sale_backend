@@ -84,7 +84,7 @@ module.exports = {
 
     verified: { type: 'boolean', defaultsTo: false },
 
-    emailVerificationToken: { type: 'string', defaultsTo: MiscService.generateRandomString(50) },
+    emailVerificationToken: { type: 'string' },
 
     emailVerified: { type: 'boolean', defaultsTo: false },
 
@@ -346,6 +346,8 @@ module.exports = {
     if (values.role === roles.user && !(values.sendingEthereumAddress || values.bitcoinAddress)) {
       return cb(ErrorService.new({status: 400, message: 'Sending ethereum address or bitcoin address must be set'}));
     }
+
+    values.emailVerificationToken = MiscService.generateRandomString(50);
 
     return cb();
   },
