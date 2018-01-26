@@ -14,7 +14,7 @@ const validator = require('validator');
 const floatMin0 = value => validator.isFloat(value + '', {min: 0});
 
 module.exports = {
-  phoneNumber: value => /^[1-9]\d{9,12}$/i.test(value),
+  phoneNumber: value => /^[1-9]\d{7,12}$/i.test(value),
 
   ethereumAddress: value => Web3Utils.isAddress(value),
 

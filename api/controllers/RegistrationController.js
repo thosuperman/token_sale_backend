@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails _ User ValidationService AuthenticatorService */
+/* global sails _ User ValidationService AuthenticatorService Invites ErrorService */
 
 const request = require('request');
 const geoip = require('geoip-country');
@@ -278,23 +278,25 @@ module.exports = {
     let allParams = req.allParams();
     const twoFactorSecret = req.session.twoFactorSecret;
 
-    if (!req.session.isIPChecked) {
-      return res.badRequest({
-        message: `User didn't check his IP`
-      });
-    }
+    if (!allParams.inviteToken) {
+      if (!req.session.isIPChecked) {
+        return res.badRequest({
+          message: `User didn't check his IP`
+        });
+      }
 
-    // TODO: Check US citizens registration logic
-    if (req.session.hasUSIP) {
-      return res.badRequest({
-        message: `User can't has US IP`
-      });
-    }
+      // TODO: Check US citizens registration logic
+      if (req.session.hasUSIP) {
+        return res.badRequest({
+          message: `User can't has US IP`
+        });
+      }
 
-    if (allParams.country === 'USA') {
-      return res.badRequest({
-        message: `User can't has US country`
-      });
+      if (allParams.country === 'USA') {
+        return res.badRequest({
+          message: `User can't has US country`
+        });
+      }
     }
 
     if (!req.session.isCaptchaValid) {
@@ -343,7 +345,25 @@ module.exports = {
       });
     }
 
-    User.create(allParams)
+    let promise = Promise.resolve();
+    let cache = {};
+
+    if (allParams.inviteToken) {
+      promise = promise
+        .then(() => Invites.findOne({token: allParams.inviteToken}))
+        .then(invite => {
+          if (!invite) {
+            return Promise.reject(ErrorService.new({ status: 404, message: 'Invite token not found' }));
+          }
+
+          cache.invite = invite;
+
+          return true;
+        });
+    }
+
+    promise
+      .then(() => User.create(allParams))
       .then(user => {
         delete req.session.isCaptchaValid;
         delete req.session.isIPChecked;
@@ -358,7 +378,14 @@ module.exports = {
 
         return user;
       })
-      .then(result => res.ok(result))
+      .then(user => {
+        if (cache.invite) {
+          Invites.destroy({id: cache.invite.id})
+            .catch(err => sails.log.error(err));
+        }
+
+        return res.ok(user);
+      })
       .catch(err => res.negotiate(err));
   }
 
