@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails Files User */
+/* global sails Files User AuthenticatorRecovery */
 
 const skipperS3 = require('skipper-better-s3')({
   key: sails.config.s3ApiKey,
@@ -18,6 +18,21 @@ module.exports = {
   _config: {
     actions: true
   },
+
+  // clean: function (req, res) {
+  //   Promise.all([
+  //     User.find({document: {not: null}}),
+  //     AuthenticatorRecovery.find({photo: {not: null}})
+  //   ])
+  //   .then(([users, recoveries]) => {
+  //     let files = users.map(u => u.document).concat(recoveries.map(r => r.photo));
+  //
+  //     return Files.find({id: {not: files}});
+  //     // return Files.destroy({id: {not: files}});
+  //   })
+  //   .then(result => res.ok(result))
+  //   .catch(err => res.negotiate(err));
+  // },
 
   /**
    * `FilesController.findOne()`
