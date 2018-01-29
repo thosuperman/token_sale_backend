@@ -7,16 +7,7 @@
 
 /* global sails _ User Files CountriesService ErrorService MiscService MailerService AddressHistory */
 
-const {blueprints} = require('../../config/blueprints');
-const prefix = blueprints.prefix || '';
-
 const skipperS3 = require('skipper-better-s3');
-const skipperS3Adapter = skipperS3({
-  key: sails.config.s3ApiKey,
-  secret: sails.config.s3ApiSecret,
-  bucket: sails.config.s3Bucket,
-  region: sails.config.s3Region
-});
 
 const updateAttrs = ['email', 'sendingEthereumAddress', 'bitcoinAddress'];
 
@@ -41,15 +32,10 @@ module.exports = {
    * `ProfileController.index()`
    */
   index: function (req, res) {
-    const user = _.clone(req.user);
+    const user = req.user;
 
     switch (req.method) {
       case 'GET':
-        if (user.document) {
-          user.documentUrl = `${prefix}/profile/document/${user.document}`;
-          delete user.document;
-        }
-
         return res.json(user);
 
       case 'PUT':
@@ -97,7 +83,7 @@ module.exports = {
               Promise.all(promises).catch(err => sails.log.error(err));
             }
 
-            return Object.assign({}, user, {documentUrl: `${prefix}/profile/document/${user.document}`});
+            return user;
           })
           .then(result => res.ok(result))
           .catch(err => res.negotiate(err));
@@ -146,48 +132,22 @@ module.exports = {
           allParams.document = file.id;
           allParams.needVerify = true; // Need admin verification
 
-          // TODO: Add old document remove after update
+          let oldDocument = req.user.document;
 
           return User.update({id: req.user.id}, allParams)
             .then(([user]) => {
               req.user = user;
-              return Object.assign({}, user, {documentUrl: `${prefix}/profile/document/${user.document}`});
+
+              if (oldDocument) {
+                Files.destroy({id: oldDocument}).catch(err => sails.log.error(err));
+              }
+
+              return user;
             })
             .then(result => res.ok(result))
             .catch(err => res.negotiate(err));
         });
     });
-  },
-
-  document: function (req, res) {
-    var fileID = req.param('id');
-
-    if (fileID !== req.user.document) {
-      return res.notFound();
-    }
-
-    Files.findOne({ id: fileID })
-      .exec((err, file) => {
-        if (err) {
-          return res.serverError(err);
-        }
-
-        if (!file) {
-          return res.notFound();
-        }
-
-        res.set('Content-Type', file.type);
-
-        skipperS3Adapter.read(file.fd)
-          .on('error', function (err) {
-            return res.serverError(err);
-          })
-          .pipe(res);
-
-        // const url = skipperS3Adapter.url('getObject', { s3params: { Key: file.fd } });
-
-        // return res.redirect(303, url);
-      });
   },
 
   selects: function (req, res) {

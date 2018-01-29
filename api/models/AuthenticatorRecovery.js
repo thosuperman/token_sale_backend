@@ -5,7 +5,7 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global User ErrorService */
+/* global User ErrorService Files */
 
 const {blueprints} = require('../../config/blueprints');
 const prefix = blueprints.prefix || '';
@@ -62,7 +62,11 @@ module.exports = {
     }
 
     return cb();
-  }
+  },
 
-  // TODO: Add photo remove after model destroy
+  afterDestroy: function (records, cb) {
+    Promise.all(records.map(r => Files.destroy({id: r.photo})))
+      .then(() => cb())
+      .catch(err => cb(err));
+  }
 };

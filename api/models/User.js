@@ -5,7 +5,7 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global _ ValidationService CountriesService ErrorService MiscService MailerService */
+/* global _ ValidationService CountriesService ErrorService MiscService MailerService Files */
 
 const bcrypt = require('bcrypt');
 
@@ -367,6 +367,12 @@ module.exports = {
       MailerService.sendConfirmationEmail(valuesToUpdate);
     }
     return cb();
+  },
+
+  afterDestroy: function (records, cb) {
+    Promise.all(records.map(r => Files.destroy({id: r.photo})))
+      .then(() => cb())
+      .catch(err => cb(err));
   },
 
   comparePassword: function (password, user, cb) {

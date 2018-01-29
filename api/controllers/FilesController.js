@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails Files */
+/* global sails Files User */
 
 const skipperS3 = require('skipper-better-s3')({
   key: sails.config.s3ApiKey,
@@ -23,7 +23,13 @@ module.exports = {
    * `FilesController.findOne()`
    */
   findOne: function (req, res) {
-    var fileID = req.param('id');
+    const fileID = req.param('id');
+    const user = req.user;
+
+    // NOTE: Policy inside FilesController
+    if (!(user.role === User.constants.roles.admin || user.document === fileID)) {
+      return res.notFound();
+    }
 
     Files.findOne({ id: fileID })
       .exec((err, file) => {

@@ -108,7 +108,7 @@ module.exports.policies = {
   },
 
   FilesController: {
-    findOne: ['isAdmin'],
+    findOne: ['isAuthorized'],
     '*': ['deny']
   },
 
