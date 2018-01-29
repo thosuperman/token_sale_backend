@@ -285,7 +285,6 @@ module.exports = {
         });
       }
 
-      // TODO: Check US citizens registration logic
       if (req.session.hasUSIP) {
         return res.badRequest({
           message: `User can't has US IP`
@@ -334,7 +333,8 @@ module.exports = {
 
     Object.assign(allParams, {
       twoFactorSecret,
-      registeredFromUSIP: req.session.hasUSIP,
+      // NOTE: Change registeredFromUSIP attr set logic if invite will be not only for US citizens
+      registeredFromUSIP: !!allParams.inviteToken || req.session.hasUSIP,
       isMVPUser: false
     });
 
