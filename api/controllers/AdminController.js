@@ -40,46 +40,6 @@ module.exports = {
     .catch(err => res.negotiate(err));
   },
 
-  confirm: function (req, res) {
-    const token = req.param('token');
-    const password = req.param('password');
-    const code = req.param('code');
-
-    if (!token) {
-      return res.badRequest({ message: 'Token can not be empty' });
-    }
-
-    if (!password) {
-      return res.badRequest({ message: 'Password can not be empty' });
-    }
-
-    if (!code) {
-      return res.badRequest({ message: 'Google Authenticator Code can not be empty' });
-    }
-
-    User.findOne({emailVerificationToken: token})
-      .exec((err, user) => {
-        if (err) {
-          return res.negotiate(err);
-        }
-
-        if (!user) {
-          return res.notFound({message: 'No user with such token found'});
-        }
-
-        if (!AuthenticatorService.verify(user.twoFactorSecret, code)) {
-          return res.badRequest({
-            message: 'Google Authenticator Code is expired or invalid'
-          });
-        }
-
-        // TODO: Add emailVerificationToken: null
-        return User.update({id: user.id}, {password, emailVerified: true})
-          .then(result => res.ok(result))
-          .catch(err => res.negotiate(err));
-      });
-  },
-
   update: function (req, res) {
     let allParams = _.pick(req.allParams(), ['firstName', 'lastName', 'email', 'phone']);
 

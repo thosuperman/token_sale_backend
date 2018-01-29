@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global _ User */
+/* global _ User AuthenticatorService MiscService MailerService */
 
 module.exports = {
   // TODO: Review blueprints global logic
@@ -152,5 +152,38 @@ module.exports = {
       })
       .then(result => res.json(result))
       .catch(err => res.negotiate(err));
+  },
+
+  create: function (req, res) {
+    let allParams = _.pick(req.allParams(), [
+      'email',
+      'sendingEthereumAddress',
+      'bitcoinAddress',
+      'firstName',
+      'lastName',
+      'country',
+      'nationality'
+    ]);
+
+    const secret = AuthenticatorService.generateSecret();
+
+    const cache = {};
+
+    User.create(Object.assign(allParams, {
+      password: MiscService.generateRandomString(42, true),
+      twoFactorSecret: secret.base32
+    }))
+    .then(user => {
+      cache.user = user;
+
+      return AuthenticatorService.generageQRCode(secret.otpauth_url);
+    })
+    .then(url => {
+      MailerService.sendCreateUserEmail(cache.user, { qrcode: url, key: secret.base32 });
+
+      return cache.user;
+    })
+    .then(result => res.ok(result))
+    .catch(err => res.negotiate(err));
   }
 };

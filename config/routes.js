@@ -75,6 +75,7 @@ module.exports.routes = {
   [`GET ${prefix}/profile/confirmEmail/:token`]: {controller: 'ProfileController', action: 'confirmEmail'},
   [`POST ${prefix}/profile/forgotPassword`]: {controller: 'ProfileController', action: 'forgotPassword'},
   [`PUT ${prefix}/profile/restorePassword/:token`]: {controller: 'ProfileController', action: 'restorePassword'},
+  [`PUT ${prefix}/profile/confirm`]: {controller: 'ProfileController', action: 'confirm'},
 
   [`GET ${prefix}/values`]: {controller: 'ValuesController', action: 'index'},
 
@@ -98,9 +99,10 @@ module.exports.routes = {
   [`PUT ${prefix}/users/allocate/:id`]: {controller: 'TransactionsController', action: 'allocate'},
   [`GET ${prefix}/users/allocate/:id`]: {controller: 'TransactionsController', action: 'findAllocate'},
   [`POST ${prefix}/users/inviteUS`]: {model: 'invites', blueprint: 'create', policy: 'isAdmin'},
+  [`POST ${prefix}/users`]: {controller: 'UserController', action: 'create'},
 
   [`POST ${prefix}/admin`]: {controller: 'AdminController', action: 'create'},
-  [`PUT ${prefix}/admin/confirm`]: {controller: 'AdminController', action: 'confirm'},
+  [`PUT ${prefix}/admin/confirm`]: {controller: 'ProfileController', action: 'confirm'},
   [`PUT ${prefix}/admin/profile`]: {controller: 'AdminController', action: 'update'},
 
   [`GET ${prefix}/manageTokens`]: {controller: 'ManageTokensController', action: 'index'},

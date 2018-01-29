@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails _ User Files CountriesService ErrorService MiscService MailerService AddressHistory */
+/* global sails _ User Files CountriesService ErrorService MiscService MailerService AddressHistory AuthenticatorService */
 
 const skipperS3 = require('skipper-better-s3');
 
@@ -166,7 +166,7 @@ module.exports = {
           return Promise.reject(ErrorService.new({message: 'No user with such token found', status: 404}));
         }
 
-        return User.update({id: user.id}, {emailVerified: true});
+        return User.update({id: user.id}, {emailVerified: true, emailVerificationToken: null});
       })
       .then(result => res.redirect('/#/?emailVerified'))
       .catch(err => {
@@ -215,5 +215,44 @@ module.exports = {
         res.ok({ message: 'Password has been successfully restored' });
       })
       .catch(err => res.negotiate(err));
+  },
+
+  confirm: function (req, res) {
+    const token = req.param('token');
+    const password = req.param('password');
+    const code = req.param('code');
+
+    if (!token) {
+      return res.badRequest({ message: 'Token can not be empty' });
+    }
+
+    if (!password) {
+      return res.badRequest({ message: 'Password can not be empty' });
+    }
+
+    if (!code) {
+      return res.badRequest({ message: 'Google Authenticator Code can not be empty' });
+    }
+
+    User.findOne({emailVerificationToken: token})
+      .exec((err, user) => {
+        if (err) {
+          return res.negotiate(err);
+        }
+
+        if (!user) {
+          return res.notFound({message: 'No user with such token found'});
+        }
+
+        if (!AuthenticatorService.verify(user.twoFactorSecret, code)) {
+          return res.badRequest({
+            message: 'Google Authenticator Code is expired or invalid'
+          });
+        }
+
+        return User.update({id: user.id}, {password, emailVerified: true, emailVerificationToken: null})
+          .then(records => res.ok(records[0]))
+          .catch(err => res.negotiate(err));
+      });
   }
 };

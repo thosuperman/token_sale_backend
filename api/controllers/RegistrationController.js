@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails _ User ValidationService AuthenticatorService Invites ErrorService */
+/* global sails _ User ValidationService AuthenticatorService Invites ErrorService MailerService */
 
 const request = require('request');
 const geoip = require('geoip-country');
@@ -383,6 +383,8 @@ module.exports = {
           Invites.destroy({id: cache.invite.id})
             .catch(err => sails.log.error(err));
         }
+
+        MailerService.sendConfirmationEmail(user);
 
         return res.ok(user);
       })

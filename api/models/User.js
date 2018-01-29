@@ -352,14 +352,6 @@ module.exports = {
     return cb();
   },
 
-  afterCreate: function (values, cb) {
-    if (values.role === roles.user) {
-      MailerService.sendConfirmationEmail(values);
-    }
-
-    return cb();
-  },
-
   beforeUpdate: function (valuesToUpdate, cb) {
     if (valuesToUpdate.email) {
       valuesToUpdate.emailVerified = false;

@@ -56,6 +56,7 @@ module.exports.policies = {
     update: ['isAdmin'],
     verify: ['isAdmin'],
     blockChange: ['isAdmin'],
+    create: ['isAdmin'],
     '*': ['deny']
     // destroy: false
   },
@@ -72,7 +73,8 @@ module.exports.policies = {
     '*': ['isAuthorized'],
     confirmEmail: true,
     forgotPassword: true,
-    restorePassword: true
+    restorePassword: true,
+    confirm: true
   },
 
   AuthController: {
