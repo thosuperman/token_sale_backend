@@ -55,15 +55,15 @@ module.exports = {
   ****************************************************************************/
 
   // TODO: Enable secure cookie session and try domain setting on production when will be SSL
-  // session: {
-  //   cookie: {
-  //     // domain: 'kora.foundation',
-  //     secure: true
-  //   }
-  // },
+  session: {
+    cookie: {
+      domain: 'token.kora.network',
+      secure: true
+    }
+  },
 
   // Enable CSRF protection
-  csrf: true,
+  // csrf: true,
 
   /***************************************************************************
    * Enable morgan logger sails-hook-requestlogger                           *
