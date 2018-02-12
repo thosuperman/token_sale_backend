@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails Files User AuthenticatorRecovery */
+/* global sails Files User */
 
 const skipperS3 = require('skipper-better-s3')({
   key: sails.config.s3ApiKey,
@@ -15,10 +15,6 @@ const skipperS3 = require('skipper-better-s3')({
 });
 
 module.exports = {
-  _config: {
-    actions: true
-  },
-
   // clean: function (req, res) {
   //   Promise.all([
   //     User.find({document: {not: null}}),

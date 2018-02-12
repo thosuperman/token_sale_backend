@@ -16,7 +16,8 @@ const skipperS3 = require('skipper-better-s3')({
 
 module.exports = {
   constants: {
-    maxBytes: 20 * 1024 * 1024
+    allowedTypes: ['image/jpeg', 'image/pjpeg', 'image/png', 'image/tiff'],
+    maxBytes: 10 * 1024 * 1024
   },
 
   attributes: {
