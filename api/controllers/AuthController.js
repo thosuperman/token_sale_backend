@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global User ValidationService AuthenticatorService */
+/* global User ValidationService AuthenticatorService Sessions */
 
 module.exports = {
 
@@ -73,7 +73,14 @@ module.exports = {
           req.session.userId = user.id;
           req.user = user;
 
-          return res.ok(user);
+          Sessions.destroy({session: {contains: user.id}, id: {not: req.sessionID}})
+            .exec(err => {
+              if (err) {
+                return res.negotiate(err);
+              }
+
+              return res.ok(user);
+            });
         });
       });
   },

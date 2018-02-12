@@ -79,5 +79,9 @@ module.exports = {
     ExchangeRates.findLastByTypes()
       .then(result => res.ok(result))
       .catch(err => res.negotiate(err));
+  },
+
+  session: function (req, res) {
+    res.ok({session: req.session, id: req.sessionID});
   }
 };
