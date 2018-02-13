@@ -28,6 +28,10 @@ module.exports = function forbidden (data, options) {
   }
   else sails.log.verbose('Sending 403 ("Forbidden") response');
 
+  if (data === 'CSRF mismatch') {
+    // Return another response for example:
+    return res.jsonx({message: 'Refresh browser page please'});
+  }
   // Only include errors in response if application environment
   // is not set to 'production'.  In production, we shouldn't
   // send back any identifying information about errors.
@@ -86,4 +90,3 @@ module.exports = function forbidden (data, options) {
   });
 
 };
-
