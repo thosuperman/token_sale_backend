@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails _ User Files CountriesService ErrorService MiscService MailerService AddressHistory AuthenticatorService */
+/* global sails _ User Files CountriesService ErrorService MiscService MailerService AddressHistory AuthenticatorService Sessions */
 
 const skipperS3 = require('skipper-better-s3');
 
@@ -213,7 +213,7 @@ module.exports = {
     User.findOne({email})
       .then(user => {
         if (!user) {
-          return Promise.reject(ErrorService.new({message: 'No user with such email found', status: 404}));
+          return Promise.reject(ErrorService.new({message: 'Email is incorrect', status: 400}));
         }
 
         return User.update({id: user.id}, {resetPasswordToken: MiscService.generateRandomString(50)});
@@ -240,11 +240,10 @@ module.exports = {
           return Promise.reject(ErrorService.new({message: 'No user with such token found', status: 404}));
         }
 
-        return User.update({id: user.id}, { password, resetPasswordToken: '' });
+        return User.update({id: user.id}, { password, resetPasswordToken: '' })
+          .then(() => Sessions.destroy({session: {contains: user.id}}));
       })
-      .then(result => {
-        res.ok({ message: 'Password has been successfully restored' });
-      })
+      .then(() => res.ok({ message: 'Password has been successfully restored' }))
       .catch(err => res.negotiate(err));
   },
 

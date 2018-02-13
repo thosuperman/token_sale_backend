@@ -52,7 +52,6 @@ module.exports = {
           let headers = upload.headers;
           let byteCount = upload.byteCount;
           let validated = true;
-          // let validated = false;
           let errorMessages = [];
 
           // Check file type
