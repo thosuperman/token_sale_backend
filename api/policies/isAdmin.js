@@ -10,8 +10,7 @@
 module.exports = function (req, res, next) {
   // req.user creates in fetchUserHook
   if (!(req.user && req.user.enabled && req.user.role === User.constants.roles.admin)) {
-    // return res.json(401, {message: 'User is not admin'});
-    return res.notFound();
+    return res.json(401, {message: 'User is not authorized'});
   }
 
   return next();
