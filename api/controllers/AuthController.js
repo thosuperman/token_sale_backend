@@ -13,10 +13,10 @@ module.exports = {
    * `AuthController.login()`
    */
   login: function (req, res) {
-    let {userName, password, token} = req.allParams();
+    let {userName: email, password, token} = req.allParams();
 
-    if (!userName) {
-      return res.badRequest({ message: 'Username/email can not be empty' });
+    if (!email) {
+      return res.badRequest({ message: 'Email can not be empty' });
     }
 
     if (!password) {
@@ -27,15 +27,9 @@ module.exports = {
       return res.badRequest({ message: 'Google Authenticator Code can not be empty' });
     }
 
-    userName = ValidationService.escape(userName);
+    email = ValidationService.escape(email);
 
-    User.findOne({
-      or: [
-        {phone: userName},
-        {userName: userName.toLowerCase()},
-        {email: userName.toLowerCase()}
-      ]
-    })
+    User.findOne({email: email.toLowerCase()})
       .exec((err, user) => {
         if (err) {
           return res.negotiate;
@@ -43,7 +37,7 @@ module.exports = {
 
         if (!user) {
           return res.badRequest({
-            message: 'Username or Password is invalid'
+            message: 'Email or Password is invalid'
           });
         }
 
@@ -60,7 +54,7 @@ module.exports = {
 
           if (!valid) {
             return res.badRequest({
-              message: 'Username or Password is invalid'
+              message: 'Email or Password is invalid'
             });
           }
 
