@@ -252,11 +252,11 @@ module.exports = {
    * `RegistrationController.generateQRCode()`
    */
   generateQRCode: function (req, res) {
-    if (req.user && req.user.enabled) {
-      return res.badRequest({
-        message: 'Looks like user already registered. Logout first'
-      });
-    }
+    // if (req.user && req.user.enabled) {
+    //   return res.badRequest({
+    //     message: 'Looks like user already registered. Logout first'
+    //   });
+    // }
 
     const secret = AuthenticatorService.generateSecret();
 
