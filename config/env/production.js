@@ -63,7 +63,7 @@ module.exports = {
   },
 
   // Enable CSRF protection
-  csrf: true,
+  // csrf: true,
 
   /***************************************************************************
    * Enable morgan logger sails-hook-requestlogger                           *
