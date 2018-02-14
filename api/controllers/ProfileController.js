@@ -115,7 +115,6 @@ module.exports = {
       let headers = upload.headers;
       let byteCount = upload.byteCount;
       let validated = true;
-      // let validated = false;
       let errorMessages = [];
 
       // Check file type
@@ -176,6 +175,15 @@ module.exports = {
           message: 'File not uploaded: ' + errorMessages.join(' - ')
         });
       }
+    } else if (req.user.needVerify && req.user.document) {
+      return User.update({id: req.user.id}, allParams)
+        .then(([user]) => {
+          req.user = user;
+
+          return user;
+        })
+        .then(result => res.ok(result))
+        .catch(err => res.negotiate(err));
     } else {
       return res.badRequest({message: 'No file was uploaded'});
     }
