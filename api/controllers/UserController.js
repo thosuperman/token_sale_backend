@@ -22,7 +22,7 @@ module.exports = {
       needVerify,
       limit = 10,
       page = 1,
-      sort = 'email ASC'
+      sort = 'updatedAt DESC'
     } = req.allParams();
 
     let where = {};
@@ -60,9 +60,9 @@ module.exports = {
       User.find({ where, sort }).paginate({page, limit}),
       User.count(where)
     ])
-    .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
-    .then(result => res.json(result))
-    .catch(err => res.negotiate(err));
+      .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
+      .then(result => res.json(result))
+      .catch(err => res.negotiate(err));
   },
 
   findOne: function (req, res) {
@@ -173,17 +173,17 @@ module.exports = {
       password: MiscService.generateRandomString(42, true),
       twoFactorSecret: secret.base32
     }))
-    .then(user => {
-      cache.user = user;
+      .then(user => {
+        cache.user = user;
 
-      return AuthenticatorService.generageQRCode(secret.otpauth_url);
-    })
-    .then(url => {
-      MailerService.sendCreateUserEmail(cache.user, { qrcode: url, key: secret.base32 });
+        return AuthenticatorService.generageQRCode(secret.otpauth_url);
+      })
+      .then(url => {
+        MailerService.sendCreateUserEmail(cache.user, { qrcode: url, key: secret.base32 });
 
-      return cache.user;
-    })
-    .then(result => res.ok(result))
-    .catch(err => res.negotiate(err));
+        return cache.user;
+      })
+      .then(result => res.ok(result))
+      .catch(err => res.negotiate(err));
   }
 };
