@@ -21,11 +21,11 @@ module.exports = {
       token
     } = req.allParams();
 
-    if (oldPassword) {
+    if (!oldPassword) {
       return res.badRequest({message: 'Old password is required'});
     }
 
-    if (newPassword) {
+    if (!newPassword) {
       return res.badRequest({message: 'New password is required'});
     }
 
