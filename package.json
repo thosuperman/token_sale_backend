@@ -21,6 +21,7 @@
     "qrcode": "^0.9.0",
     "rc": "1.0.1",
     "request": "^2.83.0",
+    "request-promise-native": "^1.0.5",
     "sails": "~0.12.14",
     "sails-disk": "~0.10.9",
     "sails-hook-mongoat": "^2.0.0",

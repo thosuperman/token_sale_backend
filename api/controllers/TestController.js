@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails EtherscanService BitstampService ExchangeRates KoraService BlockchainService */
+/* global sails EtherscanService BitstampService ExchangeRates KoraService BlockchainService OnfidoService */
 
 module.exports = {
 
@@ -83,5 +83,23 @@ module.exports = {
 
   session: function (req, res) {
     res.ok({session: req.session, id: req.sessionID});
+  },
+
+  applicants: function (req, res) {
+    OnfidoService.applicants({id: req.param('id')})
+      .then(result => res.ok(result))
+      .catch(err => res.negotiate(err));
+  },
+
+  createApplicant: function (req, res) {
+    OnfidoService.createApplicant({body: req.allParams()})
+      .then(result => res.ok(result))
+      .catch(err => res.negotiate(err));
+  },
+
+  createCheck: function (req, res) {
+    OnfidoService.createCheck({applicantId: req.param('id')})
+      .then(result => res.ok(result))
+      .catch(err => res.negotiate(err));
   }
 };
