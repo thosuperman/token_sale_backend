@@ -5,7 +5,7 @@
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
-/* global _ ValidationService CountriesService ErrorService MiscService MailerService Files */
+/* global _ ValidationService CountriesService ErrorService MiscService MailerService Files OnfidoService */
 
 const bcrypt = require('bcrypt');
 
@@ -106,7 +106,9 @@ module.exports = {
 
     isMVPUser: { type: 'boolean' },
 
-    enabled: {type: 'boolean', defaultsTo: true},
+    enabled: { type: 'boolean', defaultsTo: true },
+
+    applicantId: { type: 'string' },
 
     toJSON: function () {
       var obj = this.toObject();
@@ -352,12 +354,47 @@ module.exports = {
     return cb();
   },
 
+  afterCreate: function (record, cb) {
+    if (record.role === roles.user) {
+      return OnfidoService.createApplicant({user: record})
+        .then(applicant => this.update({id: record.id}, {applicantId: applicant.id}))
+        .then(([updatedRecord]) => {
+          record = updatedRecord;
+          return cb();
+        })
+        .catch(err => cb(err));
+    }
+
+    return cb();
+  },
+
   beforeUpdate: function (valuesToUpdate, cb) {
     if (valuesToUpdate.email) {
       valuesToUpdate.emailVerified = false;
       valuesToUpdate.emailVerificationToken = MiscService.generateRandomString(50);
       MailerService.sendConfirmationEmail(valuesToUpdate);
     }
+
+    return cb();
+  },
+
+  afterUpdate: function (record, cb) {
+    if (record.role === roles.user && record.enabled && !record.verified) {
+      if (!record.applicantId) {
+        return OnfidoService.createApplicant({user: record})
+          .then(applicant => this.update({id: record.id}, {applicantId: applicant.id}))
+          .then(([updatedRecord]) => {
+            record = updatedRecord;
+            return cb();
+          })
+          .catch(err => cb(err));
+      }
+
+      return OnfidoService.updateApplicant({user: record})
+        .then(() => cb())
+        .catch(err => cb(err));
+    }
+
     return cb();
   },
 
