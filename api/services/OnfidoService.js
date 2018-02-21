@@ -62,7 +62,10 @@ module.exports = {
       uri: `/applicants/${applicantId}/checks`,
       body: {
         type: 'express',
-        reports: [{ name: 'document' }, { name: 'facial_similarity' }]
+        reports: [
+          { name: 'document' }
+          // { name: 'facial_similarity' }
+        ]
       }
     });
 
