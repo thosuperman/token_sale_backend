@@ -10,7 +10,7 @@
 module.exports = {
 
   _config: {
-    actions: (sails.config.environment === 'development')
+    actions: (sails.config.environment !== 'production')
   },
 
   blocktrailTxs: function (req, res) {
@@ -86,13 +86,13 @@ module.exports = {
   },
 
   applicants: function (req, res) {
-    OnfidoService.applicants({id: req.param('id')})
+    OnfidoService.applicants({applicantId: req.param('id')})
       .then(result => res.ok(result))
       .catch(err => res.negotiate(err));
   },
 
   createApplicant: function (req, res) {
-    OnfidoService.createApplicant({body: req.allParams()})
+    OnfidoService.createApplicant({user: req.allParams()})
       .then(result => res.ok(result))
       .catch(err => res.negotiate(err));
   },
