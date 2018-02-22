@@ -7,11 +7,15 @@
 
 // const request = require('request');
 const rp = require('request-promise-native').defaults({
-  baseUrl: 'https://api.onfido.com/v2/',
+  // baseUrl: 'https://api.onfido.com/v2/',
   headers: {'Authorization': `Token token=${sails.config.onfidoApiToken}`},
   simple: false,
   resolveWithFullResponse: true,
   json: true
+});
+
+const rpBase = rp.defaults({
+  baseUrl: 'https://api.onfido.com/v2/'
 });
 
 const sdkTokenReferrer = (sails.config.environment === 'production') ? 'https://token.kora.network/*' : '*://*/*';
@@ -33,7 +37,7 @@ const handleResponse = promise => promise
 
 module.exports = {
   applicants: function ({applicantId}, cb) {
-    let promise = rp({
+    let promise = rpBase({
       uri: `/applicants/${applicantId || ''}`
     });
 
@@ -41,7 +45,7 @@ module.exports = {
   },
 
   createApplicant: function ({user}, cb) {
-    let promise = rp({
+    let promise = rpBase({
       method: 'POST',
       uri: '/applicants',
       body: {
@@ -57,7 +61,7 @@ module.exports = {
   },
 
   updateApplicant: function ({user}, cb) {
-    let promise = rp({
+    let promise = rpBase({
       method: 'PUT',
       uri: `/applicants/${user.applicantId}`,
       body: {
@@ -73,7 +77,7 @@ module.exports = {
   },
 
   createCheck: function ({applicantId}, cb) {
-    let promise = rp({
+    let promise = rpBase({
       method: 'POST',
       uri: `/applicants/${applicantId}/checks`,
       body: {
@@ -89,7 +93,7 @@ module.exports = {
   },
 
   sdkToken: function ({applicantId}, cb) {
-    let promise = rp({
+    let promise = rpBase({
       method: 'POST',
       uri: `/sdk_token`,
       body: {
