@@ -9,11 +9,27 @@
 const rp = require('request-promise-native').defaults({
   baseUrl: 'https://api.onfido.com/v2/',
   headers: {'Authorization': `Token token=${sails.config.onfidoApiToken}`},
-  simple: true,
+  simple: false,
+  resolveWithFullResponse: true,
   json: true
 });
 
 const sdkTokenReferrer = (sails.config.environment === 'production') ? 'https://token.kora.network/*' : '*://*/*';
+
+const handleResponse = promise => promise
+  .then(response => {
+    let body = response.body || {};
+
+    if (!(/^2/.test('' + response.statusCode))) {
+      let err = new Error((body.error && body.error.message) || 'Something went wrong');
+      err.status = response.statusCode || 500;
+      err.error = body.error || body;
+
+      return Promise.reject(err);
+    }
+
+    return body;
+  });
 
 module.exports = {
   applicants: function ({applicantId}, cb) {
@@ -21,7 +37,7 @@ module.exports = {
       uri: `/applicants/${applicantId || ''}`
     });
 
-    return MiscService.cbify(promise, cb);
+    return MiscService.cbify(handleResponse(promise), cb);
   },
 
   createApplicant: function ({user}, cb) {
@@ -37,7 +53,7 @@ module.exports = {
       }
     });
 
-    return MiscService.cbify(promise, cb);
+    return MiscService.cbify(handleResponse(promise), cb);
   },
 
   updateApplicant: function ({user}, cb) {
@@ -53,7 +69,7 @@ module.exports = {
       }
     });
 
-    return MiscService.cbify(promise, cb);
+    return MiscService.cbify(handleResponse(promise), cb);
   },
 
   createCheck: function ({applicantId}, cb) {
@@ -69,7 +85,7 @@ module.exports = {
       }
     });
 
-    return MiscService.cbify(promise, cb);
+    return MiscService.cbify(handleResponse(promise), cb);
   },
 
   sdkToken: function ({applicantId}, cb) {
@@ -82,6 +98,6 @@ module.exports = {
       }
     });
 
-    return MiscService.cbify(promise, cb);
+    return MiscService.cbify(handleResponse(promise), cb);
   }
 };
