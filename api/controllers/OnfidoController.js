@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global OnfidoService */
+/* global OnfidoService User */
 
 module.exports = {
 
@@ -31,7 +31,7 @@ module.exports = {
     }
 
     OnfidoService.createCheck({applicantId: req.user.applicantId})
-      // TODO: Add some status to user
+      .then(check => User.update({id: req.user.id}, {check}).then(() => check))
       .then(result => res.ok(result))
       .catch(err => res.negotiate(err));
   },

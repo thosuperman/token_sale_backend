@@ -110,6 +110,8 @@ module.exports = {
 
     applicantId: { type: 'string' },
 
+    check: { type: 'json' },
+
     toJSON: function () {
       var obj = this.toObject();
 
