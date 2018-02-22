@@ -83,8 +83,8 @@ module.exports = {
       body: {
         type: 'express',
         reports: [
-          { name: 'document' }
-          // { name: 'facial_similarity' }
+          { name: 'document' },
+          { name: 'facial_similarity' }
         ]
       }
     });
