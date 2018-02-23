@@ -134,14 +134,14 @@ module.exports = {
         obj.nationalityName = CountriesService.collection[obj.nationality].name;
       }
 
-      if (obj.document) {
-        obj.documentUrl = `${prefix}/files/` + (obj.document.id || obj.document);
-        delete obj.document;
-      } else if (obj.onfidoChecked) {
-        obj.documentUrl = `${prefix}/onfido/document/` + obj.applicantId;
-      }
+      // TODO: Update documentUrl for admin
+      // if (obj.document) {
+      //   obj.documentUrl = `${prefix}/files/` + (obj.document.id || obj.document);
+      //   delete obj.document;
+      // }
 
       if (obj.onfidoChecked) {
+        obj.documentUrl = `${prefix}/onfido/document/` + obj.applicantId;
         obj.reportUrl = `${prefix}/onfido/report/` + obj.applicantId;
       }
 
