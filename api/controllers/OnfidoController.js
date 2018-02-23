@@ -5,7 +5,14 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global OnfidoService User Onfido _ */
+/* global sails OnfidoService User Onfido Files _ */
+
+const skipperS3 = require('skipper-better-s3')({
+  key: sails.config.s3ApiKey,
+  secret: sails.config.s3ApiSecret,
+  bucket: sails.config.s3Bucket,
+  region: sails.config.s3Region
+});
 
 module.exports = {
 
@@ -40,7 +47,49 @@ module.exports = {
           return Onfido.update({id: record.id}, {check}).then(([record]) => record);
         })
       )
-      .then(onfido => User.update({id: req.user.id}, {onfidoChecked: true}).then(() => onfido.check))
+      .then(onfido => User.update({id: req.user.id}, {onfidoChecked: true})
+        .then(() => {
+          OnfidoService.listDocuments({applicantId: req.user.applicantId}, (err, {documents}) => {
+            if (err) {
+              return sails.log.error(err);
+            }
+
+            if (!(documents && documents[0])) {
+              return sails.log.error('Document not found');
+            }
+
+            let file = OnfidoService.requestBase({
+              uri: documents[0].download_href
+            });
+
+            file.on('error', err => sails.log.error(err));
+
+            const receiver = skipperS3.receive();
+
+            receiver.write(file, (...args) => {
+              sails.log.info('receiver.write args', args);
+
+              Files.create(file)
+                .then(file => {
+                  let oldDocument = req.user.document;
+
+                  return User.update({id: req.user.id}, {document: file.id})
+                    .then(() => {
+                      sails.log.info('Document upload to S3 finished');
+
+                      if (oldDocument) {
+                        return Files.destroy({id: oldDocument});
+                      }
+                    });
+                })
+                .catch(err => sails.log.error(err));
+            }
+            );
+          });
+
+          return onfido.check;
+        })
+      )
       .then(result => res.ok(result))
       .catch(err => res.negotiate(err));
   },
