@@ -132,5 +132,10 @@ module.exports.policies = {
 
   AdminController: {
     '*': ['isAdmin']
+  },
+
+  OnfidoController: {
+    '*': ['isAuthorized'],
+    report: ['isAdmin']
   }
 };

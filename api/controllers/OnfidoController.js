@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global OnfidoService User */
+/* global OnfidoService User Onfido _ */
 
 module.exports = {
 
@@ -31,7 +31,16 @@ module.exports = {
     }
 
     OnfidoService.createCheck({applicantId: req.user.applicantId})
-      .then(check => User.update({id: req.user.id}, {check}).then(() => check))
+      .then(check => Onfido.findOne({user: req.user.id})
+        .then(record => {
+          if (!record) {
+            return Onfido.create({user: req.user.id, applicantId: req.user.applicantId, check});
+          }
+
+          return Onfido.update({id: record.id}, {check}).then(([record]) => record);
+        })
+      )
+      .then(onfido => User.update({id: req.user.id}, {onfidoChecked: true}).then(() => onfido.check))
       .then(result => res.ok(result))
       .catch(err => res.negotiate(err));
   },
@@ -62,5 +71,24 @@ module.exports = {
         })
         .pipe(res);
     });
+  },
+
+  report: function (req, res) {
+    const applicantId = req.param('id');
+
+    Onfido.findOne({applicantId})
+      .exec((err, record) => {
+        if (err) {
+          return res.negotiate(err);
+        }
+
+        if (!record) {
+          return res.notFound();
+        }
+
+        res.set('Content-Type', 'text/html; charset=utf-8');
+
+        res.ok(_.unescape(record.escapedReport));
+      });
   }
 };

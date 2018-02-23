@@ -119,7 +119,8 @@ module.exports.routes = {
 
   [`POST ${prefix}/onfido/sdkToken`]: {controller: 'OnfidoController', action: 'sdkToken'},
   [`POST ${prefix}/onfido/createCheck`]: {controller: 'OnfidoController', action: 'createCheck'},
-  [`GET ${prefix}/onfido/document/:id`]: {controller: 'OnfidoController', action: 'document'}
+  [`GET ${prefix}/onfido/document/:id`]: {controller: 'OnfidoController', action: 'document'},
+  [`GET ${prefix}/onfido/report/:id`]: {controller: 'OnfidoController', action: 'report'}
 
   // [`${prefix}/custom`]: {controller: 'User', action: 'find'},
   // '/routes': (req, res) => res.ok(sails.config.routes)

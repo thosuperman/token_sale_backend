@@ -80,6 +80,8 @@ module.exports = {
 
     document: { model: 'files' },
 
+    hasVerifyInfo: { type: 'boolean', defaultsTo: false },
+
     needVerify: { type: 'boolean', defaultsTo: false },
 
     verified: { type: 'boolean', defaultsTo: false },
@@ -110,7 +112,7 @@ module.exports = {
 
     applicantId: { type: 'string' },
 
-    check: { type: 'json' },
+    onfidoChecked: { type: 'boolean', defaultsTo: false },
 
     toJSON: function () {
       var obj = this.toObject();
@@ -138,10 +140,9 @@ module.exports = {
       //   delete obj.document;
       // }
 
-      if (obj.check) {
-        // TODO: Add options for check
+      if (obj.onfidoChecked) {
         obj.documentUrl = `${prefix}/onfido/document/` + obj.applicantId;
-        delete obj.check;
+        obj.reportUrl = `${prefix}/onfido/report/` + obj.applicantId;
       }
 
       return obj;
