@@ -62,29 +62,29 @@ module.exports = {
               uri: documents[0].download_href
             });
 
+            file.on('error', err => sails.log.error(err));
+
             const receiver = skipperS3.receive();
 
-            file
-              .on('error', err => sails.log.error(err))
-              .on('finish', () => {
-                sails.log.info('File', file);
+            receiver.write(file, (...args) => {
+              sails.log.info('receiver.write args', args);
 
-                Files.create(file.extra)
-                  .then(file => {
-                    let oldDocument = req.user.document;
+              Files.create(file)
+                .then(file => {
+                  let oldDocument = req.user.document;
 
-                    return User.update({id: req.user.id}, {document: file.id})
-                      .then(() => {
-                        sails.log.info('Document upload to S3 finished');
+                  return User.update({id: req.user.id}, {document: file.id})
+                    .then(() => {
+                      sails.log.info('Document upload to S3 finished');
 
-                        if (oldDocument) {
-                          return Files.destroy({id: oldDocument});
-                        }
-                      });
-                  })
-                  .catch(err => sails.log.error(err));
-              })
-              .pipe(receiver);
+                      if (oldDocument) {
+                        return Files.destroy({id: oldDocument});
+                      }
+                    });
+                })
+                .catch(err => sails.log.error(err));
+            }
+            );
           });
 
           return onfido.check;
