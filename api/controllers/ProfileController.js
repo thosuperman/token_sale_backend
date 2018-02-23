@@ -5,9 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails _ User Files CountriesService ErrorService MiscService MailerService AddressHistory AuthenticatorService Sessions */
-
-const skipperS3 = require('skipper-better-s3');
+/* global sails _ User CountriesService ErrorService MiscService MailerService AddressHistory AuthenticatorService Sessions */
 
 const updateAttrs = ['email', 'sendingEthereumAddress', 'bitcoinAddress'];
 
@@ -108,85 +106,16 @@ module.exports = {
       });
     }
 
-    let file = req.file('document');
+    allParams.hasVerifyInfo = true; // For admin verification
 
-    if (file._files && file._files[0] && file._files[0].stream) {
-      let upload = file._files[0].stream;
-      let headers = upload.headers;
-      let byteCount = upload.byteCount;
-      let validated = true;
-      let errorMessages = [];
+    return User.update({id: req.user.id}, allParams)
+      .then(([user]) => {
+        req.user = user;
 
-      // Check file type
-      if (_.indexOf(Files.constants.allowedTypes, headers['content-type']) === -1) {
-        validated = false;
-        errorMessages.push('Wrong filetype (' + headers['content-type'] + '). Must be one of ' + Files.constants.allowedTypes.join(', ') + '.');
-      }
-      // Check file size
-      if (byteCount > Files.constants.maxBytes) {
-        validated = false;
-        errorMessages.push('Filesize exceeded: ' + Math.round(byteCount / (1024 * 1024) * 100) / 100 + ' MB / ' + Files.constants.maxBytes / (1024 * 1024) + ' MB.');
-      }
-
-      // Upload the file.
-      if (validated) {
-        file.upload({
-          adapter: skipperS3,
-          key: sails.config.s3ApiKey,
-          secret: sails.config.s3ApiSecret,
-          bucket: sails.config.s3Bucket,
-          region: sails.config.s3Region
-        }, function (err, uploads) {
-          if (err) {
-            return res.negotiate(err);
-          }
-
-          if (uploads.length === 0) {
-            return res.badRequest({message: 'No document image was uploaded'});
-          }
-
-          Files.create(uploads[0])
-            .exec((err, file) => {
-              if (err) {
-                return res.negotiate(err);
-              }
-
-              allParams.document = file.id;
-              allParams.needVerify = true; // Need admin verification
-
-              let oldDocument = req.user.document;
-
-              return User.update({id: req.user.id}, allParams)
-                .then(([user]) => {
-                  req.user = user;
-
-                  if (oldDocument) {
-                    Files.destroy({id: oldDocument}).catch(err => sails.log.error(err));
-                  }
-
-                  return user;
-                })
-                .then(result => res.ok(result))
-                .catch(err => res.negotiate(err));
-            });
-        });
-      } else {
-        return res.badRequest({
-          message: 'File not uploaded: ' + errorMessages.join(' - ')
-        });
-      }
-    } else if (req.user.needVerify && req.user.document) {
-      return User.update({id: req.user.id}, allParams)
-        .then(([user]) => {
-          req.user = user;
-
-          return user;
-        })
-        .then(result => res.ok(result))
-        .catch(err => res.negotiate(err));
-    } else {
-      return res.badRequest({message: 'No file was uploaded'});
-    }
+        return user;
+      })
+      .then(result => res.ok(result))
+      .catch(err => res.negotiate(err));
   },
 
   selects: function (req, res) {
