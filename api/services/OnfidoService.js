@@ -5,18 +5,21 @@
 
 /* global sails MiscService */
 
-// const request = require('request');
+const baseUrl = 'https://api.onfido.com/';
+const headers = {'Authorization': `Token token=${sails.config.onfidoApiToken}`};
+
+const request = require('request').defaults({ headers });
+const requestBase = request.defaults({ baseUrl });
+
 const rp = require('request-promise-native').defaults({
   // baseUrl: 'https://api.onfido.com/v2/',
-  headers: {'Authorization': `Token token=${sails.config.onfidoApiToken}`},
+  headers,
   simple: false,
   resolveWithFullResponse: true,
   json: true
 });
 
-const rpBase = rp.defaults({
-  baseUrl: 'https://api.onfido.com/v2/'
-});
+const rpBase = rp.defaults({ baseUrl });
 
 const sdkTokenReferrer = (sails.config.environment === 'production') ? 'https://token.kora.network/*' : '*://*/*';
 
@@ -36,9 +39,13 @@ const handleResponse = promise => promise
   });
 
 module.exports = {
+  request,
+
+  requestBase,
+
   applicants: function ({applicantId}, cb) {
     let promise = rpBase({
-      uri: `/applicants/${applicantId || ''}`
+      uri: `/v2/applicants/${applicantId || ''}`
     });
 
     return MiscService.cbify(handleResponse(promise), cb);
@@ -47,7 +54,7 @@ module.exports = {
   createApplicant: function ({user}, cb) {
     let promise = rpBase({
       method: 'POST',
-      uri: '/applicants',
+      uri: '/v2/applicants',
       body: {
         first_name: user.firstName,
         last_name: user.lastName,
@@ -63,7 +70,7 @@ module.exports = {
   updateApplicant: function ({user}, cb) {
     let promise = rpBase({
       method: 'PUT',
-      uri: `/applicants/${user.applicantId}`,
+      uri: `/v2/applicants/${user.applicantId}`,
       body: {
         first_name: user.firstName,
         last_name: user.lastName,
@@ -79,7 +86,7 @@ module.exports = {
   createCheck: function ({applicantId}, cb) {
     let promise = rpBase({
       method: 'POST',
-      uri: `/applicants/${applicantId}/checks`,
+      uri: `/v2/applicants/${applicantId}/checks`,
       body: {
         type: 'express',
         reports: [
@@ -95,11 +102,20 @@ module.exports = {
   sdkToken: function ({applicantId}, cb) {
     let promise = rpBase({
       method: 'POST',
-      uri: `/sdk_token`,
+      uri: `/v2/sdk_token`,
       body: {
         applicant_id: applicantId,
         referrer: sdkTokenReferrer
       }
+    });
+
+    return MiscService.cbify(handleResponse(promise), cb);
+  },
+
+  listDocuments: function ({applicantId}, cb) {
+    let promise = rpBase({
+      method: 'GET',
+      uri: `/v2/applicants/${applicantId}/documents`
     });
 
     return MiscService.cbify(handleResponse(promise), cb);
