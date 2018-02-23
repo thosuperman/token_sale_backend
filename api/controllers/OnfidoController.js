@@ -36,12 +36,31 @@ module.exports = {
       .catch(err => res.negotiate(err));
   },
 
-  /**
-   * `OnfidoController.webhook()`
-   */
-  webhook: function (req, res) {
-    return res.json({
-      todo: 'webhook() is not implemented yet!'
+  document: function (req, res) {
+    const applicantId = req.param('id');
+    const user = req.user;
+
+    // NOTE: Policy inside OnfidoService.document
+    if (!(user.role === User.constants.roles.admin || applicantId === user.applicantId)) {
+      return res.notFound();
+    }
+
+    OnfidoService.listDocuments({applicantId}, (err, {documents}) => {
+      if (err) {
+        return res.negotiate(err);
+      }
+
+      if (!(documents && documents[0])) {
+        return res.notFound();
+      }
+
+      OnfidoService.requestBase({
+        uri: documents[0].download_href
+      })
+        .on('error', function (err) {
+          return res.negotiate(err);
+        })
+        .pipe(res);
     });
   }
 };

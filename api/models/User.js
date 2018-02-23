@@ -133,9 +133,15 @@ module.exports = {
       }
 
       // TODO: Update documentUrl for admin
-      if (obj.document) {
-        obj.documentUrl = `${prefix}/files/` + (obj.document.id || obj.document);
-        delete obj.document;
+      // if (obj.document) {
+      //   obj.documentUrl = `${prefix}/files/` + (obj.document.id || obj.document);
+      //   delete obj.document;
+      // }
+
+      if (obj.check) {
+        // TODO: Add options for check
+        obj.documentUrl = `${prefix}/onfido/document/` + obj.applicantId;
+        delete obj.check;
       }
 
       return obj;
