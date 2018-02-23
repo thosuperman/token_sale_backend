@@ -389,19 +389,35 @@ module.exports = {
 
   afterUpdate: function (record, cb) {
     if (record.role === roles.user && record.enabled && !record.verified) {
+      const self = this;
+      let promises = [];
+
       if (!record.applicantId) {
-        return OnfidoService.createApplicant({user: record})
-          .then(applicant => this.update({id: record.id}, {applicantId: applicant.id}))
-          .then(([updatedRecord]) => {
-            record = updatedRecord;
-            return cb();
-          })
-          .catch(err => cb(err));
+        promises.push(
+          OnfidoService.createApplicant({user: record})
+            .then(applicant => self.update({id: record.id}, {applicantId: applicant.id}))
+            .then(([updatedRecord]) => {
+              record = updatedRecord;
+            })
+        );
       }
 
-      return OnfidoService.updateApplicant({user: record})
-        .then(() => cb())
-        .catch(err => cb(err));
+      promises.push(OnfidoService.updateApplicant({user: record}));
+
+      if (!record.needVerify && record.hasVerifyInfo && record.onfidoChecked) {
+        promises.push(
+          self.update({id: record.id}, {needVerify: true})
+            .then(([updatedRecord]) => {
+              record = updatedRecord;
+            })
+        );
+      }
+
+      if (promises.length) {
+        return Promise.all(promises)
+          .then(() => cb())
+          .catch(err => cb(err));
+      }
     }
 
     return cb();
