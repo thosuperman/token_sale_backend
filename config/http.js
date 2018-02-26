@@ -59,7 +59,8 @@ module.exports.http = {
 
     helmetProtection: function (req, res, next) {
       return helmet({
-        frameguard: false
+        frameguard: false,
+        noCache: true
       })(req, res, next);
     }
 
