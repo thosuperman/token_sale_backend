@@ -3,5 +3,5 @@
  */
 
 module.exports.mvp = {
-  baseURL: 'http://localhost:1337'
+  baseURL: 'https://mvp.kora.network'
 };
