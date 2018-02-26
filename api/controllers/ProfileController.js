@@ -150,16 +150,16 @@ module.exports = {
     User.findOne({email})
       .then(user => {
         if (!user) {
-          return Promise.reject(ErrorService.new({message: 'Email is incorrect', status: 400}));
+          return Promise.resolve();
         }
 
-        return User.update({id: user.id}, {resetPasswordToken: MiscService.generateRandomString(50)});
-      })
-      .then(updatedUsers => {
-        MailerService.sendResetPwEmail(updatedUsers[0]);
+        return User.update({id: user.id}, {resetPasswordToken: MiscService.generateRandomString(50)})
+          .then(updatedUsers => {
+            MailerService.sendResetPwEmail(updatedUsers[0]);
+          });
       })
       .then(() => {
-        res.ok({ message: 'Forgot password request has been successfully sent' });
+        res.ok({ message: 'Forgot password request has been successfully sent to registered email.' });
       })
       .catch(err => res.negotiate(err));
   },
