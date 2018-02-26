@@ -20,6 +20,10 @@ module.exports = {
      * Shortcut routes disable
      */
     shortcuts: false
+  },
+
+  mvp: {
+    baseURL: 'http://localhost:1337'
   }
 
 };
