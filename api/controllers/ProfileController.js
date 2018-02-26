@@ -131,7 +131,7 @@ module.exports = {
     User.findOne({emailVerificationToken: token})
       .then(user => {
         if (!user) {
-          return Promise.reject(ErrorService.new({message: 'No user with such token found', status: 404}));
+          return Promise.reject(ErrorService.new({message: 'Email confirmation link is invalid', status: 404}));
         }
 
         return User.update({id: user.id}, {emailVerified: true, emailVerificationToken: null});
@@ -174,7 +174,7 @@ module.exports = {
     User.findOne({resetPasswordToken})
       .then(user => {
         if (!user) {
-          return Promise.reject(ErrorService.new({message: 'No user with such token found', status: 404}));
+          return Promise.reject(ErrorService.new({message: 'Forgot password request is expired. Please create a new forgot password request', status: 404}));
         }
 
         return User.update({id: user.id}, { password, resetPasswordToken: '' })
