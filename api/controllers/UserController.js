@@ -94,19 +94,19 @@ module.exports = {
           });
         }
 
-        if (!record.needVerify) {
-          return res.badRequest({
-            message: 'User didn\'t fill verify data'
-          });
-        }
+        // if (!record.needVerify) {
+        //   return res.badRequest({
+        //     message: 'User didn\'t fill verify data'
+        //   });
+        // }
 
-        if (!record.emailVerified) {
-          return res.badRequest({
-            message: 'User have not verified his email'
-          });
-        }
+        // if (!record.emailVerified) {
+        //   return res.badRequest({
+        //     message: 'User have not verified his email'
+        //   });
+        // }
 
-        return User.update({id: record.id}, {needVerify: false, verified: true});
+        return User.update({id: record.id}, {verified: true});
       })
       .then(result => res.json(result))
       .catch(err => res.negotiate(err));
