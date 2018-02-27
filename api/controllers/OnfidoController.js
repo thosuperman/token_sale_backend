@@ -7,6 +7,9 @@
 
 /* global OnfidoService User Onfido _ */
 
+const {blueprints} = require('../../config/blueprints');
+const prefix = blueprints.prefix || '';
+
 module.exports = {
 
   /**
@@ -40,7 +43,10 @@ module.exports = {
           return Onfido.update({id: record.id}, {check}).then(([record]) => record);
         })
       )
-      .then(onfido => User.update({id: req.user.id}, {onfidoChecked: true}).then(() => onfido.check))
+      .then(onfido => User.update({id: req.user.id}, {onfidoChecked: true}).then(() => ({
+        documentUrl: `${prefix}/onfido/document/` + req.user.applicantId,
+        check: onfido.check
+      })))
       .then(result => res.ok(result))
       .catch(err => res.negotiate(err));
   },
