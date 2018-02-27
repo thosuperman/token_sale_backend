@@ -274,6 +274,13 @@ module.exports = {
   ],
 
   beforeValidate: function (values, cb) {
+    // NOTE: Delete empty unique attributes for prevent saving to db
+    ['phone', 'userName', 'email', 'sendingEthereumAddress', 'receivingEthereumAddress', 'bitcoinAddress'].forEach(attr => {
+      if (attr in values && !values[attr]) {
+        delete values[attr];
+      }
+    });
+
     if (values.role === roles.user) {
       let notFilledAttr = userRequiredAttrs.find(key => !values[key]);
 

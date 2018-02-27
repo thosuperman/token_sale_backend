@@ -20,7 +20,7 @@ module.exports = {
 
   hex: value => Web3Utils.isHex(value),
 
-  bitcoinAddress: value => !!value && WAValidator.validate(value, 'bitcoin', (testnet ? 'both' : 'prod')),
+  bitcoinAddress: value => WAValidator.validate(value, 'bitcoin', (testnet ? 'both' : 'prod')),
 
   password: value => /^(?=.*\d)(?=.*[a-zA-Z]).{9,}$/.test(value),
 
