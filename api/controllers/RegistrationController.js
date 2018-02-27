@@ -89,10 +89,118 @@ module.exports = {
     });
   },
 
+  // /**
+  //  * `RegistrationController.sendMVPCode()`
+  //  */
+  // sendMVPCode: function (req, res) {
+  //   const userName = ValidationService.escape(req.param('userName'));
+  //
+  //   if (!userName) {
+  //     return res.badRequest({
+  //       message: 'Username must be set'
+  //     });
+  //   }
+  //
+  //   User.findOne({userName}).exec((err, user) => {
+  //     if (err) {
+  //       return res.negotiate(err);
+  //     }
+  //
+  //     if (user) {
+  //       return res.badRequest({message: 'User with such Kora MVP username already registered'});
+  //     }
+  //
+  //     request({
+  //       uri: sails.config.mvp.baseURL + '/registrationICO/sendCode',
+  //       qs: {userName},
+  //       method: 'POST'
+  //     }, (err, response, body) => {
+  //       if (err) {
+  //         return res.negotiate(err);
+  //       }
+  //
+  //       if (response.statusCode === 200) {
+  //         req.session.isMVPCodeSent = true;
+  //         req.session.userName = userName;
+  //       }
+  //
+  //       if (response.statusCode === 422) {
+  //         response.statusCode = 400;
+  //       }
+  //
+  //       try {
+  //         var parsedBody = JSON.parse(body);
+  //       } catch (e) {
+  //         return res.negotiate(e);
+  //       }
+  //
+  //       return res.json(response.statusCode, parsedBody);
+  //     });
+  //   });
+  // },
+
+  // /**
+  //  * `RegistrationController.verifyMVPCode()`
+  //  */
+  // verifyMVPCode: function (req, res) {
+  //   const code = ValidationService.escape(req.param('code'));
+  //
+  //   if (!req.session.isMVPCodeSent) {
+  //     return res.badRequest({
+  //       message: 'Verification code was not sent throught Kora MVP'
+  //     });
+  //   }
+  //
+  //   if (!code) {
+  //     return res.badRequest({
+  //       message: 'Verification code must be set'
+  //     });
+  //   }
+  //
+  //   request({
+  //     uri: sails.config.mvp.baseURL + '/registrationICO/verifyCode',
+  //     qs: {userName: req.session.userName, code},
+  //     method: 'POST'
+  //   }, (err, response, body) => {
+  //     if (err) {
+  //       return res.negotiate(err);
+  //     }
+  //
+  //     if (response.statusCode === 200) {
+  //       req.session.isMVPCodeVerified = true;
+  //     }
+  //
+  //     if (response.statusCode === 422) {
+  //       response.statusCode = 400;
+  //     }
+  //
+  //     try {
+  //       var parsedBody = JSON.parse(body);
+  //     } catch (e) {
+  //       return res.negotiate(e);
+  //     }
+  //
+  //     return res.json(response.statusCode, parsedBody);
+  //   });
+  // },
+
+  // /**
+  //  * `RegistrationController.disableMVPCode()`
+  //  */
+  // disableMVPCode: function (req, res) {
+  //   delete req.session.isMVPCodeSent;
+  //   delete req.session.isMVPCodeVerified;
+  //   delete req.session.userName;
+  //
+  //   return res.ok({
+  //     message: 'Verification code throught Kora MVP disabled'
+  //   });
+  // },
+
   /**
-   * `RegistrationController.sendMVPCode()`
+   * `RegistrationController.isRegisteredMVPUser()`
    */
-  sendMVPCode: function (req, res) {
+  isRegisteredMVPUser: function (req, res) {
     const userName = ValidationService.escape(req.param('userName'));
 
     if (!userName) {
@@ -111,16 +219,16 @@ module.exports = {
       }
 
       request({
-        uri: sails.config.mvp.baseURL + '/registrationICO/sendCode',
+        uri: sails.config.mvp.baseURL + '/registrationICO/isRegisteredUser',
         qs: {userName},
-        method: 'POST'
+        method: 'GET'
       }, (err, response, body) => {
         if (err) {
           return res.negotiate(err);
         }
 
         if (response.statusCode === 200) {
-          req.session.isMVPCodeSent = true;
+          req.session.isRegisteredMVPUser = true;
           req.session.userName = userName;
         }
 
@@ -136,64 +244,6 @@ module.exports = {
 
         return res.json(response.statusCode, parsedBody);
       });
-    });
-  },
-
-  /**
-   * `RegistrationController.verifyMVPCode()`
-   */
-  verifyMVPCode: function (req, res) {
-    const code = ValidationService.escape(req.param('code'));
-
-    if (!req.session.isMVPCodeSent) {
-      return res.badRequest({
-        message: 'Verification code was not sent throught Kora MVP'
-      });
-    }
-
-    if (!code) {
-      return res.badRequest({
-        message: 'Verification code must be set'
-      });
-    }
-
-    request({
-      uri: sails.config.mvp.baseURL + '/registrationICO/verifyCode',
-      qs: {userName: req.session.userName, code},
-      method: 'POST'
-    }, (err, response, body) => {
-      if (err) {
-        return res.negotiate(err);
-      }
-
-      if (response.statusCode === 200) {
-        req.session.isMVPCodeVerified = true;
-      }
-
-      if (response.statusCode === 422) {
-        response.statusCode = 400;
-      }
-
-      try {
-        var parsedBody = JSON.parse(body);
-      } catch (e) {
-        return res.negotiate(e);
-      }
-
-      return res.json(response.statusCode, parsedBody);
-    });
-  },
-
-  /**
-   * `RegistrationController.disableMVPCode()`
-   */
-  disableMVPCode: function (req, res) {
-    delete req.session.isMVPCodeSent;
-    delete req.session.isMVPCodeVerified;
-    delete req.session.userName;
-
-    return res.ok({
-      message: 'Verification code throught Kora MVP disabled'
     });
   },
 
@@ -279,24 +329,30 @@ module.exports = {
     const twoFactorSecret = req.session.twoFactorSecret;
 
     if (!allParams.inviteToken) {
-      if (!req.session.isIPChecked) {
-        return res.badRequest({
-          message: `User didn't check his IP`
-        });
-      }
-
-      if (req.session.hasUSIP) {
-        return res.badRequest({
-          message: `User can't has US IP`
-        });
-      }
-
-      if (allParams.country === 'USA') {
-        return res.badRequest({
-          message: `User can't has US country`
-        });
-      }
+      return res.badRequest({
+        message: `Invite token must be set`
+      });
     }
+
+    // if (!allParams.inviteToken) {
+    //   if (!req.session.isIPChecked) {
+    //     return res.badRequest({
+    //       message: `User didn't check his IP`
+    //     });
+    //   }
+    //
+    //   if (req.session.hasUSIP) {
+    //     return res.badRequest({
+    //       message: `User can't has US IP`
+    //     });
+    //   }
+    //
+    //   if (allParams.country === 'USA') {
+    //     return res.badRequest({
+    //       message: `User can't has US country`
+    //     });
+    //   }
+    // }
 
     if (!req.session.isCaptchaValid) {
       return res.badRequest({
@@ -310,11 +366,11 @@ module.exports = {
       });
     }
 
-    if (req.session.isMVPCodeSent && !req.session.isMVPCodeVerified) {
-      return res.badRequest({
-        message: 'Verification code throught Kora MVP was sent but not verified'
-      });
-    }
+    // if (req.session.isMVPCodeSent && !req.session.isMVPCodeVerified) {
+    //   return res.badRequest({
+    //     message: 'Verification code throught Kora MVP was sent but not verified'
+    //   });
+    // }
 
     if (!AuthenticatorService.verify(twoFactorSecret, allParams.token)) {
       return res.badRequest({
@@ -334,11 +390,12 @@ module.exports = {
     Object.assign(allParams, {
       twoFactorSecret,
       // NOTE: Change registeredFromUSIP attr set logic if invite will be not only for US citizens
-      registeredFromUSIP: !!allParams.inviteToken || req.session.hasUSIP,
+      // registeredFromUSIP: !!allParams.inviteToken || req.session.hasUSIP,
       isMVPUser: false
     });
 
-    if (req.session.isMVPCodeSent && req.session.isMVPCodeVerified) {
+    // if (req.session.isMVPCodeSent && req.session.isMVPCodeVerified) {
+    if (req.session.isRegisteredMVPUser && req.session.userName) {
       Object.assign(allParams, {
         isMVPUser: true,
         userName: req.session.userName
@@ -366,11 +423,12 @@ module.exports = {
       .then(() => User.create(allParams))
       .then(user => {
         delete req.session.isCaptchaValid;
-        delete req.session.isIPChecked;
-        delete req.session.hasUSIP;
+        // delete req.session.isIPChecked;
+        // delete req.session.hasUSIP;
         delete req.session.twoFactorSecret;
-        delete req.session.isMVPCodeSent;
-        delete req.session.isMVPCodeVerified;
+        // delete req.session.isMVPCodeSent;
+        // delete req.session.isMVPCodeVerified;
+        delete req.session.isRegisteredMVPUser;
         delete req.session.userName;
 
         req.session.userId = user.id;
