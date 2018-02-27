@@ -120,7 +120,11 @@ module.exports.routes = {
   [`POST ${prefix}/onfido/sdkToken`]: {controller: 'OnfidoController', action: 'sdkToken'},
   [`POST ${prefix}/onfido/createCheck`]: {controller: 'OnfidoController', action: 'createCheck'},
   [`GET ${prefix}/onfido/document/:id`]: {controller: 'OnfidoController', action: 'document'},
-  [`GET ${prefix}/onfido/report/:id`]: {controller: 'OnfidoController', action: 'report'}
+  [`GET ${prefix}/onfido/report/:id`]: {controller: 'OnfidoController', action: 'report'},
+
+  [`POST ${prefix}/whitelist`]: {model: 'whitelist', blueprint: 'create'},
+  [`GET ${prefix}/whitelist`]: {controller: 'WhitelistController', action: 'find', policy: 'isAdmin'},
+  [`GET ${prefix}/whitelist/:id`]: {model: 'whitelist', blueprint: 'findOne', policy: 'isAdmin'}
 
   // [`${prefix}/custom`]: {controller: 'User', action: 'find'},
   // '/routes': (req, res) => res.ok(sails.config.routes)
