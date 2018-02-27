@@ -409,6 +409,7 @@ module.exports = {
           self.update({id: record.id}, {needVerify: true})
             .then(([updatedRecord]) => {
               record = updatedRecord;
+              MailerService.sendKYCSubmissionReceivedEmail(updatedRecord);
             })
         );
       }

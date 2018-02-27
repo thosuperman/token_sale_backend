@@ -115,7 +115,7 @@ const mailer = {
   sendCreateUserEmail,
   sendInviteUSEmail,
   sendKYCSubmissionReceivedEmail,
-  sendKYCApprovedEmail,
+  sendKYCApprovedEmail
 };
 
 module.exports = mailer;

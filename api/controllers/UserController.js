@@ -106,7 +106,12 @@ module.exports = {
         //   });
         // }
 
-        return User.update({id: record.id}, {verified: true});
+        return User.update({id: record.id}, {verified: true})
+          .then(([updatedRecord]) => {
+            MailerService.sendKYCApprovedEmail(updatedRecord);
+
+            return updatedRecord;
+          });
       })
       .then(result => res.json(result))
       .catch(err => res.negotiate(err));
