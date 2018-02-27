@@ -57,9 +57,7 @@ module.exports = {
         allParams = _.pick(allParams, (value, key) => (user[key] !== value));
 
         if (_.isEmpty(allParams)) {
-          return res.badRequest({
-            message: 'Nothing was changed'
-          });
+          return res.ok(req.user);
         }
 
         let oldParams = _.pick(user, Object.keys(allParams));
