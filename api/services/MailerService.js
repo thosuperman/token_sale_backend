@@ -102,8 +102,16 @@ function sendCreateUserEmail (user, {key, qrcode}) {
 function sendInviteUSEmail ({token, email}) {
   return sendEmail({
     to: email,
-    subject: 'You have requested registration invite from Kora',
-    html: `<p>Please, follow the <a href="${sails.config.HOST}/#/register/${token}?email=${email}">link</a> to register at Kora token sale</p>`
+    subject: 'WHITELIST Invitation to Join Kora Presale',
+    html: `
+<div>
+<p>Thank you for indicating your interest in the Kora project by signing up on the WHITELIST, since we are currently oversubscribed we are sending out invitation links by batches to our whitelist. </p>
+<p>Kindly follow this link to complete your KYC process ahead of the Pre-sale.</p>
+<p><a href="${sails.config.HOST}/#/register/${token}?email=${email}">${sails.config.HOST}/#/register/${token}?email=${email}</a></p>
+<p>Regards,<br/>Kora Team</p>
+<img src="${sails.config.HOST}/logo.png" alt="logo" width="200" />
+</div>
+`
   });
 }
 
