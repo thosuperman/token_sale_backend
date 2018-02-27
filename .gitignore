@@ -142,6 +142,7 @@ www
 
 !assets
 assets/*
+!assets/logo.png
 !assets/countries
 !assets/favicon.ico
 !assets/robots.txt

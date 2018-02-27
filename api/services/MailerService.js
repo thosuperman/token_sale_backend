@@ -17,8 +17,51 @@ function sendEmail ({to, subject, html}) {
 function sendConfirmationEmail (user) {
   return sendEmail({
     to: user.email,
-    subject: 'Kora email confirmation instructions',
-    html: `<p>To confirm your email click the <a href="${sails.config.HOST}/api/profile/confirmEmail/${user.emailVerificationToken}">link</a></p>`
+    subject: 'Verify Your Email on Kora',
+    html: `
+<div>
+<p>Hi,</p>
+<p>Thanks for signing up on Kora’s Token Sale portal. </p>
+<p>In order to complete KYC and contribute to the Token Sale, please verify your email:</p>
+<p><a href="${sails.config.HOST}/api/profile/confirmEmail/${user.emailVerificationToken}">${sails.config.HOST}/api/profile/confirmEmail/${user.emailVerificationToken}</a></p>
+<p>Thanks, <br/> - The Team at Kora </p>
+<img src="${sails.config.HOST}/logo.png" alt="logo" width="200" />
+</div>
+`
+  });
+}
+
+function sendKYCSubmissionReceivedEmail (user) {
+  return sendEmail({
+    to: user.email,
+    subject: 'KYC Submission Received',
+    html: `
+<div>
+<p>Hi,</p>
+<p>Thanks for your submitting your identity for verification. As we use a third-party provider, it can take up to 3-5 business days to process and confirm your submission.</p>
+<p>You will receive a confirmation once it has been verified. We appreciate your patience.</p>
+<p>If you have any questions, please write to us at <a href="mailto:info@kora.network">info@kora.network</a></p>
+<p>Thanks, <br/> - The Team at Kora </p>
+<p>Note: You will not be able to contribute till your identity has been verified.</p>
+<img src="${sails.config.HOST}/logo.png" alt="logo" width="200" />
+</div>
+`
+  });
+}
+
+function sendKYCApprovedEmail (user) {
+  return sendEmail({
+    to: user.email,
+    subject: 'KYC Approved',
+    html: `
+<div>
+<p>Hi,</p>
+<p>You can now contribute to the Kora Token Sale! Instructions on how to contribute will be released on all our channels so please stay tuned.</p>
+<p>If you have any questions, please write to us at <a href="mailto:info@kora.network">info@kora.network</a></p>
+<p>Thanks, <br/> - The Team at Kora </p>
+<img src="${sails.config.HOST}/logo.png" alt="logo" width="200" />
+</div>
+`
   });
 }
 
@@ -70,7 +113,9 @@ const mailer = {
   sendResetPwEmail,
   sendCreateAdminEmail,
   sendCreateUserEmail,
-  sendInviteUSEmail
+  sendInviteUSEmail,
+  sendKYCSubmissionReceivedEmail,
+  sendKYCApprovedEmail,
 };
 
 module.exports = mailer;
