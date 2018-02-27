@@ -10,7 +10,7 @@
 const defaultRecord = {
   isDiscount: true,
   isPublicSale: false,
-  discountMVP: 2,
+  discountMVP: 5,
   USD_KNT: 10,
   preSale: [
     {discount: 90, amountUSD: 500000, note: 'Reserved for core team and early advisors.'},
