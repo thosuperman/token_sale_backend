@@ -102,13 +102,26 @@ function sendCreateUserEmail (user, {key, qrcode}) {
 function sendInviteUSEmail ({token, email}) {
   return sendEmail({
     to: email,
-    subject: 'WHITELIST Invitation to Join Kora Presale',
+    subject: 'Kora Pre-Sale Registration & Contribution',
     html: `
 <div>
-<p>Thank you for indicating your interest in the Kora project by signing up on the WHITELIST, since we are currently oversubscribed we are sending out invitation links by batches to our whitelist. </p>
-<p>Kindly follow this link to complete your KYC process ahead of the Pre-sale.</p>
-<p><a href="${sails.config.HOST}/#/register/${token}?email=${email}">${sails.config.HOST}/#/register/${token}?email=${email}</a></p>
-<p>Regards,<br/>Kora Team</p>
+<p>Hi there,</p>
+<p>You have been invited in this batch of people who signed up for the Whitelist, so we are excited to share the link for the Token Sale Portal with you.</p>
+<p><b>When can you register and contribute?</b></p>
+<p>Anytime from now till the sale closes!</p>
+<p><b>Do I need to rush?</b></p>
+<p>It's first come, first serve. Remember, the minimum is $5000 and there are no limits at the Pre-sale stage.</p>
+<p><b>How do I participate?</b></p>
+<p>
+<ul>
+<li>Go to <a href="${sails.config.HOST}/#/register/${token}?email=${email}">our portal</a></li>
+<li>Follow the necessary procedure to register via the above link. Please ensure you submit your ID for verification as without this process you cannot contribute.</li>
+<li>Verification does not take long, but may take 3-5 business days in some cases. Please check back on the portal frequently to know your verification status.</li>
+<li>Once you have been verified, you can now click on the ETH or BTC icon to see our address and send funds.</li>
+</ul>
+</p>
+<p>Happy Contribution!</p>
+<p>Thanks,<br/>  -  The Team at Kora</p>
 <img src="${sails.config.HOST}/logo.png" alt="logo" width="200" />
 </div>
 `
