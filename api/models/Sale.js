@@ -13,20 +13,16 @@ const defaultRecord = {
   discountMVP: 5,
   USD_KNT: 10,
   preSale: [
-    {discount: 90, amountUSD: 500000, note: 'Reserved for core team and early advisors.'},
-    {discount: 65, amountUSD: 500000, note: 'Reserved for early advisors and Contributors.'},
-    {discount: 55, amountUSD: 500000, note: 'Restricted to HNW, VC and accredited Contributors if in USA.'},
-    {discount: 50, amountUSD: 500000, note: 'Restricted to HNW, VC and accredited Contributors if in USA.'},
-    {discount: 45, amountUSD: 1000000, note: 'Restricted to HNW, VC and accredited Contributors if in USA.'},
-    {discount: 40, amountUSD: 1000000, note: 'Restricted to early members of community.'}
+    {discount: 40, amountUSD: 1000000, note: 'Restricted to early members of community.'},
+    {discount: 35, amountUSD: 1000000, note: 'Restricted to early members of community.'},
+    {discount: 30, amountUSD: 1000000, note: 'Restricted to HNW, VC and accredited Contributors if in USA.'}
   ],
   publicSale: [
-    {discount: 30, amountUSD: 2500000, note: 'Open to the public.'},
-    {discount: 25, amountUSD: 2500000, note: 'Open to the public.'},
-    {discount: 20, amountUSD: 2500000, note: 'Open to the public.'},
-    {discount: 15, amountUSD: 2500000, note: 'Open to the public.'},
-    {discount: 10, amountUSD: 5000000, note: 'Open to the public.'},
-    {discount: 0, amountUSD: 5000000, note: 'Open to the public.'}
+    {discount: 20, amountUSD: 4000000, note: 'Open to the public.'},
+    {discount: 15, amountUSD: 4000000, note: 'Open to the public.'},
+    {discount: 10, amountUSD: 4000000, note: 'Open to the public.'},
+    {discount: 5, amountUSD: 4000000, note: 'Open to the public.'},
+    {discount: 0, amountUSD: 4000000, note: 'Open to the public.'}
   ]
 };
 
