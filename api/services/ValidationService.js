@@ -16,7 +16,7 @@ const floatMin0 = value => validator.isFloat(value + '', {min: 0});
 module.exports = {
   phoneNumber: value => /^[1-9]\d{7,12}$/i.test(value),
 
-  ethereumAddress: value => Web3Utils.isAddress(value),
+  ethereumAddress: value => /^0x/.test(value) && Web3Utils.isAddress(value),
 
   hex: value => Web3Utils.isHex(value),
 
