@@ -32,6 +32,30 @@ const checkUserAttrsNames = _.values(checkUserAttrsNamesHash);
 module.exports = {
 
   /**
+   * `RegistrationController.checkInviteToken()`
+   */
+  checkInviteToken: function (req, res) {
+    const inviteToken = req.param('inviteToken');
+
+    if (!inviteToken) {
+      return res.badRequest({message: 'Invite token must be set'});
+    }
+
+    Invites.findOne({token: inviteToken})
+      .exec((err, record) => {
+        if (err) {
+          return res.negotiate(err);
+        }
+
+        if (!record) {
+          return res.notFound({message: 'Invite token not found'});
+        }
+
+        return res.ok({message: 'Invite token exists', email: record.email});
+      });
+  },
+
+  /**
    * `RegistrationController.checkUserInfo()`
    */
   checkUserInfo: function (req, res) {

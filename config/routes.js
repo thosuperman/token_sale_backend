@@ -57,6 +57,7 @@ module.exports.routes = {
   [`GET ${prefix}/countries`]: {controller: 'CountriesController', action: 'index'},
   [`GET ${prefix}/countries/collection`]: {controller: 'CountriesController', action: 'collection'},
 
+  [`GET ${prefix}/registration/checkInviteToken`]: {controller: 'RegistrationController', action: 'checkInviteToken'},
   [`${prefix}/registration/checkUserInfo`]: {controller: 'RegistrationController', action: 'checkUserInfo'},
   [`PUT ${prefix}/registration/isRegisteredMVPUser`]: {controller: 'RegistrationController', action: 'isRegisteredMVPUser'},
   // [`PUT ${prefix}/registration/sendMVPCode`]: {controller: 'RegistrationController', action: 'sendMVPCode'},
