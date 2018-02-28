@@ -20,7 +20,7 @@ module.exports = {
     ];
 
     if (req.user.verified && req.user.enabled) {
-      promises.push(fetchKoraWallets());
+      promises.push(fetchKoraWallets({user: req.user}));
     }
 
     Promise.all(promises)
@@ -62,7 +62,7 @@ function fetchExchangeRates (cb) {
   return MiscService.cbify(promise, cb);
 }
 
-function fetchKoraWallets (cb) {
+function fetchKoraWallets ({user}, cb) {
   let cache = {
     BTCWallet: {},
     ETHWallet: {}
@@ -70,14 +70,14 @@ function fetchKoraWallets (cb) {
 
   let promise = KoraService.wallets()
     .then(({BTC, ETH}) => {
-      cache.BTCWallet.address = BTC;
-      cache.ETHWallet.address = ETH;
+      cache.BTCWallet.address = user.bitcoinAddress ? BTC : null;
+      cache.ETHWallet.address = user.sendingEthereumAddress ? ETH : null;
 
       return Promise.all([BTC, ETH].map(a => AuthenticatorService.generageQRCode(a)));
     })
     .then(([BTC, ETH]) => {
-      cache.BTCWallet.qrcode = BTC;
-      cache.ETHWallet.qrcode = ETH;
+      cache.BTCWallet.qrcode = user.bitcoinAddress ? BTC : null;
+      cache.ETHWallet.qrcode = user.sendingEthereumAddress ? ETH : null;
 
       return cache;
     });
