@@ -413,6 +413,10 @@ module.exports = {
             return Promise.reject(ErrorService.new({ status: 404, message: 'Invite token not found' }));
           }
 
+          if (invite.email !== allParams.email.toLowerCase()) {
+            return Promise.reject(ErrorService.new({ status: 400, message: 'Invite email and registration email do not match' }));
+          }
+
           cache.invite = invite;
 
           return true;

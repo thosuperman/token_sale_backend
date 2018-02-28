@@ -30,6 +30,14 @@ module.exports = {
     }
   },
 
+  beforeValidate: function (values, cb) {
+    if (values.email) {
+      values.email = values.email.toLowerCase();
+    }
+
+    return cb();
+  },
+
   beforeCreate: function (values, cb) {
     values.token = MiscService.generateRandomString(50);
 

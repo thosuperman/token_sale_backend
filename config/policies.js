@@ -137,5 +137,9 @@ module.exports.policies = {
   OnfidoController: {
     '*': ['isAuthorized'],
     report: ['isAdmin']
+  },
+
+  InvitesController: {
+    '*': ['isAdmin']
   }
 };
