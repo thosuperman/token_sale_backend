@@ -30,6 +30,8 @@ module.exports = {
 
   float: value => validator.isFloat(value + ''),
 
+  email: value => validator.isEmail(value + ''),
+
   floatMin0,
 
   saleArray: value => Array.isArray(value) && value.every(s => (floatMin0(s.discount) && floatMin0(s.amountUSD)))
