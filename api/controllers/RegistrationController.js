@@ -184,18 +184,19 @@ module.exports = {
   //   });
   // },
 
-  // /**
-  //  * `RegistrationController.disableMVPCode()`
-  //  */
-  // disableMVPCode: function (req, res) {
-  //   delete req.session.isMVPCodeSent;
-  //   delete req.session.isMVPCodeVerified;
-  //   delete req.session.userName;
-  //
-  //   return res.ok({
-  //     message: 'Verification code throught Kora MVP disabled'
-  //   });
-  // },
+  /**
+   * `RegistrationController.disableMVPCheck()`
+   */
+  disableMVPCheck: function (req, res) {
+    // delete req.session.isMVPCodeSent;
+    // delete req.session.isMVPCodeVerified;
+    delete req.session.userName;
+    delete req.session.isRegisteredUser;
+
+    return res.ok({
+      message: 'Check on registration in Kora MVP disabled'
+    });
+  },
 
   /**
    * `RegistrationController.isRegisteredMVPUser()`

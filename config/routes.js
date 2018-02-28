@@ -61,7 +61,7 @@ module.exports.routes = {
   [`PUT ${prefix}/registration/isRegisteredMVPUser`]: {controller: 'RegistrationController', action: 'isRegisteredMVPUser'},
   // [`PUT ${prefix}/registration/sendMVPCode`]: {controller: 'RegistrationController', action: 'sendMVPCode'},
   // [`PUT ${prefix}/registration/verifyMVPCode`]: {controller: 'RegistrationController', action: 'verifyMVPCode'},
-  // [`PUT ${prefix}/registration/disableMVPCode`]: {controller: 'RegistrationController', action: 'disableMVPCode'},
+  [`PUT ${prefix}/registration/disableMVPCheck`]: {controller: 'RegistrationController', action: 'disableMVPCheck'},
   [`PUT ${prefix}/registration/validateCaptcha`]: {controller: 'RegistrationController', action: 'validateCaptcha'},
   [`PUT ${prefix}/registration/checkIp`]: {controller: 'RegistrationController', action: 'checkIp'},
   [`PUT ${prefix}/registration/generateQRCode`]: {controller: 'RegistrationController', action: 'generateQRCode'},
