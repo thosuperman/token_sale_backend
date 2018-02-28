@@ -71,5 +71,9 @@ module.exports = {
 
   requestlogger: {
     inProduction: true
+  },
+
+  blockchains: {
+    testnet: false
   }
 };
