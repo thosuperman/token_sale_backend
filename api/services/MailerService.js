@@ -20,12 +20,12 @@ function sendConfirmationEmail (user) {
     subject: 'Verify Your Email on Kora',
     html: `
 <div>
+<img src="${sails.config.HOST}/logo.png" alt="logo" width="100" />
 <p>Hi,</p>
 <p>Thanks for signing up on Kora’s Token Sale portal. </p>
 <p>In order to complete KYC and contribute to the Token Sale, please verify your email:</p>
 <p><a href="${sails.config.HOST}/api/profile/confirmEmail/${user.emailVerificationToken}">${sails.config.HOST}/api/profile/confirmEmail/${user.emailVerificationToken}</a></p>
 <p>Thanks, <br/> - The Team at Kora </p>
-<img src="${sails.config.HOST}/logo.png" alt="logo" width="200" />
 </div>
 `
   });
@@ -37,13 +37,13 @@ function sendKYCSubmissionReceivedEmail (user) {
     subject: 'KYC Submission Received',
     html: `
 <div>
+<img src="${sails.config.HOST}/logo.png" alt="logo" width="100" />
 <p>Hi,</p>
 <p>Thanks for your submitting your identity for verification. As we use a third-party provider, it can take up to 3-5 business days to process and confirm your submission.</p>
 <p>You will receive a confirmation once it has been verified. We appreciate your patience.</p>
 <p>If you have any questions, please write to us at <a href="mailto:info@kora.network">info@kora.network</a></p>
 <p>Thanks, <br/> - The Team at Kora </p>
 <p>Note: You will not be able to contribute till your identity has been verified.</p>
-<img src="${sails.config.HOST}/logo.png" alt="logo" width="200" />
 </div>
 `
   });
@@ -55,11 +55,11 @@ function sendKYCApprovedEmail (user) {
     subject: 'KYC Approved',
     html: `
 <div>
+<img src="${sails.config.HOST}/logo.png" alt="logo" width="100" />
 <p>Hi,</p>
 <p>You can now contribute to the Kora Token Sale! Instructions on how to contribute will be released on all our channels so please stay tuned.</p>
 <p>If you have any questions, please write to us at <a href="mailto:info@kora.network">info@kora.network</a></p>
 <p>Thanks, <br/> - The Team at Kora </p>
-<img src="${sails.config.HOST}/logo.png" alt="logo" width="200" />
 </div>
 `
   });
@@ -105,6 +105,7 @@ function sendInviteUSEmail ({token, email}) {
     subject: 'Kora Pre-Sale Registration & Contribution',
     html: `
 <div>
+<img src="${sails.config.HOST}/logo.png" alt="logo" width="100" />
 <p>Hi there,</p>
 <p>You have been invited in this batch of people who signed up for the Whitelist, so we are excited to share the link for the Token Sale Portal with you.</p>
 <p><b>When can you register and contribute?</b></p>
@@ -122,7 +123,6 @@ function sendInviteUSEmail ({token, email}) {
 </p>
 <p>Happy Contribution!</p>
 <p>Thanks,<br/>  -  The Team at Kora</p>
-<img src="${sails.config.HOST}/logo.png" alt="logo" width="200" />
 </div>
 `
   });
