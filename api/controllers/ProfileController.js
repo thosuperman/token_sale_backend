@@ -174,7 +174,7 @@ module.exports = {
     const resetPasswordToken = req.param('token');
     const password = req.param('new_password');
 
-    // if (!password) res.badRequest({ message: 'No password provided' });
+    if (!password) res.badRequest({ message: 'No password provided' });
 
     User.findOne({resetPasswordToken})
       .then(user => {
