@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global sails _ User CountriesService ErrorService MiscService MailerService AddressHistory AuthenticatorService Sessions */
+/* global sails _ User CountriesService ErrorService MiscService MailerService AddressHistory AuthenticatorService Sessions ValidationService */
 
 const updateAttrs = ['email', 'sendingEthereumAddress', 'bitcoinAddress'];
 
@@ -144,6 +144,10 @@ module.exports = {
   // POST /api/profile/forgotPassword
   forgotPassword: function (req, res) {
     const email = req.param('email');
+
+    if (!ValidationService.email(email)) {
+      return res.badRequest({message: 'Provide valid email'});
+    }
 
     User.findOne({email})
       .then(user => {
