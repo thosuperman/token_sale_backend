@@ -50,7 +50,10 @@ module.exports = {
         // }
 
         allParams = Object.keys(allParams).reduce((result, el) => {
-          result[el] = (el === 'bitcoinAddress') ? allParams[el] : allParams[el].toLowerCase();
+          if (allParams[el]) {
+            result[el] = (el === 'bitcoinAddress') ? allParams[el] : allParams[el].toLowerCase();
+          }
+
           return result;
         }, {});
 
