@@ -92,9 +92,17 @@ module.exports = {
           return res.notFound();
         }
 
-        res.set('Content-Type', 'text/html; charset=utf-8');
+        // res.set('Content-Type', 'text/html; charset=utf-8');
 
-        res.ok(_.unescape(record.escapedReport));
+        // res.ok(_.unescape(record.escapedReport));
+
+        OnfidoService.request({
+          uri: record.check.download_uri
+        })
+          .on('error', function (err) {
+            return res.negotiate(err);
+          })
+          .pipe(res);
       });
   }
 };
