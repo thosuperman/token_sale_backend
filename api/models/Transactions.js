@@ -220,7 +220,8 @@ module.exports = {
               type: sale.isPublicSale ? TATypes.publicSale : TATypes.preSale,
               USD,
               KNT,
-              transaction: id
+              transaction: id,
+              sale: sale.id
             })
           ];
 
@@ -230,7 +231,8 @@ module.exports = {
                 type: TATypes.allocateKNT,
                 USD,
                 KNT,
-                transaction: id
+                transaction: id,
+                sale: sale.id
               })
             );
           }

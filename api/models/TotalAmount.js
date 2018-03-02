@@ -24,7 +24,9 @@ module.exports = {
 
     KNT: { type: 'float', required: true },
 
-    transaction: { model: 'transactions', required: true }
+    transaction: { model: 'transactions', required: true },
+
+    sale: { model: 'sale' }
   },
 
   indexes: [
@@ -38,13 +40,14 @@ module.exports = {
     return MiscService.cbify(promise, cb);
   },
 
-  addNew: function ({type, USD, KNT, transaction}, cb) {
+  addNew: function ({type, USD, KNT, transaction, sale}, cb) {
     let promise = this.findLast({type})
       .then(lastRecord => this.create({
         type,
         USD: +(lastRecord.USD + USD).toFixed(10),
         KNT: +(lastRecord.KNT + KNT).toFixed(10),
-        transaction
+        transaction,
+        sale
       }));
 
     return MiscService.cbify(promise, cb);
