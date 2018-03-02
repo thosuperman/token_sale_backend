@@ -32,6 +32,7 @@ module.exports = {
             currentAmountKNT: +(TAPreSale.KNT + TAPublicSale.KNT).toFixed(10),
             expectedAmountUSD: sale.totalAmountUSD,
             expectedAmountKNT: sale.totalAmountKNT,
+            adminAmountUSD: TAAllocateKNT.USD,
             adminAmountKNT: TAAllocateKNT.KNT
           },
           sale: Sale.mapRecord(sale, sale.isPublicSale ? TAPublicSale.USD : TAPreSale.USD)

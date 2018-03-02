@@ -5,7 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
-/* global Transactions User */
+/* global Transactions User KoraService */
 
 module.exports = {
   find: function (req, res) {
@@ -22,9 +22,9 @@ module.exports = {
       Transactions.find({ where, sort }).paginate({page, limit}),
       Transactions.count(where)
     ])
-    .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
-    .then(result => res.json(result))
-    .catch(err => res.negotiate(err));
+      .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
+      .then(result => res.json(result))
+      .catch(err => res.negotiate(err));
   },
 
   findAll: function (req, res) {
@@ -64,9 +64,9 @@ module.exports = {
         .paginate({page, limit}),
       Transactions.count(where)
     ])
-    .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
-    .then(result => res.json(result))
-    .catch(err => res.negotiate(err));
+      .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
+      .then(result => res.json(result))
+      .catch(err => res.negotiate(err));
   },
 
   filters: function (req, res) {
@@ -82,31 +82,44 @@ module.exports = {
 
     KNT = parseFloat(KNT);
 
-    if (isNaN(KNT) && KNT <= 0) {
+    if (isNaN(KNT) || KNT <= 0) {
       return res.badRequest({message: 'KNT value is invalid'});
     }
 
     User.findOne({id})
-     .exec((err, user) => {
-       if (err) {
-         return res.negotiate(err);
-       }
+      .exec((err, user) => {
+        if (err) {
+          return res.negotiate(err);
+        }
 
-       if (!user) {
-         return res.notFound({message: 'User not found'});
-       }
+        if (!user) {
+          return res.notFound({message: 'User not found'});
+        }
 
-       return Transactions.create({
-         type: Transactions.constants.types.allocateKNT,
-         status: Transactions.constants.statuses.confirmed,
-         date: new Date(),
-         user: id,
-         KNT,
-         admin: req.user.id
-       })
-       .then(result => res.json(result))
-       .catch(err => res.negotiate(err));
-     });
+        if (!user.enabled) {
+          return res.badRequest({message: 'User must be not blocked'});
+        }
+
+        if (!user.verified) {
+          return res.badRequest({message: 'User must be verified'});
+        }
+
+        return KoraService.calcUSD({
+          valueKNT: KNT,
+          needDiscountMVP: user.isMVPUser
+        })
+          .then(USD => Transactions.create({
+            type: Transactions.constants.types.allocateKNT,
+            status: Transactions.constants.statuses.confirmed,
+            date: new Date(),
+            user: id,
+            USD,
+            KNT,
+            admin: req.user.id
+          }))
+          .then(result => res.json(result))
+          .catch(err => res.negotiate(err));
+      });
   },
 
   findAllocate: function (req, res) {
@@ -127,8 +140,8 @@ module.exports = {
       Transactions.find({ where, sort }).populate('admin').paginate({page, limit}),
       Transactions.count(where)
     ])
-    .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
-    .then(result => res.json(result))
-    .catch(err => res.negotiate(err));
+      .then(([data, count]) => ({data, count, pages: Math.ceil(count / limit)}))
+      .then(result => res.json(result))
+      .catch(err => res.negotiate(err));
   }
 };

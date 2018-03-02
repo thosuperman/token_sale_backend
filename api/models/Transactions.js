@@ -90,10 +90,6 @@ module.exports = {
   ],
 
   beforeValidate: function (values, cb) {
-    if (values.type === types.allocateKNT) {
-      values.USD = 0;
-    }
-
     if (values.raw) {
       if (typeof values.raw.confirmations !== 'undefined') {
         values.confirmations = parseInt(values.raw.confirmations, 10);
@@ -134,27 +130,27 @@ module.exports = {
             },
             sort: 'date DESC'
           })
-          .then(record => {
-            if (!record) {
-              return ExchangeRates.findOne({
-                where: {
-                  type: exchangeRateType,
-                  date: {'>': date}
-                },
-                sort: 'date ASC'
-              });
-            }
+            .then(record => {
+              if (!record) {
+                return ExchangeRates.findOne({
+                  where: {
+                    type: exchangeRateType,
+                    date: {'>': date}
+                  },
+                  sort: 'date ASC'
+                });
+              }
 
-            return record;
-          })
-          .then((exchangeRate) => {
-            if (exchangeRate) {
-              values.USD = +(values.value * exchangeRate.USD).toFixed(10);
-              values.exchangeRate = exchangeRate.id;
+              return record;
+            })
+            .then((exchangeRate) => {
+              if (exchangeRate) {
+                values.USD = +(values.value * exchangeRate.USD).toFixed(10);
+                values.exchangeRate = exchangeRate.id;
 
-              return exchangeRate;
-            }
-          })
+                return exchangeRate;
+              }
+            })
         );
       }
 
@@ -218,12 +214,29 @@ module.exports = {
       const TATypes = TotalAmount.constants.types;
 
       return Sale.findLast()
-        .then(sale => TotalAmount.addNew({
-          type: (type === types.allocateKNT) ? TATypes.allocateKNT : sale.isPublicSale ? TATypes.publicSale : TATypes.preSale,
-          USD,
-          KNT,
-          transaction: id
-        }))
+        .then(sale => {
+          let promises = [
+            TotalAmount.addNew({
+              type: sale.isPublicSale ? TATypes.publicSale : TATypes.preSale,
+              USD,
+              KNT,
+              transaction: id
+            })
+          ];
+
+          if (type === types.allocateKNT) {
+            promises.push(
+              TotalAmount.addNew({
+                type: TATypes.allocateKNT,
+                USD,
+                KNT,
+                transaction: id
+              })
+            );
+          }
+
+          return Promise.all(promises);
+        })
         .then(() => cb())
         .catch(err => cb(err));
     }

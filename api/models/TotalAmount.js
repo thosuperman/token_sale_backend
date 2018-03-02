@@ -20,7 +20,7 @@ module.exports = {
   attributes: {
     type: { type: 'string', in: typesList, required: true },
 
-    USD: { type: 'float', required: true }, // Not need for adminKNT
+    USD: { type: 'float', required: true },
 
     KNT: { type: 'float', required: true },
 
