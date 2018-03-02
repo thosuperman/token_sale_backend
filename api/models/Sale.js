@@ -132,7 +132,7 @@ function mapSale (record, sale, USD) {
     s.USD_KNT_MVP = +(s.USD_KNT * 100 / (100 - record.discountMVP)).toFixed(10);
     s.KNT_USD_MVP = +(1 / s.USD_KNT_MVP).toFixed(10);
 
-    s.disabled = (USD == null) || (s.fullAmountUSD - USD <= s.amountUSD);
+    s.disabled = (USD == null) || (USD >= s.fullAmountUSD);
 
     return s;
   });
